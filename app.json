@@ -1,5 +1,5 @@
 {
-  "name": "AloneX Robot",
+  "name": "Alone X Robot",
   "description": "Telegram Group Management and Music Bot",
   "repository": "https://github.com/TeamAloneOp/EikoRobot",
   "logo": "https://litter.catbox.moe/sfi0h9.jpg",
@@ -15,17 +15,17 @@
     "TOKEN": {
       "description": "Your bot token from @BotFather",
       "required": true,
-      "value": "6808170222:AAEN4RaxQGJMVFEcQwyaskvQ-qXdxY2p34A"
+      "value": "YOUR BOT TOKEN"
     },
     "DB_URL": {
       "description": "Your MongoDB URI for database",
       "required": true,
-      "value": "mongodb+srv://bhulud30_db_user:bhulud30_db_user@cluster0.yzspcrl.mongodb.net/?appName=Cluster0"
+      "value": "YOUR MONGO DB"
     },
     "DB_URL2": {
       "description": "Your second MongoDB URI for database (optional but recommended)",
       "required": false,
-      "value": "mongodb+srv://bhulud30_db_user:bhulud30_db_user@cluster0.yzspcrl.mongodb.net/?appName=Cluster0"
+      "value": "YOUR MONGODB DB"
     },
     "API_ID": {
       "description": "Your Telegram API_ID from my.telegram.org",
@@ -53,7 +53,8 @@
     },
     "WEB_URL": {
       "description": "Your Heroku app URL (Optional, for keep alive)",
-      "required": false
+      "required": false,
+      "value": "https://t.me/ForRealAlone"
     },
     "SUPPORT_CHAT": {
       "description": "Your support group username (without @)",
