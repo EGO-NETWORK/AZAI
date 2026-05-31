@@ -20,15 +20,10 @@ img2pdf
 speedtest-cli
 TgCrypto
 yt-dlp
-torch
-transformers
-opencv-python
+opencv-python-headless
 lottie
 phlogo
 moviepy
 g4f
-asyncpg
-pydub
-pandas
 python-dotenv
 PyGithub

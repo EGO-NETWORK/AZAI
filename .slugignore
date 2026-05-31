@@ -1,0 +1,13 @@
+.git
+README.md
+sample.env
+AloneX/helpers/images/
+*.jpg
+*.png
+*.mp4
+*.webm
+logs.txt
+logs.tx
+restart_data.txt
+.gitignore
+app.json
