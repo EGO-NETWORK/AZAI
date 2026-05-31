@@ -102,7 +102,7 @@ Built with Python, Pyrogram, and Py-TgCalls, it’s optimized for reliability an
    ```
 5. **Clone the Repository**
    ```bash
-   git clone https://github.com/TheHamkerAlone/HamkerXRobot && cd HamkerXRobot
+   git clone https://github.com/TheHamkerAlone/EikoRobot && cd EikoRobot
    ```
 6. **Installing tmux**
    ```bash
