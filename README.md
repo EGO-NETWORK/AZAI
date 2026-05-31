@@ -33,7 +33,11 @@
 
 **𝘿𝙀𝙈𝙊 𝙏𝙀𝙎𝙏 𝘽𝙊𝙏 ➣ [Eɪᴋᴏ Tsᴜᴋɪᴍɪ](https://t.me/oxnybot)**
 
-
+<p align="center">
+    <a href="https://heroku.com/deploy?template=https://github.com/TheHamkerAlone/HamkerXRobot">
+        <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy">
+    </a>
+</p>
 
 <img src="https://readme-typing-svg.herokuapp.com?color=FF0000&width=420&lines=⚠️𝗙𝗢𝗥𝗞+𝗔𝗟𝗢𝗡𝗘+𝗥𝗢𝗕𝗢𝗧+𝗥𝗘𝗣𝗢+𝗕𝗘𝗙𝗢𝗥𝗘+𝗗𝗘𝗣𝗟𝗢𝗬⚠️">
 
@@ -53,7 +57,14 @@ Built with Python, Pyrogram, and Py-TgCalls, it’s optimized for reliability an
 - ❤️ Built with Python
 <hr>
 
-<h2>☁️ Manual Deployment</h2>
+<h2>☁️ Deployment</h2>
+
+<h3>🚀 Heroku Deployment</h3>
+1. Fork the repository.
+2. Click the **Deploy to Heroku** button above.
+3. Fill in the required environment variables.
+4. Deploy the app.
+5. Once deployed, turn on the `web` dyno in the Resources tab. (The `web` dyno is required for the bot's internal web server, which handles streaming and keep-alive features).
 
 <h2 align="center">
 
