@@ -33,12 +33,6 @@
 
 **𝘿𝙀𝙈𝙊 𝙏𝙀𝙎𝙏 𝘽𝙊𝙏 ➣ [Eɪᴋᴏ Tsᴜᴋɪᴍɪ](https://t.me/oxnybot)**
 
-<p align="center">
-    <a href="https://heroku.com/deploy?template=https://github.com/TeamAloneOp/EikoRobot">
-        <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy">
-    </a>
-</p>
-
 <img src="https://readme-typing-svg.herokuapp.com?color=FF0000&width=420&lines=⚠️𝗙𝗢𝗥𝗞+𝗔𝗟𝗢𝗡𝗘+𝗥𝗢𝗕𝗢𝗧+𝗥𝗘𝗣𝗢+𝗕𝗘𝗙𝗢𝗥𝗘+𝗗𝗘𝗣𝗟𝗢𝗬⚠️">
 
 
@@ -65,6 +59,18 @@ Built with Python, Pyrogram, and Py-TgCalls, it’s optimized for reliability an
 3. Fill in the required environment variables.
 4. Deploy the app.
 5. Once deployed, turn on the `web` dyno in the Resources tab. (The `web` dyno is required for the bot's internal web server, which handles streaming and keep-alive features).
+
+<hr>
+
+<h2>☁️ Manual Deployment</h2>
+
+<h3 align="center">
+    ─「 ᴅᴇᴩʟᴏʏ ᴏɴ ʜᴇʀᴏᴋᴜ 」─
+
+<h3> 𝗛𝗘𝗥𝗢𝗞𝗨 𝗗𝗘𝗣𝗟𝗢𝗬𝗠𝗘𝗡𝗧 𝗕𝗨𝗧𝗧𝗢𝗡 </h3>
+</h3>
+
+[![Deploy To Heroku](https://graph.org/file/826b0a2fc82db8328a113.png)](https://dashboard.heroku.com/new?template=https://github.com/TeamAloneOp/EikoRobot)
 
 <h2 align="center">
 
