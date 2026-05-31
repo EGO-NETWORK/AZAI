@@ -2,7 +2,7 @@
   "name": "Alone X Robot",
   "description": "Telegram Group Management and Music Bot",
   "repository": "https://github.com/TeamAloneOp/EikoRobot",
-  "logo": "https://litter.catbox.moe/sfi0h9.jpg",
+  "logo": "https://files.catbox.moe/1gxuh7.jpg",
   "keywords": [
     "telegram",
     "bot",
@@ -47,15 +47,6 @@
       "required": true,
       "value": "-1001603822916"
     },
-    "USER_STRING": {
-      "description": "Pyrogram String Session (Optional, for user client features)",
-      "required": false
-    },
-    "WEB_URL": {
-      "description": "Your Heroku app URL (Optional, for keep alive)",
-      "required": false,
-      "value": "https://t.me/ForRealAlone"
-    },
     "SUPPORT_CHAT": {
       "description": "Your support group username (without @)",
       "required": false,
@@ -76,11 +67,6 @@
       "required": false,
       "value": "8458947967"
     },
-    "GIST_TOKEN": {
-      "description": "GitHub Gist Token (Optional)",
-      "required": false
-    }
-  },
   "buildpacks": [
     {
       "url": "heroku-community/apt"
