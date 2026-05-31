@@ -1,7 +1,7 @@
 {
   "name": "AloneX Robot",
   "description": "Telegram Group Management and Music Bot",
-  "repository": "https://github.com/TheHamkerAlone/HamkerXRobot",
+  "repository": "https://github.com/TeamAloneOp/EikoRobot",
   "logo": "https://litter.catbox.moe/sfi0h9.jpg",
   "keywords": [
     "telegram",
@@ -14,31 +14,38 @@
   "env": {
     "TOKEN": {
       "description": "Your bot token from @BotFather",
-      "required": true
+      "required": true,
+      "value": "6808170222:AAEN4RaxQGJMVFEcQwyaskvQ-qXdxY2p34A"
     },
     "DB_URL": {
       "description": "Your MongoDB URI for database",
-      "required": true
+      "required": true,
+      "value": "mongodb+srv://bhulud30_db_user:bhulud30_db_user@cluster0.yzspcrl.mongodb.net/?appName=Cluster0"
     },
     "DB_URL2": {
       "description": "Your second MongoDB URI for database (optional but recommended)",
-      "required": false
+      "required": false,
+      "value": "mongodb+srv://bhulud30_db_user:bhulud30_db_user@cluster0.yzspcrl.mongodb.net/?appName=Cluster0"
     },
     "API_ID": {
       "description": "Your Telegram API_ID from my.telegram.org",
-      "required": true
+      "required": true,
+      "value": "17596251"
     },
     "API_HASH": {
       "description": "Your Telegram API_HASH from my.telegram.org",
-      "required": true
+      "required": true,
+      "value": "e58343b4c0193e293e391daf97603fcd"
     },
     "ALONE_OWNER_ID": {
       "description": "Your Telegram User ID",
-      "required": true
+      "required": true,
+      "value": "8458947967"
     },
     "LOG_GROUP_ID": {
       "description": "Group ID for logs (should start with -100)",
-      "required": true
+      "required": true,
+      "value": "-1001603822916"
     },
     "USER_STRING": {
       "description": "Pyrogram String Session (Optional, for user client features)",
@@ -60,11 +67,13 @@
     },
     "OWNER_ID": {
       "description": "Owner ID (same as ALONE_OWNER_ID)",
-      "required": false
+      "required": false,
+      "value": "8458947967"
     },
     "SUDO_USERS": {
       "description": "Sudo users ID separated by space",
-      "required": false
+      "required": false,
+      "value": "8458947967"
     },
     "GIST_TOKEN": {
       "description": "GitHub Gist Token (Optional)",
