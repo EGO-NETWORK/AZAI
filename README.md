@@ -34,7 +34,7 @@
 **𝘿𝙀𝙈𝙊 𝙏𝙀𝙎𝙏 𝘽𝙊𝙏 ➣ [Eɪᴋᴏ Tsᴜᴋɪᴍɪ](https://t.me/oxnybot)**
 
 <p align="center">
-    <a href="https://heroku.com/deploy?template=https://github.com/TheHamkerAlone/HamkerXRobot">
+    <a href="https://heroku.com/deploy?template=https://github.com/TeamAloneOp/EikoRobot">
         <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy">
     </a>
 </p>
