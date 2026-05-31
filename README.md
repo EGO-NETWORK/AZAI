@@ -26,7 +26,7 @@
 
 
 <p align="center">
-  <img src="https://litter.catbox.moe/sfi0h9.jpg">
+  <img src="https://files.catbox.moe/1gxuh7.jpg">
 </p>
 
 
