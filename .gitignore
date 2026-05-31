@@ -1,0 +1,26 @@
+# Ignore log files
+log.txt
+logs.txt
+config.py
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+
+# Ignore virtual environment directories
+venv/
+env/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore other common files
+*.log
+*.tmp
+*.bak
+
+# Ignore Pyrogram session files
+*.session
+
+#ignore download files
+downloads
