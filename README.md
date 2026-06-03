@@ -1,147 +1,270 @@
+<h1 align="center">𓆩⚚ 𝐀𝐙𝐀𝐈 ⚚𓆪</h1>
 
-<h2 align="center">
-    𖢵 ᴀʅσηҽ χ яσвσт 𖢵
-
-★ 𝙾𝙽𝙻𝚈 + 𝚅𝙿𝚂 ★
-</h2>
-
-[![Typing SVG](https://readme-typing-svg.herokuapp.com/?lines=ㅤ+𝚆𝙴𝙻𝙲𝙾𝙼𝙴+𝚃𝙾+𝙰𝙻𝙾𝙽𝙴+𝚁𝙾𝙱𝙾𝚃+𝚁𝙴𝙿𝙾+;ㅤ+𝚃𝙷𝙸𝚂+𝙸𝚂+𝙰+𝙰𝙳𝚅𝙰𝙽𝙲𝙴+𝙼𝚄𝚂𝙸𝙲+𝙱𝙾𝚃;𝙿𝙾𝚆𝙴𝚁𝙴𝙳+𝙱𝚈+☞+𝗧𝗛𝗘+𝗧𝗘𝗔𝗠+𝗔𝗟𝗢𝗡𝗘)](https://github.com/TheHamkerAlone)
-
-
-<b>𝗧𝗲𝗹𝗲𝗴𝗿𝗮𝗺 𝗚𝗿𝗼𝘂𝗽 𝗠𝗮𝗻𝗮𝗴𝗲𝗺𝗲𝗻𝘁 𝗣𝗼𝘄𝗲𝗿 𝗙𝘂𝗹𝗹 𝗕𝗼𝘁</b><br>
-𝗣𝗼𝘄𝗲𝗿-𝗙𝘂𝗹𝗹-𝗔𝗻𝘁𝗶-𝗣𝗿𝗼𝗻-𝗦𝗲𝗰𝗿𝘂𝘁𝘆, 𝗠𝗼𝘀𝘁-𝗣𝗼𝘄𝗲𝗿-𝗙𝘂𝗹𝗹-𝗚𝗿𝗼𝘂𝗽-𝗦𝗲𝗰𝗿𝘂𝘁𝘆-𝗕𝗼𝘁.
-
-<a href="https://github.com/TheHamkerAlone/HamkerXRobot/stargazers">
-    <img src="https://img.shields.io/github/stars/TheHamkerAlone/HamkerXRobot?color=blueviolet&logo=github&logoColor=black&style=for-the-badge" alt="Stars"/>
-</a>
-<a href="https://github.com/TheHamkerAlone/HamkerXRobot/network/members">
-    <img src="https://img.shields.io/github/forks/TheHamkerAlone/HamkerXRobot?color=blueviolet&logo=github&logoColor=black&style=for-the-badge" alt="Forks"/>
-</a>
-<a href="https://github.com/TheHamkerAlone/HamkerXRobot/blob/master/LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License"/>
-</a>
-<a href="https://www.python.org/">
-    <img src="https://img.shields.io/badge/Written%20in-Python-blue?style=for-the-badge&logo=python" alt="Python"/>
-</a>
-
+<h3 align="center">𝐄ɢᴏ 𝐍ᴇᴛᴡᴏʀᴋ • 𝐄𝐒𝐓. 2026</h3>
 
 <p align="center">
-  <img src="https://files.catbox.moe/1gxuh7.jpg">
+  <b>𝐀ᴅᴠᴀɴᴄᴇᴅ 𝐓ᴇʟᴇɢʀᴀᴍ 𝐂ᴏᴍᴍᴜɴɪᴛʏ 𝐒ʏꜱᴛᴇᴍ</b><br>
+  𝐁ᴜɪʟᴛ 𝐅ᴏʀ 𝐕ᴇʀɪꜰɪᴄᴀᴛɪᴏɴ, 𝐏ʀᴏᴛᴇᴄᴛɪᴏɴ, 𝐀𝐈 𝐂ʜᴀᴛ, 𝐄ᴄᴏɴᴏᴍʏ, 𝐐ᴜɪᴢᴢᴇꜱ, 𝐆ᴀᴍᴇꜱ, 𝐒ʜᴏᴘ, 𝐕ᴀᴜʟᴛ, 𝐁ɪʀᴛʜᴅᴀʏꜱ, 𝐅ᴇꜱᴛɪᴠᴀʟꜱ, 𝐄ᴠᴇɴᴛꜱ, 𝐃ᴏɴᴀᴛɪᴏɴꜱ, 𝐀ɴᴅ 𝐂ʟᴇᴀɴ 𝐆ʀᴏᴜᴘ 𝐂ᴏɴᴛʀᴏʟ.
 </p>
 
-
-
-**𝘿𝙀𝙈𝙊 𝙏𝙀𝙎𝙏 𝘽𝙊𝙏 ➣ [Eɪᴋᴏ Tsᴜᴋɪᴍɪ](https://t.me/oxnybot)**
-
-<img src="https://readme-typing-svg.herokuapp.com?color=FF0000&width=420&lines=⚠️𝗙𝗢𝗥𝗞+𝗔𝗟𝗢𝗡𝗘+𝗥𝗢𝗕𝗢𝗧+𝗥𝗘𝗣𝗢+𝗕𝗘𝗙𝗢𝗥𝗘+𝗗𝗘𝗣𝗟𝗢𝗬⚠️">
-
-
-HamkerXRobotMusic lets you stream high-quality and low-latency audio and video playback into telegram group video chats.<br>
-Built with Python, Pyrogram, and Py-TgCalls, it’s optimized for reliability and easy deployment on Heroku, VPS, or Docker.
-</div>
-
-<hr>
-
-<h2>🔥 Features</h2>
-
-- 🎧 Stream low-latency audio in real time to <b>Telegram group video chats</b>
-- 🌐 Supports multiple platforms like <b>YouTube, Spotify, Apple Music, SoundCloud</b>
-- ⚡ Advanced queue management with auto-play
-- ⚙️ Easy deployment — works on Local, VPS, or Heroku
-- ❤️ Built with Python
-<hr>
-
-<h2>☁️ Deployment</h2>
-
-<h3>🚀 Heroku Deployment</h3>
-1. Fork the repository.
-2. Click the **Deploy to Heroku** button above.
-3. Fill in the required environment variables.
-4. Deploy the app.
-5. Once deployed, turn on the `web` dyno in the Resources tab. (The `web` dyno is required for the bot's internal web server, which handles streaming and keep-alive features).
-
-<hr>
-
-<h2>☁️ Manual Deployment</h2>
-
-<h3 align="center">
-    ─「 ᴅᴇᴩʟᴏʏ ᴏɴ ʜᴇʀᴏᴋᴜ 」─
-
-<h3> 𝗛𝗘𝗥𝗢𝗞𝗨 𝗗𝗘𝗣𝗟𝗢𝗬𝗠𝗘𝗡𝗧 𝗕𝗨𝗧𝗧𝗢𝗡 </h3>
-</h3>
-
-[![Deploy To Heroku](https://graph.org/file/826b0a2fc82db8328a113.png)](https://dashboard.heroku.com/new?template=https://github.com/TeamAloneOp/EikoRobot)
-
-<h2 align="center">
-
-🔴「 𝗜𝗙 𝗔𝗡𝗬 𝗘𝗥𝗥𝗢𝗥 𝗧𝗛𝗘𝗡 𝗦𝗘𝗡𝗗 𝗦𝗦 𝗧𝗢 𝗗𝗠 」🔴
-[![ALONE](https://te.legra.ph/file/fa42213a5129d4a26dd3d.jpg)](https://t.me/XoDrk)
+<p align="center">
+  <b>𝐎ꜰꜰɪᴄɪᴀʟ 𝐈ᴍᴀɢᴇ:</b> 𝐏ᴇɴᴅɪɴɢ 𝐎ᴡɴᴇʀ 𝐀ᴘᴘʀᴏᴠᴀʟ
 </p>
-<h3 align="center">
-    ─「 ᴅᴇᴩʟᴏʏ ᴏɴ ʟᴏᴄᴀʟ ʜᴏsᴛ/ ᴠᴘs 」─
-</h3>
-
-### 🔧 Quick Setup
-
-1. **Upgrade & Update:**
-   ```bash
-   sudo apt-get update && sudo apt-get upgrade -y
-   ```
-
-2. **Install Required Packages:**
-   ```bash
-   sudo apt-get install python3-pip ffmpeg -y
-   ```
-3. **Setting up PIP**
-   ```bash
-   sudo pip3 install -U pip
-   ```
-4. **Installing Node**
-   ```bash
-   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash && source ~/.bashrc && nvm install v18
-   ```
-5. **Clone the Repository**
-   ```bash
-   git clone https://github.com/TheHamkerAlone/EikoRobot && cd EikoRobot
-   ```
-6. **Installing tmux**
-   ```bash
-   sudo apt install tmux -y && tmux
-   ```
-7. **Installing Activate**
-   ```bash
-   python3 -m venv AloneXRobot
-   ```
-8. **Activate Mode**
-   ```bash
-   source AloneXRobot/bin/activate
-   ```
-9. **Install Requirements**
-   ```bash
-   pip3 install -U -r requirements.txt
-   ```
-10. **Config Env**
-   ```bash
-   nano .env
-   ```
-Then - ctrl+x - y - Then Enter
-11. **Run the Bot**
-   ```bash
-   python3 -m AloneX
-   ```
 
 ---
-━━━━━━━━━━━━━━━━━━━━
 
-<h3 align="center">
-    ─「 sᴜᴩᴩᴏʀᴛ 」─
-</h3>
+## 𓆩⚚ 𝐎ᴡɴᴇʀ ⚚𓆪
 
 <p align="center">
-<a href="https://telegram.me/AloneBotSupport"><img src="https://img.shields.io/badge/-Support%20Group-blue.svg?style=for-the-badge&logo=Telegram"></a>
+  <b>𝐌𝐑 𝐄𝐆𝐎</b><br>
+  𝐅ᴏᴜɴᴅᴇʀ 𝐀ɴᴅ 𝐎ᴡɴᴇʀ 𝐎ꜰ 𝐄ɢᴏ 𝐍ᴇᴛᴡᴏʀᴋ
 </p>
 
 <p align="center">
-<a href="https://telegram.me/AloneUpdates"><img src="https://img.shields.io/badge/-Support%20Channel-blue.svg?style=for-the-badge&logo=Telegram"></a>
+  <a href="https://t.me/EGOISTICxPRIME">𝐌ᴀꜱᴛᴇʀ</a> •
+  <a href="https://t.me/EGOxUPDATES">𝐔ᴘᴅᴀᴛᴇꜱ</a> •
+  <a href="https://t.me/EGOxSUPPORT">𝐒ᴜᴘᴘᴏʀᴛ</a>
 </p>
 
+---
+
+## 𓆩⚚ 𝐀ʙᴏᴜᴛ 𝐀𝐙𝐀𝐈 ⚚𓆪
+
+𝐀𝐙𝐀𝐈 𝐈ꜱ 𝐓ʜᴇ 𝐎ꜰꜰɪᴄɪᴀʟ 𝐂ᴏᴍᴍᴜɴɪᴛʏ 𝐀ᴜᴛᴏᴍᴀᴛɪᴏɴ 𝐒ʏꜱᴛᴇᴍ 𝐎ꜰ 𝐄ɢᴏ 𝐍ᴇᴛᴡᴏʀᴋ.
+
+𝐈ᴛ 𝐈ꜱ 𝐃ᴇꜱɪɢɴᴇᴅ 𝐅ᴏʀ 𝐓ᴇʟᴇɢʀᴀᴍ 𝐂ᴏᴍᴍᴜɴɪᴛɪᴇꜱ 𝐓ʜᴀᴛ 𝐍ᴇᴇᴅ 𝐒ᴀꜰᴇᴛʏ, 𝐄ɴɢᴀɢᴇᴍᴇɴᴛ, 𝐀ᴜᴛᴏᴍᴀᴛɪᴏɴ, 𝐑ᴇᴡᴀʀᴅꜱ, 𝐐ᴜɪᴢᴢᴇꜱ, 𝐒ʜᴏᴘ 𝐒ʏꜱᴛᴇᴍꜱ, 𝐕ᴀᴜʟᴛ 𝐈ᴛᴇᴍꜱ, 𝐁ɪʀᴛʜᴅᴀʏ 𝐀ɴᴅ 𝐅ᴇꜱᴛɪᴠᴀʟ 𝐑ᴇᴡᴀʀᴅꜱ, 𝐌ᴇᴅɪᴀ 𝐂ᴏɴᴛʀᴏʟ, 𝐀ɴᴅ 𝐏ʀᴇᴍɪᴜᴍ 𝐆ʀᴏᴜᴘ 𝐌ᴀɴᴀɢᴇᴍᴇɴᴛ.
+
+𝐓ʜɪꜱ 𝐑ᴇᴘᴏꜱɪᴛᴏʀʏ 𝐈ꜱ 𝐁ᴇɪɴɢ 𝐂ᴏɴᴠᴇʀᴛᴇᴅ 𝐈ɴᴛᴏ 𝐀ɴ 𝐎ʀɪɢɪɴᴀʟ 𝐀𝐙𝐀𝐈 × 𝐄ɢᴏ 𝐍ᴇᴛᴡᴏʀᴋ 𝐒ʏꜱᴛᴇᴍ.
+
+---
+
+## 𓆩⚚ 𝐂ᴏʀᴇ 𝐅ᴇᴀᴛᴜʀᴇꜱ ⚚𓆪
+
+### 𝐏ʀᴏᴛᴇᴄᴛɪᴏɴ
+
+- 𝐕ᴇʀɪꜰɪᴄᴀᴛɪᴏɴ-𝐁ᴀꜱᴇᴅ 𝐂ᴏᴍᴍᴜɴɪᴛʏ 𝐀ᴄᴄᴇꜱꜱ
+- 𝐍ᴇᴡ 𝐀ɴᴅ 𝐎ʟᴅ 𝐌ᴇᴍʙᴇʀ 𝐕ᴇʀɪꜰɪᴄᴀᴛɪᴏɴ
+- 𝐂ᴀᴘᴛᴄʜᴀ / 𝐒ᴇᴛᴜᴘ 𝐅ʟᴏᴡ
+- 𝐆ʀᴏᴜᴘ 𝐒ᴀꜰᴇᴛʏ 𝐂ᴏɴᴛʀᴏʟꜱ
+- 𝐀ɴᴛɪ-𝐒ᴘᴀᴍ 𝐀ɴᴅ 𝐅ʟᴏᴏᴅ 𝐂ᴏɴᴛʀᴏʟ
+- 𝐀ɴᴛɪ-𝐋ɪɴᴋ 𝐀ɴᴅ 𝐌ᴇᴅɪᴀ 𝐂ᴏɴᴛʀᴏʟ
+- 𝐖ᴀʀɴɪɴɢ, 𝐌ᴜᴛᴇ, 𝐁ᴀɴ, 𝐀ɴᴅ 𝐏ᴜʀɢᴇ 𝐒ᴜᴘᴘᴏʀᴛ
+- 𝐎ᴡɴᴇʀ-𝐌ᴀɴᴀɢᴇᴅ 𝐂ᴏᴍᴍᴜɴɪᴛʏ 𝐂ᴏɴᴛʀᴏʟ
+
+### 𝐏ʀᴏꜰɪʟᴇ 𝐒ʏꜱᴛᴇᴍ
+
+- 𝐔ꜱᴇʀ 𝐏ʀᴏꜰɪʟᴇ 𝐒ᴇᴛᴜᴘ
+- 𝐍ᴀᴍᴇ, 𝐆ᴇɴᴅᴇʀ, 𝐁ɪʀᴛʜᴅᴀʏ, 𝐀ɴᴅ 𝐏ʀᴇꜰᴇʀᴇɴᴄᴇ 𝐒ᴜᴘᴘᴏʀᴛ
+- 𝐏ʀᴏꜰɪʟᴇ 𝐂ᴀʀᴅꜱ
+- 𝐓ɪᴛʟᴇꜱ, 𝐁ᴀᴅɢᴇꜱ, 𝐅ʀᴀᴍᴇꜱ
+- 𝐋ᴇᴠᴇʟ, 𝐗𝐏, 𝐑𝐄𝐏, 𝐑ᴀɴᴋ, 𝐀ɴᴅ 𝐕ᴀᴜʟᴛ 𝐒ᴛᴀᴛꜱ
+
+### 𝐄ᴄᴏɴᴏᴍʏ
+
+- 𝐄ɢᴏ 𝐂ʀᴇᴅɪᴛꜱ 𝐒ʏꜱᴛᴇᴍ
+- 𝐆ʟᴏʙᴀʟ 𝐁ᴀʟᴀɴᴄᴇ
+- 𝐃ᴀɪʟʏ 𝐑ᴇᴡᴀʀᴅꜱ
+- 𝐒ᴛʀᴇᴀᴋ 𝐁ᴏɴᴜꜱ
+- 𝐗𝐏, 𝐑𝐄𝐏, 𝐋ᴇᴠᴇʟꜱ, 𝐀ɴᴅ 𝐑ᴀɴᴋɪɴɢꜱ
+- 𝐎ᴡɴᴇʀ 𝐄ᴄᴏɴᴏᴍʏ 𝐂ᴏɴᴛʀᴏʟ
+- 𝐄ᴄᴏɴᴏᴍʏ 𝐋ᴏɢꜱ
+
+### 𝐐ᴜɪᴢ 𝐒ʏꜱᴛᴇᴍ
+
+- 𝐀ɴɪᴍᴇ 𝐂ʜᴀʀᴀᴄᴛᴇʀ 𝐈ᴍᴀɢᴇ 𝐐ᴜɪᴢ
+- 𝐆𝐊 𝐐ᴜɪᴢ 𝐖ɪᴛʜ 𝐈ɴᴛᴇʀᴀᴄᴛɪᴠᴇ 𝐁ᴜᴛᴛᴏɴꜱ
+- 𝐎ɴᴇ-𝐀ᴛᴛᴇᴍᴘᴛ 𝐀ɴꜱᴡᴇʀ 𝐏ʀᴏᴛᴇᴄᴛɪᴏɴ
+- 𝐂ᴏʀʀᴇᴄᴛ 𝐀ɴꜱᴡᴇʀ 𝐑ᴇᴡᴀʀᴅꜱ
+- 𝐀ᴜᴛᴏ 𝐐ᴜɪᴢ 𝐌ᴏᴅᴇ
+- 𝐂ᴜꜱᴛᴏᴍ 𝐀ɴɪᴍᴇ 𝐈ᴍᴀɢᴇ 𝐒ᴜᴘᴘᴏʀᴛ
+- 𝐐ᴜɪᴢ 𝐋ᴇᴀᴅᴇʀʙᴏᴀʀᴅ
+
+### 𝐆ᴀᴍᴇꜱ
+
+- 𝐃ɪᴄᴇ
+- 𝐃ᴀʀᴛ
+- 𝐁ᴀꜱᴋᴇᴛʙᴀʟʟ
+- 𝐅ᴏᴏᴛʙᴀʟʟ
+- 𝐁ᴏᴡʟɪɴɢ
+- 𝐒ʟᴏᴛ
+- 𝐂ᴏᴏʟᴅᴏᴡɴ 𝐀ɴᴅ 𝐀ɴᴛɪ-𝐅ᴀʀᴍ 𝐒ᴜᴘᴘᴏʀᴛ
+- 𝐒ᴍᴀʟʟ 𝐑ᴇᴡᴀʀᴅꜱ 𝐅ᴏʀ 𝐆ᴀᴍᴇ 𝐏ʟᴀʏ
+
+### 𝐒ʜᴏᴘ 𝐀ɴᴅ 𝐕ᴀᴜʟᴛ
+
+- 𝐏ᴇᴛꜱ, 𝐕ᴇʜɪᴄʟᴇꜱ, 𝐇ᴏᴍᴇꜱ, 𝐋ᴜxᴜʀʏ, 𝐆ɪꜰᴛꜱ
+- 𝐅ʀᴀᴍᴇꜱ, 𝐓ɪᴛʟᴇꜱ, 𝐁ᴀᴅɢᴇꜱ, 𝐀ɴᴅ 𝐋ɪᴍɪᴛᴇᴅ 𝐈ᴛᴇᴍꜱ
+- 𝐌ᴇᴅɪᴀ-𝐒ᴜᴘᴘᴏʀᴛᴇᴅ 𝐏ᴜʀᴄʜᴀꜱᴇ 𝐅ʟᴏᴡ
+- 𝐈ᴛᴇᴍ 𝐈ᴍᴀɢᴇ / 𝐆𝐈𝐅 𝐒ᴜᴘᴘᴏʀᴛ
+- 𝐏ᴇʀᴍᴀɴᴇɴᴛ 𝐕ᴀᴜʟᴛ 𝐎ᴡɴᴇʀꜱʜɪᴘ
+- 𝐆ɪꜰᴛɪɴɢ 𝐒ᴜᴘᴘᴏʀᴛ
+- 𝐂ᴜꜱᴛᴏᴍ 𝐒ʜᴏᴘ 𝐌ᴇᴅɪᴀ 𝐂ᴏɴᴛʀᴏʟ
+
+### 𝐁ɪʀᴛʜᴅᴀʏ 𝐒ʏꜱᴛᴇᴍ
+
+- 𝐀ᴜᴛᴏ 𝐁ɪʀᴛʜᴅᴀʏ 𝐖ɪꜱʜ
+- 𝐃𝐌 𝐁ɪʀᴛʜᴅᴀʏ 𝐖ɪꜱʜ
+- 𝐆ʀᴏᴜᴘ 𝐁ɪʀᴛʜᴅᴀʏ 𝐏ᴏꜱᴛ
+- 𝐁ɪʀᴛʜᴅᴀʏ 𝐑ᴇᴡᴀʀᴅꜱ
+- 𝐁ɪʀᴛʜᴅᴀʏ 𝐁ᴀᴅɢᴇꜱ
+- 𝐂ᴜꜱᴛᴏᴍ 𝐁ɪʀᴛʜᴅᴀʏ 𝐌ᴇᴅɪᴀ 𝐒ᴜᴘᴘᴏʀᴛ
+
+### 𝐅ᴇꜱᴛɪᴠᴀʟ 𝐒ʏꜱᴛᴇᴍ
+
+- 𝐀ᴜᴛᴏ 𝐅ᴇꜱᴛɪᴠᴀʟ 𝐖ɪꜱʜ
+- 𝐆ʟᴏʙᴀʟ 𝐅ᴇꜱᴛɪᴠᴀʟ 𝐑ᴇᴡᴀʀᴅꜱ
+- 𝐂ᴜꜱᴛᴏᴍ 𝐅ᴇꜱᴛɪᴠᴀʟ 𝐄ᴠᴇɴᴛꜱ
+- 𝐅ᴇꜱᴛɪᴠᴀʟ 𝐁ᴀᴅɢᴇꜱ
+- 𝐅ᴇꜱᴛɪᴠᴀʟ 𝐆ʀᴏᴜᴘ 𝐏ᴏꜱᴛꜱ
+- 𝐅ᴇꜱᴛɪᴠᴀʟ 𝐃𝐌 𝐖ɪꜱʜᴇꜱ
+- 𝐎ᴡɴᴇʀ 𝐎ᴠᴇʀʀɪᴅᴇ 𝐒ᴜᴘᴘᴏʀᴛ
+
+### 𝐄ᴠᴇɴᴛ 𝐒ʏꜱᴛᴇᴍ
+
+- 𝐂ᴜꜱᴛᴏᴍ 𝐄ᴠᴇɴᴛ 𝐂ʀᴇᴀᴛɪᴏɴ
+- 𝐄ᴠᴇɴᴛ 𝐑ᴇᴡᴀʀᴅꜱ
+- 𝐄ᴠᴇɴᴛ 𝐁ᴀᴅɢᴇꜱ
+- 𝐄ᴠᴇɴᴛ 𝐏ɪɴ 𝐒ᴜᴘᴘᴏʀᴛ
+- 𝐄ᴠᴇɴᴛ 𝐒ᴛᴀᴛꜱ
+- 𝐄ᴠᴇɴᴛ 𝐏ᴀɴᴇʟꜱ
+- 𝐀ᴜᴛᴏ 𝐒ᴄʜᴇᴅᴜʟᴇ 𝐒ᴜᴘᴘᴏʀᴛ
+
+### 𝐐ᴜᴇꜱᴛ 𝐒ʏꜱᴛᴇᴍ
+
+- 𝐃ᴀɪʟʏ 𝐐ᴜᴇꜱᴛꜱ
+- 𝐐ᴜɪᴢ 𝐐ᴜᴇꜱᴛꜱ
+- 𝐆ᴀᴍᴇ 𝐐ᴜᴇꜱᴛꜱ
+- 𝐌ᴇꜱꜱᴀɢᴇ 𝐀ᴄᴛɪᴠɪᴛʏ 𝐐ᴜᴇꜱᴛꜱ
+- 𝐈ɴᴠɪᴛᴇ 𝐐ᴜᴇꜱᴛꜱ
+- 𝐐ᴜᴇꜱᴛ 𝐑ᴇᴡᴀʀᴅꜱ
+- 𝐂ʀᴀᴛᴇ 𝐂ʜᴀɴᴄᴇ 𝐒ᴜᴘᴘᴏʀᴛ
+
+### 𝐑ᴇꜰᴇʀʀᴀʟ 𝐒ʏꜱᴛᴇᴍ
+
+- 𝐈ɴᴠɪᴛᴇ 𝐓ʀᴀᴄᴋɪɴɢ
+- 𝐑ᴇᴡᴀʀᴅ 𝐀ꜰᴛᴇʀ 𝐕ᴇʀɪꜰɪᴄᴀᴛɪᴏɴ
+- 𝐈ɴᴠɪᴛᴇ 𝐂ᴏᴜɴᴛ
+- 𝐈ɴᴠɪᴛᴇ 𝐌ɪʟᴇꜱᴛᴏɴᴇ 𝐁ᴀᴅɢᴇꜱ
+
+### 𝐅ᴀᴍᴇ 𝐀ɴᴅ 𝐋ᴇᴀᴅᴇʀʙᴏᴀʀᴅ
+
+- 𝐓ᴏᴘ 𝐄ᴄᴏɴᴏᴍʏ 𝐔ꜱᴇʀꜱ
+- 𝐓ᴏᴘ 𝐗𝐏 𝐔ꜱᴇʀꜱ
+- 𝐓ᴏᴘ 𝐑𝐄𝐏 𝐔ꜱᴇʀꜱ
+- 𝐓ᴏᴘ 𝐐ᴜɪᴢ 𝐏ʟᴀʏᴇʀꜱ
+- 𝐓ᴏᴘ 𝐈ɴᴠɪᴛᴇ 𝐔ꜱᴇʀꜱ
+- 𝐑ᴀʀᴇ 𝐈ᴛᴇᴍ 𝐎ᴡɴᴇʀꜱ
+- 𝐂ᴜꜱᴛᴏᴍ 𝐋ᴇᴀᴅᴇʀʙᴏᴀʀᴅ 𝐈ᴍᴀɢᴇꜱ
+
+### 𝐒ᴏᴄɪᴀʟ 𝐒ʏꜱᴛᴇᴍ
+
+- 𝐑𝐄𝐏 𝐒ʏꜱᴛᴇᴍ
+- 𝐑ᴇʟᴀᴛɪᴏɴꜱʜɪᴘ 𝐒ʏꜱᴛᴇᴍ
+- 𝐅ᴀᴍɪʟʏ 𝐒ʏꜱᴛᴇᴍ
+- 𝐀ᴅᴏᴘᴛ 𝐒ʏꜱᴛᴇᴍ
+- 𝐅ᴀᴍɪʟʏ 𝐑ᴀɴᴋꜱ
+- 𝐍ᴏ 𝐔ɴꜱᴀꜰᴇ 𝐎ʀ 𝐂ʀᴇᴇᴘʏ 𝐁ᴇʜᴀᴠɪᴏᴜʀ
+
+### 𝐀𝐈 𝐂ʜᴀᴛ
+
+- 𝐏ʀᴇᴍɪᴜᴍ 𝐂ᴏᴍᴍᴜɴɪᴛʏ 𝐂ʜᴀᴛ 𝐒ᴜᴘᴘᴏʀᴛ
+- 𝐇ɪɴɢʟɪꜱʜ 𝐂ᴏᴍᴍᴜɴɪᴛʏ 𝐑ᴇᴘʟɪᴇꜱ
+- 𝐎ᴡɴᴇʀ-𝐀ᴡᴀʀᴇ 𝐁ᴇʜᴀᴠɪᴏᴜʀ
+- 𝐏ʀᴏꜰɪʟᴇ-𝐀ᴡᴀʀᴇ 𝐑ᴇᴘʟɪᴇꜱ
+- 𝐑ᴇᴘʟʏ 𝐂ᴏɴᴛᴇxᴛ 𝐌ᴇᴍᴏʀʏ
+- 𝐒ʜᴏʀᴛ 𝐂ᴏɴᴠᴇʀꜱᴀᴛɪᴏɴ 𝐌ᴇᴍᴏʀʏ
+
+### 𝐌ᴇᴅɪᴀ 𝐀ɴᴅ 𝐏ᴀɴᴇʟ 𝐂ᴏɴᴛʀᴏʟ
+
+- 𝐂ᴜꜱᴛᴏᴍ 𝐒ᴛᴀʀᴛ 𝐕ɪᴅᴇᴏ / 𝐈ᴍᴀɢᴇ
+- 𝐂ᴜꜱᴛᴏᴍ 𝐒ᴛᴀʀᴛ 𝐐ᴜᴏᴛᴇ
+- 𝐂ᴜꜱᴛᴏᴍ 𝐏ʀᴏꜰɪʟᴇ 𝐁ᴀᴄᴋɢʀᴏᴜɴᴅ
+- 𝐂ᴜꜱᴛᴏᴍ 𝐒ʜᴏᴘ 𝐌ᴇᴅɪᴀ
+- 𝐂ᴜꜱᴛᴏᴍ 𝐕ᴀᴜʟᴛ 𝐌ᴇᴅɪᴀ
+- 𝐂ᴜꜱᴛᴏᴍ 𝐄ᴠᴇɴᴛ 𝐌ᴇᴅɪᴀ
+- 𝐂ᴜꜱᴛᴏᴍ 𝐁ɪʀᴛʜᴅᴀʏ 𝐌ᴇᴅɪᴀ
+- 𝐏ʀᴇᴍɪᴜᴍ 𝐌ᴇᴅɪᴀ + 𝐓ᴇxᴛ + 𝐁ᴜᴛᴛᴏɴ 𝐏ᴀɴᴇʟꜱ
+
+### 𝐃ᴏɴᴀᴛɪᴏɴ 𝐒ʏꜱᴛᴇᴍ
+
+- 𝐃ᴏɴᴀᴛɪᴏɴ 𝐏ᴀɴᴇʟ
+- 𝐒ᴜᴘᴘᴏʀᴛ𝐞ʀ 𝐁ᴀᴅɢᴇꜱ
+- 𝐒ᴜᴘᴘᴏʀᴛ𝐞ʀ 𝐅ʀᴀᴍᴇꜱ
+- 𝐍ᴏ 𝐏ᴀʏ-𝐓ᴏ-𝐖ɪɴ 𝐑ᴇᴡᴀʀᴅꜱ
+- 𝐃ᴏɴᴀᴛɪᴏɴ 𝐋ᴏɢꜱ
+
+### 𝐌ɪɴɪ 𝐀ᴘᴘ 𝐒ʏꜱᴛᴇᴍ
+
+- 𝐇ᴏᴍᴇ 𝐏ᴀɢᴇ
+- 𝐏ʀᴏꜰɪʟᴇ 𝐏ᴀɢᴇ
+- 𝐒ʜᴏᴘ 𝐏ᴀɢᴇ
+- 𝐕ᴀᴜʟᴛ 𝐏ᴀɢᴇ
+- 𝐐ᴜᴇꜱᴛ 𝐏ᴀɢᴇ
+- 𝐃ᴏɴᴀᴛᴇ 𝐏ᴀɢᴇ
+- 𝐅ᴀᴍᴇ 𝐏ᴀɢᴇ
+- 𝐒ᴇᴛᴛɪɴɢꜱ 𝐏ᴀɢᴇ
+- 𝐏ʀɪᴠᴀᴄʏ 𝐏ᴀɢᴇ
+
+### 𝐒ᴇᴛᴛɪɴɢꜱ
+
+- 𝐔ꜱᴇʀ 𝐒ᴇᴛᴛɪɴɢꜱ
+- 𝐆ʀᴏᴜᴘ 𝐒ᴇᴛᴛɪɴɢꜱ
+- 𝐐ᴜɪᴢ 𝐎ɴ / 𝐎ꜰꜰ
+- 𝐄ᴠᴇɴᴛ 𝐎ɴ / 𝐎ꜰꜰ
+- 𝐕ᴇʀɪꜰɪᴄᴀᴛɪᴏɴ 𝐎ɴ / 𝐎ꜰꜰ
+- 𝐌ᴇᴅɪᴀ 𝐂ᴏɴᴛʀᴏʟꜱ
+- 𝐏ʀɪᴠᴀᴄʏ 𝐏ʀᴇꜰᴇʀᴇɴᴄᴇꜱ
+
+### 𝐎ᴡɴᴇʀ 𝐂ᴏɴᴛʀᴏʟ
+
+- 𝐒ʏꜱᴛᴇᴍ 𝐒ᴛᴀᴛꜱ
+- 𝐁ʀᴏᴀᴅᴄᴀꜱᴛ
+- 𝐁ᴀᴄᴋᴜᴘ 𝐀ɴᴅ 𝐑ᴇꜱᴛᴏʀᴇ
+- 𝐄ᴠᴇɴᴛ 𝐂ᴏɴᴛʀᴏʟ
+- 𝐄ᴄᴏɴᴏᴍʏ 𝐂ᴏɴᴛʀᴏʟ
+- 𝐌ᴇᴅɪᴀ 𝐂ᴏɴᴛʀᴏʟ
+- 𝐅ᴇᴇᴅʙᴀᴄᴋ 𝐀ɴᴅ 𝐒ᴜɢɢᴇꜱᴛɪᴏɴꜱ
+- 𝐌ᴀɪɴᴛᴇɴᴀɴᴄᴇ 𝐌ᴏᴅᴇ
+
+---
+
+## 𓆩⚚ 𝐒ᴛᴀᴛᴜꜱ ⚚𓆪
+
+𝐀𝐙𝐀𝐈 𝐈ꜱ 𝐔ɴᴅᴇʀ 𝐀ᴄᴛɪᴠᴇ 𝐂ᴏɴᴠᴇʀꜱɪᴏɴ.
+
+| 𝐌ᴏᴅᴜʟᴇ | 𝐒ᴛᴀᴛᴜꜱ |
+|---|---|
+| 𝐁ʀᴀɴᴅɪɴɢ | 𝐈ɴ 𝐏ʀᴏɢʀᴇꜱꜱ |
+| 𝐒ᴛᴀʀᴛ 𝐏ᴀɴᴇʟ | 𝐏ᴇɴᴅɪɴɢ 𝐀𝐙𝐀𝐈 𝐂ᴏɴᴠᴇʀꜱɪᴏɴ |
+| 𝐏ʀᴏᴛᴇᴄᴛɪᴏɴ | 𝐏ʟᴀɴɴᴇᴅ |
+| 𝐏ʀᴏꜰɪʟᴇ 𝐒ʏꜱᴛᴇᴍ | 𝐏ʟᴀɴɴᴇᴅ |
+| 𝐄ᴄᴏɴᴏᴍʏ | 𝐏ʟᴀɴɴᴇᴅ |
+| 𝐐ᴜɪᴢᴢᴇꜱ | 𝐏ʟᴀɴɴᴇᴅ |
+| 𝐒ʜᴏᴘ / 𝐕ᴀᴜʟᴛ | 𝐏ʟᴀɴɴᴇᴅ |
+| 𝐁ɪʀᴛʜᴅᴀʏ / 𝐅ᴇꜱᴛɪᴠᴀʟꜱ | 𝐏ʟᴀɴɴᴇᴅ |
+| 𝐄ᴠᴇɴᴛꜱ | 𝐏ʟᴀɴɴᴇᴅ |
+| 𝐌ɪɴɪ 𝐀ᴘᴘ | 𝐏ʟᴀɴɴᴇᴅ |
+| 𝐀𝐈 𝐂ʜᴀᴛ | 𝐏ʟᴀɴɴᴇᴅ |
+
+---
+
+## 𓆩⚚ 𝐒ᴇᴄᴜʀɪᴛʏ 𝐍ᴏᴛᴇ ⚚𓆪
+
+𝐒ᴇɴꜱɪᴛɪᴠᴇ 𝐂ᴏɴꜰɪɢᴜʀᴀᴛɪᴏɴ 𝐌ᴜꜱᴛ 𝐁ᴇ 𝐊ᴇᴘᴛ 𝐏ʀɪᴠᴀᴛᴇ.
+
+𝐃ᴏ 𝐍ᴏᴛ 𝐏ᴜʙʟɪꜱʜ 𝐏ʀɪᴠᴀᴛᴇ 𝐊ᴇʏꜱ, 𝐃ᴀᴛᴀʙᴀꜱᴇ 𝐋ɪɴᴋꜱ, 𝐒ᴇꜱꜱɪᴏɴꜱ, 𝐈ɴᴛᴇʀɴᴀʟ 𝐈𝐃ꜱ, 𝐎ʀ 𝐎ᴡɴᴇʀ-𝐎ɴʟʏ 𝐒ʏꜱᴛᴇᴍ 𝐃ᴇᴛᴀɪʟꜱ.
+
+---
+
+## 𓆩⚚ 𝐃ᴇᴘʟᴏʏᴍᴇɴᴛ 𝐍ᴏᴛᴇ ⚚𓆪
+
+𝐓ʜɪꜱ 𝐑ᴇᴘᴏ 𝐈ꜱ 𝐁ᴇɪɴɢ 𝐂ᴏɴᴠᴇʀᴛᴇᴅ 𝐅ᴏʀ 𝐀𝐙𝐀𝐈.
+
+𝐃ᴏ 𝐍ᴏᴛ 𝐃ᴇᴘʟᴏʏ 𝐈ᴛ 𝐀ꜱ 𝐅ɪɴᴀʟ 𝐔ɴᴛɪʟ 𝐓ʜᴇ 𝐂ᴏɴᴠᴇʀꜱɪᴏɴ 𝐂ʜᴇᴄᴋʟɪꜱᴛ 𝐈ꜱ 𝐂ᴏᴍᴘʟᴇᴛᴇᴅ.
+
+---
+
+<p align="center">
+  𝐏ᴏᴡᴇʀᴇᴅ 𝐁ʏ <b>𝐄ɢᴏ 𝐍ᴇᴛᴡᴏʀᴋ</b> • 𝐄𝐒𝐓. 2026<br>
+  𝐁ᴜɪʟᴛ 𝐔ɴᴅᴇʀ 𝐓ʜᴇ 𝐎ᴡɴᴇʀꜱʜɪᴘ 𝐎ꜰ <b>𝐌𝐑 𝐄𝐆𝐎</b>
+</p>
