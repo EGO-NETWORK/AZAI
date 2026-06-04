@@ -40,8 +40,8 @@ def azai_home_text() -> str:
         "**Owner:** `MR EGO`\n"
         f"**Uptime:** `{uptime}`\n"
         f"**Time:** `{ist_time}`\n\n"
-        "**Try Me In Your Group**\n"
-        "Bring AZAI to your community and unlock royal group control.\n\n"
+        "**Summon AZAI To Your Empire**\n"
+        "Turn your group into a royal command center with protection, rewards, quizzes, events, and premium EGO Network control.\n\n"
         "**Core:** Verification, AI Chat, Economy, Quiz, Shop, Vault, Events.\n\n"
         "**Powered By:** `EGO Network - EST. 2026`"
     )
@@ -65,7 +65,7 @@ def azai_help_text() -> str:
 def azai_buttons():
     return [
         [Button.inline("❂ Help", b"azai_help_menu"), Button.inline("❂ System Stats", b"azai_system_stats")],
-        [Button.url("❂ Add Me In Your Group", add_to_group_link())],
+        [Button.url("❂ Add AZAI To Your Empire", add_to_group_link())],
         [Button.url("❂ Updates", UPDATES_LINK), Button.url("❂ Support", SUPPORT_LINK)],
         [Button.url("❂ My Master", MASTER_LINK), Button.inline("❂ Close", b"azai_close_panel")],
     ]
@@ -73,7 +73,7 @@ def azai_buttons():
 
 def azai_help_buttons():
     return [
-        [Button.url("❂ Add Me In Your Group", add_to_group_link())],
+        [Button.url("❂ Add AZAI To Your Empire", add_to_group_link())],
         [Button.inline("❂ Back", b"azai_back_home"), Button.inline("❂ Close", b"azai_close_panel")],
     ]
 
