@@ -19,7 +19,7 @@ import os
 
 LOGGER = logging.getLogger(__name__)
 START_TIME = time.time()
-FORMAT = f"[Bot] %(message)s"
+FORMAT = f"[AZAI] %(message)s"
 logging.basicConfig(level=logging.INFO, handlers=[logging.FileHandler('logs.txt'), logging.StreamHandler()], format=FORMAT)
 logging.getLogger('httpx').setLevel(logging.WARNING)
 logging.getLogger('telethon').setLevel(logging.ERROR)
@@ -49,7 +49,7 @@ async def send_restart(application: Application) -> None:
         await application.bot.edit_message_text(
             chat_id=chat_id,
             message_id=message_id,
-            text="✅ Alone Bot Restarted Successfully! ✨"
+            text="✅ AZAI System Restarted Successfully! ✨"
         )
         os.remove("restart_data.txt")  
     except FileNotFoundError:
@@ -60,7 +60,7 @@ async def send_restart(application: Application) -> None:
         if LOGS_CHANNEL:
             await application.bot.send_message(
                 chat_id=LOGS_CHANNEL,
-                text=f"<b>Alone robot just restarted! ♥️</b>\n\n<b>Time:</b> <code>{time.ctime()}</code>",
+                text=f"<b>AZAI system just restarted! ⚚</b>\n\n<b>Network:</b> <code>EGO Network • EST. 2026</code>\n<b>Time:</b> <code>{time.ctime()}</code>",
                 parse_mode=constants.ParseMode.HTML
             )
     except Exception as e:
@@ -174,7 +174,8 @@ async def initialize_database():
         try:
             await app.bot.send_message(
                 LOGS_CHANNEL,
-                f"<b>AloneX Robot has successfully initialized! 🚀</b>\n\n"
+                f"<b>AZAI System has successfully initialized! 🚀</b>\n\n"
+                f"<b>Network:</b> <code>EGO Network • EST. 2026</code>\n"
                 f"<b>Modules:</b> <code>ALL</code>\n"
                 f"<b>Database:</b> <code>CONNECTED</code>\n"
                 f"<b>Time:</b> <code>{time.ctime()}</code>",
