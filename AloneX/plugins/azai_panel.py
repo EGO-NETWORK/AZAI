@@ -86,6 +86,14 @@ async def azai_panel_handler(event):
     await event.reply(azai_home_text(), file=AZAI_PANEL_MEDIA, buttons=azai_buttons())
 
 
+async def azai_help_command(event):
+    if event.is_channel and not event.is_group:
+        return
+    if event.fwd_from:
+        return
+    await event.reply(azai_help_text(), file=AZAI_PANEL_MEDIA, buttons=azai_help_buttons())
+
+
 async def azai_help_menu(event):
     await event.answer(font("Opening AZAI help menu..."))
     await event.edit(azai_help_text(), buttons=azai_help_buttons(), file=AZAI_PANEL_MEDIA)
@@ -128,8 +136,10 @@ async def azai_close_panel(event):
 
 
 if "azai_panel" not in tbot.handlers_loaded:
+    tbot.add_event_handler(azai_panel_handler, events.NewMessage(pattern=f"^{prefix_cmds}start(?: .*)?$", incoming=True))
     tbot.add_event_handler(azai_panel_handler, events.NewMessage(pattern=f"^{prefix_cmds}azai$", incoming=True))
     tbot.add_event_handler(azai_panel_handler, events.NewMessage(pattern=f"^{prefix_cmds}startpanel$", incoming=True))
+    tbot.add_event_handler(azai_help_command, events.NewMessage(pattern=f"^{prefix_cmds}help$", incoming=True))
     tbot.add_event_handler(azai_help_menu, events.CallbackQuery(pattern=b"azai_help_menu"))
     tbot.add_event_handler(azai_system_stats, events.CallbackQuery(pattern=b"azai_system_stats"))
     tbot.add_event_handler(azai_back_home, events.CallbackQuery(pattern=b"azai_back_home"))
