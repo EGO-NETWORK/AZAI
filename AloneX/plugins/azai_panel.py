@@ -12,6 +12,7 @@ AZAI_PANEL_MEDIA = "https://files.catbox.moe/1gxuh7.jpg"
 UPDATES_LINK = "https://t.me/EGOxUPDATES"
 SUPPORT_LINK = "https://t.me/EGOxSUPPORT"
 MASTER_LINK = "https://t.me/EGOISTICxPRIME"
+AZAI_BOT_USERNAME = "Urxazaibot"
 
 
 def readable_time(seconds: int) -> str:
@@ -22,8 +23,10 @@ def readable_time(seconds: int) -> str:
 
 
 def bot_username_clean() -> str:
-    username = str(BOT_USERNAME or "AZAI").replace("@", "").strip()
-    return username or "AZAI"
+    username = str(BOT_USERNAME or "").replace("@", "").strip()
+    if not username or username.lower() in {"azai", "oxnybot", "eiko"}:
+        username = AZAI_BOT_USERNAME
+    return username
 
 
 def add_to_group_link() -> str:
