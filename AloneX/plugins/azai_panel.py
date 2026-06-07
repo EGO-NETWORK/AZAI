@@ -67,17 +67,17 @@ def azai_help_text() -> str:
 
 def azai_buttons():
     return [
-        [Button.inline("❂ Help", b"azai_help_menu"), Button.inline("❂ System Stats", b"azai_system_stats")],
-        [Button.url("❂ Add AZAI To Your Empire", add_to_group_link())],
-        [Button.url("❂ Updates", UPDATES_LINK), Button.url("❂ Support", SUPPORT_LINK)],
-        [Button.url("❂ My Master", MASTER_LINK), Button.inline("❂ Close", b"azai_close_panel")],
+        [Button.inline(font("❂ Help"), b"azai_help_menu"), Button.inline(font("❂ System Stats"), b"azai_system_stats")],
+        [Button.url(font("❂ Add AZAI To Your Empire"), add_to_group_link())],
+        [Button.url(font("❂ Updates"), UPDATES_LINK), Button.url(font("❂ Support"), SUPPORT_LINK)],
+        [Button.url(font("❂ My Master"), MASTER_LINK), Button.inline(font("❂ Close"), b"azai_close_panel")],
     ]
 
 
 def azai_help_buttons():
     return [
-        [Button.url("❂ Add AZAI To Your Empire", add_to_group_link())],
-        [Button.inline("❂ Back", b"azai_back_home"), Button.inline("❂ Close", b"azai_close_panel")],
+        [Button.url(font("❂ Add AZAI To Your Empire"), add_to_group_link())],
+        [Button.inline(font("❂ Back"), b"azai_back_home"), Button.inline(font("❂ Close"), b"azai_close_panel")],
     ]
 
 
@@ -122,8 +122,8 @@ async def azai_system_stats(event):
         f"• **Time:** `{ist_time}`"
     )
     buttons = [
-        [Button.inline("❂ Back", b"azai_back_home"), Button.inline("❂ Refresh", b"azai_system_stats")],
-        [Button.inline("❂ Close", b"azai_close_panel")],
+        [Button.inline(font("❂ Back"), b"azai_back_home"), Button.inline(font("❂ Refresh"), b"azai_system_stats")],
+        [Button.inline(font("❂ Close"), b"azai_close_panel")],
     ]
     await event.edit(text, buttons=buttons)
 
