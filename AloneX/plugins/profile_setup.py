@@ -1,3 +1,4 @@
+import calendar
 import re
 from datetime import datetime
 
@@ -23,7 +24,11 @@ def clean_value(value: str, limit: int = 40) -> str:
 
 
 def valid_birthday(value: str) -> bool:
-    return bool(re.match(r"^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])$", value))
+    if not re.match(r"^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])$", value):
+        return False
+    day, month = map(int, value.split("/"))
+    max_day = calendar.monthrange(2000, month)[1]
+    return 1 <= day <= max_day
 
 
 async def get_profile(user_id: int) -> dict:
@@ -53,6 +58,9 @@ def setup_text(data: dict | None = None) -> str:
         + font("Gender:") + f" {gender}\n"
         + font("Birthday:") + f" {birthday}\n"
         + font("Preference:") + f" {religion}\n\n"
+        + font("Privacy Rule:") + "\n"
+        + font("AZAI will never auto-detect your name, gender, birthday, or religion.") + "\n"
+        + font("Only the data you type or select will be saved.") + "\n\n"
         + font("Commands:") + "\n"
         + "/setname Your Name\n"
         + "/setbirthday DD/MM\n"
@@ -134,7 +142,7 @@ async def setbirthday_handler(event):
     user = await event.get_sender()
     parts = event.raw_text.split(maxsplit=1)
     if len(parts) < 2 or not valid_birthday(parts[1].strip()):
-        await event.reply(font("Use birthday format: /setbirthday DD/MM"))
+        await event.reply(font("Use a real birthday date: /setbirthday DD/MM"))
         return
     birthday = parts[1].strip()
     await update_profile(user.id, birthday=birthday)
