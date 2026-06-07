@@ -1,4 +1,5 @@
 import random
+import time
 from datetime import datetime
 
 import pytz
@@ -10,6 +11,7 @@ IST = pytz.timezone("Asia/Kolkata")
 AZAI_BOT_USERNAME = "Urxazaibot"
 gate_db = database["azai_group_gate"]
 active_gate = {}
+gate_notice_cd = {}
 
 
 def now_ist() -> str:
@@ -137,7 +139,56 @@ async def gate_answer(event):
     await event.answer(font("Verification completed."), alert=True)
 
 
+def allowed_gate_text(text: str) -> bool:
+    text = (text or "").strip().lower()
+    return any(text == f"{prefix}verify" for prefix in prefix_cmds)
+
+
+async def is_admin_user(event) -> bool:
+    try:
+        sender = await event.get_sender()
+        if getattr(sender, "bot", False):
+            return True
+        perms = await event.client.get_permissions(event.chat_id, sender.id)
+        return bool(getattr(perms, "is_admin", False) or getattr(perms, "is_creator", False))
+    except Exception:
+        return False
+
+
+async def group_gate_guard(event):
+    if event.is_private:
+        return
+    if event.is_channel and not event.is_group:
+        return
+    if not event.sender_id:
+        return
+    if await is_admin_user(event):
+        return
+    if await gate_done(event.chat_id, event.sender_id):
+        return
+    if allowed_gate_text(event.raw_text):
+        await mark_gate_pending(event.chat_id, event.sender_id)
+        return
+
+    try:
+        await event.delete()
+    except Exception:
+        pass
+
+    cd_key = (event.chat_id, event.sender_id)
+    now = time.time()
+    if gate_notice_cd.get(cd_key, 0) > now:
+        return
+    gate_notice_cd[cd_key] = now + 25
+
+    try:
+        await event.respond(font("Verification required. Send /verify first."))
+    except Exception:
+        pass
+
+
 if "azai_group_gate" not in tbot.handlers_loaded:
     tbot.add_event_handler(verify_handler, events.NewMessage(pattern=f"^{prefix_cmds}verify$", incoming=True))
     tbot.add_event_handler(gate_answer, events.CallbackQuery(pattern=b"azg|"))
+    tbot.add_event_handler(group_gate_guard, events.NewMessage(incoming=True))
     tbot.handlers_loaded.add("azai_group_gate")
