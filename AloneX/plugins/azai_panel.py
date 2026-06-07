@@ -37,16 +37,16 @@ def azai_home_text() -> str:
     uptime = readable_time(time.time() - START_TIME)
     ist_time = datetime.now(IST).strftime("%d %b %Y - %I:%M:%S %p")
     return (
-        "❂ **AZAI IS ONLINE**\n"
+        font("❂ AZAI IS ONLINE") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        "**Network:** `EGO Network - EST. 2026`\n"
-        "**Owner:** `MR EGO`\n"
-        f"**Uptime:** `{uptime}`\n"
-        f"**Time:** `{ist_time}`\n\n"
-        "**Summon AZAI To Your Empire**\n"
-        "Turn your group into a royal command center with protection, rewards, quizzes, events, and premium EGO Network control.\n\n"
-        "**Core:** Verification, AI Chat, Economy, Quiz, Shop, Vault, Events.\n\n"
-        "**Powered By:** `EGO Network - EST. 2026`"
+        + font("Network:") + " `EGO Network - EST. 2026`\n"
+        + font("Owner:") + " `MR EGO`\n"
+        + font("Uptime:") + f" `{uptime}`\n"
+        + font("Time:") + f" `{ist_time}`\n\n"
+        + font("Summon AZAI To Your Empire") + "\n"
+        + font("Turn your group into a royal command center with protection, rewards, quizzes, events, and premium EGO Network control.") + "\n\n"
+        + font("Core: Verification, AI Chat, Economy, Quiz, Shop, Vault, Events.") + "\n\n"
+        + font("Powered By:") + " `EGO Network - EST. 2026`"
     )
 
 
