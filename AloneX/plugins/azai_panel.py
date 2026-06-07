@@ -52,16 +52,16 @@ def azai_home_text() -> str:
 
 def azai_help_text() -> str:
     return (
-        "❂ **AZAI HELP MENU**\n"
+        font("❂ AZAI HELP MENU") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        "**Security:** Verification, Anti-Spam, Warnings, Group Control\n"
-        "**Profile:** Profile Setup, Cards, Titles, Badges\n"
-        "**Economy:** Ego Credits, XP, REP, Daily Rewards\n"
-        "**Quiz:** Anime Quiz, GK Quiz, Auto Quiz\n"
-        "**Shop:** Items, Images, Gifts, Permanent Vault\n"
-        "**Events:** Birthday Wishes, Festival Wishes, Custom Events\n"
-        "**Media:** Start Media, Premium Panels, Button Controls\n\n"
-        "**Powered By:** `EGO Network - EST. 2026`"
+        + font("Security: Verification, Anti-Spam, Warnings, Group Control") + "\n"
+        + font("Profile: Profile Setup, Cards, Titles, Badges") + "\n"
+        + font("Economy: Ego Credits, XP, REP, Daily Rewards") + "\n"
+        + font("Quiz: Anime Quiz, GK Quiz, Auto Quiz") + "\n"
+        + font("Shop: Items, Images, Gifts, Permanent Vault") + "\n"
+        + font("Events: Birthday Wishes, Festival Wishes, Custom Events") + "\n"
+        + font("Media: Start Media, Premium Panels, Button Controls") + "\n\n"
+        + font("Powered By:") + " `EGO Network - EST. 2026`"
     )
 
 
@@ -110,16 +110,16 @@ async def azai_system_stats(event):
     uptime = readable_time(time.time() - START_TIME)
     ist_time = datetime.now(IST).strftime("%d %b %Y - %I:%M:%S %p")
     text = (
-        "❂ **AZAI SYSTEM STATS**\n"
+        font("❂ AZAI SYSTEM STATS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        "**Brand:** `EGO Network - EST. 2026`\n\n"
-        "**Performance:**\n"
-        f"• **CPU:** `{cpu:.1f}%`\n"
-        f"• **RAM:** `{memory.percent:.1f}%`\n"
-        f"• **Storage:** `{disk.percent:.1f}%`\n\n"
-        "**Runtime:**\n"
-        f"• **Uptime:** `{uptime}`\n"
-        f"• **Time:** `{ist_time}`"
+        + font("Brand:") + " `EGO Network - EST. 2026`\n\n"
+        + font("Performance:") + "\n"
+        + font("CPU:") + f" `{cpu:.1f}%`\n"
+        + font("RAM:") + f" `{memory.percent:.1f}%`\n"
+        + font("Storage:") + f" `{disk.percent:.1f}%`\n\n"
+        + font("Runtime:") + "\n"
+        + font("Uptime:") + f" `{uptime}`\n"
+        + font("Time:") + f" `{ist_time}`"
     )
     buttons = [
         [Button.inline(font("❂ Back"), b"azai_back_home"), Button.inline(font("❂ Refresh"), b"azai_system_stats")],
