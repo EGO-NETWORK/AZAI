@@ -23,6 +23,12 @@ def clean_value(value: str, limit: int = 40) -> str:
     return value[:limit]
 
 
+def display_value(value: str) -> str:
+    if value in {"Not Set", "Male", "Female", "Skip", "Other", "Hindu", "Muslim", "Christian", "Sikh", "Buddhist", "Jain"}:
+        return font(value)
+    return value
+
+
 def valid_birthday(value: str) -> bool:
     if not re.match(r"^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])$", value):
         return False
@@ -54,10 +60,10 @@ def setup_text(data: dict | None = None) -> str:
     return (
         font("❂ AZAI PROFILE SETUP") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Name:") + f" {name}\n"
-        + font("Gender:") + f" {gender}\n"
-        + font("Birthday:") + f" {birthday}\n"
-        + font("Preference:") + f" {religion}\n\n"
+        + font("Name:") + f" {display_value(name)}\n"
+        + font("Gender:") + f" {display_value(gender)}\n"
+        + font("Birthday:") + f" {display_value(birthday)}\n"
+        + font("Preference:") + f" {display_value(religion)}\n\n"
         + font("Privacy Rule:") + "\n"
         + font("AZAI will never auto-detect your name, gender, birthday, or religion.") + "\n"
         + font("Only the data you type or select will be saved.") + "\n\n"
@@ -66,7 +72,7 @@ def setup_text(data: dict | None = None) -> str:
         + "/setbirthday DD/MM\n"
         + "/setgender male/female/skip\n"
         + "/setreligion hindu/muslim/christian/sikh/buddhist/jain/other/skip\n\n"
-        + font("Powered By:") + " EGO Network - EST. 2026"
+        + font("Powered By:") + " " + font("EGO Network - EST. 2026")
     )
 
 
@@ -77,17 +83,18 @@ def profile_text(user, data: dict) -> str:
     birthday = data.get("birthday", "Not Set")
     religion = data.get("religion", "Not Set")
     updated = data.get("updated_at", "Not Set")
+    username_value = f"@{user.username}" if user.username else font("Not Set")
     return (
         font("❂ AZAI PROFILE") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Name:") + f" {name}\n"
+        + font("Name:") + f" {display_value(name)}\n"
         + font("User ID:") + f" {user.id}\n"
-        + font("Username:") + f" @{user.username if user.username else 'Not Set'}\n"
-        + font("Gender:") + f" {gender}\n"
-        + font("Birthday:") + f" {birthday}\n"
-        + font("Preference:") + f" {religion}\n"
-        + font("Updated:") + f" {updated}\n\n"
-        + font("Powered By:") + " EGO Network - EST. 2026"
+        + font("Username:") + f" {username_value}\n"
+        + font("Gender:") + f" {display_value(gender)}\n"
+        + font("Birthday:") + f" {display_value(birthday)}\n"
+        + font("Preference:") + f" {display_value(religion)}\n"
+        + font("Updated:") + f" {display_value(updated)}\n\n"
+        + font("Powered By:") + " " + font("EGO Network - EST. 2026")
     )
 
 
