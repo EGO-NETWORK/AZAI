@@ -22,17 +22,17 @@ def ai_status_text() -> str:
     groq_key = GROQ_API_KEY or os.getenv("GROQ_API_KEY") or os.getenv("GQRI_API_KEY")
     configured = _has_value(groq_key)
 
-    status = "Configured" if configured else "Missing"
-    brain = "AI chat can be connected." if configured else "Add Groq key in hosting secrets first."
+    status = font("Configured") if configured else font("Missing")
+    brain = font("AI chat can be connected.") if configured else font("Add Groq key in hosting secrets first.")
 
     return (
         font("❂ AZAI AI STATUS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Provider:") + " Groq\n"
+        + font("Provider:") + " " + font("Groq") + "\n"
         + font("Key Status:") + f" {status}\n"
-        + font("Secret Safety:") + " Hidden\n\n"
+        + font("Secret Safety:") + " " + font("Hidden") + "\n\n"
         + font("Result:") + f" {brain}\n\n"
-        + font("Powered By:") + " EGO Network - EST. 2026"
+        + font("Powered By:") + " " + font("EGO Network - EST. 2026")
     )
 
 
