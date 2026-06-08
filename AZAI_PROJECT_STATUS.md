@@ -2,7 +2,7 @@
 
 EGO Network - EST. 2026
 
-Current estimated progress: 38 percent
+Current estimated progress: 62 percent
 
 This file tracks the current AZAI conversion status.
 
@@ -25,7 +25,8 @@ This file tracks the current AZAI conversion status.
 - Home panel text styled with the existing font helper.
 - Help menu text styled with the existing font helper.
 - System stats text styled with the existing font helper.
-- Startup and restart log branding changed to AZAI.
+- Old Alone panel media disabled until approved AZAI media is provided.
+- EGO Network brand text styled in new AZAI panels.
 - AI status command added with hidden secret check.
 - Profile setup base added.
 - Profile display command added.
@@ -37,44 +38,75 @@ This file tracks the current AZAI conversion status.
 - Verification completion shows setup button that opens bot DM.
 - /verifyall and /unverifyall admin commands added.
 - /verified and /unverified status commands added.
+- Verification callback pattern fixed so setup/religion buttons do not trigger invalid verification.
 - Temporary gate file cleaned up.
 - Active gate plugin moved to AloneX/plugins/azai_group_gate.py.
-- Static AZAI text in newly added modules uses the existing font helper where safe.
+- Live test checklist added.
+- Runtime log guard added with /logstatus.
+- /commands command center added.
+- /commands now includes User, Profile, Verification, Admin, Moderation, Stickers, and Coming Soon sections.
+- /group group control panel added.
+- /settings and /setting common group settings commands added.
+- /rules common group rules command added.
+- /owner owner-only status panel added.
+- AI chat base added for DM, mention, and reply-to-bot triggers.
+- Random group message ignore rule added for AI chat.
+- Aliza/Bhabhi Ji support added through ALIZA_ID or BHABHI_ID secret.
+- Sticker echo system added.
+- Sticker mood pack system added.
+- /stickerpack and /stickermood commands added.
+- /toneguard status command added.
+- Moderation base added.
+- /mod moderation panel added.
+- /antilink on/off added.
+- /warn, /unwarn, /warnings, /resetwarns added.
+- /mute, /unmute, /ban, /unban added.
+- New AZAI user-facing texts use the existing font helper where safe.
 
 ## Partially Done
 
 - Verification lock base exists with admin controls, but live group testing is still needed.
 - Profile setup stores text profile data, but image profile card is pending.
-- AI status exists, but full AI chat memory and Groq reply system are pending.
+- AI chat base works structurally, but deeper profile-name/gender tone integration and memory still need safer incremental patching.
 - Start panel is branded, but custom owner-set start media commands are pending.
 - Font helper is used in new AZAI modules, but old base plugins are not globally converted yet.
+- Log guard exists, but core startup logging and old module logging still need live testing.
+- Moderation base exists, but mute/ban/anti-link must be tested with real Telegram admin permissions.
+- Sticker echo and mood packs exist, but real pack loading must be tested after restart.
 
 ## Pending
 
 - Clean public/default branding values in config.py.
 - Old base repository names may still exist in internal session names and database names.
-- Full AI chat with Groq is not completed yet.
-- Global economy is not completed yet.
-- Shop and vault systems are not completed yet.
-- Anime quiz and GK quiz systems are not completed yet.
-- Birthday, festival, and custom event systems are not completed yet.
-- Donation system is not completed yet.
-- Mini App is not completed yet.
-- Owner panel and group panel are not completed yet.
-- Full global stylish font system across all old plugins is not completed yet.
+- Deep AI personality patch using saved profile name and gender tone.
+- Short-term AI memory.
+- Global economy base.
+- Shop and vault systems.
+- Anime quiz and GK quiz systems.
+- Birthday, festival, and custom event systems.
+- Donation system.
+- Mini App.
+- Owner panel action buttons such as broadcast and maintenance toggle.
+- Group settings persistence beyond current base toggles.
+- Full global stylish font system across old base plugins.
+- BotFather command list cleanup.
+- Final approved AZAI images, banners, start media, profile cards, shop/economy visuals.
 
 ## Safe Next Steps
 
-1. Add live test checklist for verification gate.
-2. Clean public/default branding values in config.py if safe.
-3. Add basic economy base after naming approval.
-4. Add basic shop and vault base after item/name approval.
-5. Add quiz base.
-6. Add birthday and festival scheduler base.
-7. Add full AI chat with Groq.
+1. Update command list and panels after every new module.
+2. Add economy base after naming approval.
+3. Add shop and vault base after item/name approval.
+4. Add quiz base.
+5. Add birthday and festival scheduler base.
+6. Patch deeper AI personality in smaller safe pieces.
+7. Clean old Alone/Eiko public branding.
+8. Restart and live test all core commands.
+9. Add final approved images and media last.
 
 ## Notes
 
 - Do not place real secret values inside public repository files.
-- Keep private IDs and private relationship rules out of public documentation.
+- Keep private IDs and sensitive relationship rules out of public documentation.
 - Any feature should be marked pending until it is actually coded and tested.
+- Final launch should happen only after restart, live group test, and owner approval.
