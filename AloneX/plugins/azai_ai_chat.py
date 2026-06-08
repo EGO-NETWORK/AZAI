@@ -134,3 +134,59 @@ async def ask_groq(user_text: str, role: str, first_name: str | None) -> str | N
                 return data["choices"][0]["message"]["content"]
     except Exception:
         return None
+
+
+async def replied_to_me(event) -> bool:
+    try:
+        reply = await event.get_reply_message()
+        if not reply:
+            return False
+        sender = await reply.get_sender()
+        return bool(sender and getattr(sender, "bot", False) and (sender.username or "").lower() == clean_bot_username().lower())
+    except Exception:
+        return False
+
+
+async def ai_chat_handler(event):
+    if event.fwd_from:
+        return
+    text = (event.raw_text or "").strip()
+    if not text or is_command(text):
+        return
+
+    sender = await event.get_sender()
+    if not sender or getattr(sender, "bot", False):
+        return
+
+    role = user_role(sender.id)
+    is_private = bool(event.is_private)
+    mentioned = f"@{clean_bot_username().lower()}" in text.lower()
+    reply_to_bot = False if is_private else await replied_to_me(event)
+
+    if not is_private and not should_reply_in_group(text, mentioned, reply_to_bot):
+        return
+
+    cd_key = (event.chat_id, sender.id)
+    now = time.time()
+    if last_reply_at.get(cd_key, 0) + AI_COOLDOWN_SECONDS > now:
+        return
+    last_reply_at[cd_key] = now
+
+    if mentioned:
+        text = text.replace(f"@{clean_bot_username()}", "").replace(f"@{clean_bot_username().lower()}", "").strip() or "hello"
+
+    reply = await ask_groq(text, role, getattr(sender, "first_name", None))
+    if not reply:
+        reply = fallback_reply(role)
+    else:
+        reply = font(trim_reply(reply))
+
+    try:
+        await event.reply(reply)
+    except Exception:
+        await event.respond(reply)
+
+
+if "azai_ai_chat" not in tbot.handlers_loaded:
+    tbot.add_event_handler(ai_chat_handler, events.NewMessage(incoming=True))
+    tbot.handlers_loaded.add("azai_ai_chat")
