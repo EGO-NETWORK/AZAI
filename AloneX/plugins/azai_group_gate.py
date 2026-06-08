@@ -111,7 +111,10 @@ async def verify_handler(event):
 
 async def gate_answer(event):
     try:
-        _, chat_raw, user_raw, selected_raw = event.data.decode().split("|")
+        raw_data = event.data.decode()
+        if not raw_data.startswith("azg|"):
+            return
+        _, chat_raw, user_raw, selected_raw = raw_data.split("|")
         chat_id = int(chat_raw)
         target_user = int(user_raw)
         selected = int(selected_raw)
@@ -274,6 +277,6 @@ if "azai_group_gate" not in tbot.handlers_loaded:
     tbot.add_event_handler(unverifyall_handler, events.NewMessage(pattern=f"^{prefix_cmds}unverifyall$", incoming=True))
     tbot.add_event_handler(verified_handler, events.NewMessage(pattern=f"^{prefix_cmds}verified$", incoming=True))
     tbot.add_event_handler(unverified_handler, events.NewMessage(pattern=f"^{prefix_cmds}unverified$", incoming=True))
-    tbot.add_event_handler(gate_answer, events.CallbackQuery(pattern=b"azg|"))
+    tbot.add_event_handler(gate_answer, events.CallbackQuery(pattern=b"^azg\\|"))
     tbot.add_event_handler(group_gate_guard, events.NewMessage(incoming=True))
     tbot.handlers_loaded.add("azai_group_gate")
