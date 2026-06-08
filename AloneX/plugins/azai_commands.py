@@ -79,6 +79,26 @@ def admin_commands_text() -> str:
     )
 
 
+def moderation_commands_text() -> str:
+    return (
+        font("MODERATION COMMANDS") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + "/mod - " + font("Open moderation panel") + "\n"
+        + "/antilink on - " + font("Enable link protection") + "\n"
+        + "/antilink off - " + font("Disable link protection") + "\n"
+        + "/warn - " + font("Warn replied user") + "\n"
+        + "/unwarn - " + font("Remove one warning from replied user") + "\n"
+        + "/warnings - " + font("Check warnings") + "\n"
+        + "/resetwarns - " + font("Reset replied user's warnings") + "\n"
+        + "/mute - " + font("Mute replied user for 10 minutes") + "\n"
+        + "/unmute - " + font("Unmute replied user") + "\n"
+        + "/ban - " + font("Ban replied user") + "\n"
+        + "/unban - " + font("Unban replied user") + "\n\n"
+        + font("Use admin permissions properly. AZAI cannot moderate without admin rights.") + "\n\n"
+        + font("Powered By:") + " " + BRAND
+    )
+
+
 def media_commands_text() -> str:
     return (
         font("STICKER COMMANDS") + "\n"
@@ -111,8 +131,8 @@ def command_buttons():
     return [
         [Button.inline(font("User"), b"azcmd_user"), Button.inline(font("Profile"), b"azcmd_profile")],
         [Button.inline(font("Verification"), b"azcmd_verify"), Button.inline(font("Admin"), b"azcmd_admin")],
-        [Button.inline(font("Stickers"), b"azcmd_media"), Button.inline(font("Coming Soon"), b"azcmd_soon")],
-        [Button.inline(font("Close"), b"azcmd_close")],
+        [Button.inline(font("Moderation"), b"azcmd_mod"), Button.inline(font("Stickers"), b"azcmd_media")],
+        [Button.inline(font("Coming Soon"), b"azcmd_soon"), Button.inline(font("Close"), b"azcmd_close")],
     ]
 
 
@@ -138,6 +158,8 @@ async def commands_callback(event):
         await event.edit(verification_commands_text(), buttons=back_buttons())
     elif data == "azcmd_admin":
         await event.edit(admin_commands_text(), buttons=back_buttons())
+    elif data == "azcmd_mod":
+        await event.edit(moderation_commands_text(), buttons=back_buttons())
     elif data == "azcmd_media":
         await event.edit(media_commands_text(), buttons=back_buttons())
     elif data == "azcmd_soon":
