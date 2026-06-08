@@ -12,7 +12,7 @@ BRAND = font("EGO Network - EST. 2026")
 
 async def is_group_admin(event) -> bool:
     if event.is_private:
-        await event.reply(font("This panel works only inside groups."))
+        await event.reply(font("This command works only inside groups."))
         return False
     if event.is_channel and not event.is_group:
         return False
@@ -25,7 +25,7 @@ async def is_group_admin(event) -> bool:
             return True
     except Exception:
         pass
-    await event.reply(font("Only group admins can open this panel."))
+    await event.reply(font("Only group admins can use this command."))
     return False
 
 
@@ -44,7 +44,7 @@ def group_home_text(chat_title: str, verified: int, unverified: int) -> str:
         + font("Group:") + f" {chat_title}\n"
         + font("Verified Users:") + f" {verified}\n"
         + font("Known Unverified:") + f" {unverified}\n\n"
-        + font("Use this panel to control group verification and basic settings.") + "\n\n"
+        + font("Use /settings for group settings and /rules for group rules.") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
 
@@ -56,20 +56,20 @@ def verification_text(verified: int, unverified: int) -> str:
         + font("Verified Users:") + f" {verified}\n"
         + font("Known Unverified:") + f" {unverified}\n\n"
         + font("Rule:") + " " + font("Unverified users can only send /verify before chatting.") + "\n"
-        + font("Group-specific:") + " " + font("Yes, every group verifies separately.") + "\n\n"
+        + font("Group-specific:") + " " + font("Every group verifies separately.") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
 
 
 def rules_text() -> str:
     return (
-        font("AZAI GROUP RULES") + "\n"
+        font("GROUP RULES") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("1. Complete verification before chatting.") + "\n"
         + font("2. Do not spam links or repeated messages.") + "\n"
         + font("3. Respect group admins and members.") + "\n"
         + font("4. Profile setup is optional but recommended.") + "\n\n"
-        + font("Custom rules editor is coming later.") + "\n\n"
+        + font("Custom rules editor will be added later.") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
 
@@ -79,10 +79,14 @@ def settings_text() -> str:
         font("GROUP SETTINGS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Verification Lock:") + " " + font("Active") + "\n"
-        + font("Anti-Spam:") + " " + font("Coming Soon") + "\n"
-        + font("Warnings:") + " " + font("Coming Soon") + "\n"
-        + font("Auto Quiz:") + " " + font("Coming Soon") + "\n"
-        + font("Economy Rewards:") + " " + font("Coming Soon") + "\n\n"
+        + font("Anti-Spam:") + " " + font("Pending") + "\n"
+        + font("Warnings:") + " " + font("Pending") + "\n"
+        + font("Auto Quiz:") + " " + font("Pending") + "\n"
+        + font("Economy Rewards:") + " " + font("Pending") + "\n\n"
+        + font("Common commands:") + "\n"
+        + "/group\n"
+        + "/settings\n"
+        + "/rules\n\n"
         + font("Powered By:") + " " + BRAND
     )
 
@@ -107,6 +111,21 @@ async def group_panel_handler(event):
     title = getattr(chat, "title", None) or "Current Group"
     verified, unverified = await group_counts(event.chat_id)
     await event.reply(group_home_text(title, verified, unverified), buttons=group_buttons())
+
+
+async def settings_handler(event):
+    if not await is_group_admin(event):
+        return
+    await event.reply(settings_text(), buttons=group_buttons())
+
+
+async def rules_handler(event):
+    if event.is_private:
+        await event.reply(font("Use /rules inside a group."))
+        return
+    if event.is_channel and not event.is_group:
+        return
+    await event.reply(rules_text())
 
 
 async def group_callback(event):
@@ -142,5 +161,8 @@ async def group_callback(event):
 
 if "azai_group_panel" not in tbot.handlers_loaded:
     tbot.add_event_handler(group_panel_handler, events.NewMessage(pattern=f"^{prefix_cmds}group$", incoming=True))
+    tbot.add_event_handler(settings_handler, events.NewMessage(pattern=f"^{prefix_cmds}settings$", incoming=True))
+    tbot.add_event_handler(settings_handler, events.NewMessage(pattern=f"^{prefix_cmds}setting$", incoming=True))
+    tbot.add_event_handler(rules_handler, events.NewMessage(pattern=f"^{prefix_cmds}rules$", incoming=True))
     tbot.add_event_handler(group_callback, events.CallbackQuery(pattern=b"^azgrp_"))
     tbot.handlers_loaded.add("azai_group_panel")
