@@ -2,7 +2,7 @@
 
 EGO Network - EST. 2026
 
-Current estimated progress: 35 percent
+Current estimated progress: 38 percent
 
 This file tracks the current AZAI conversion status.
 
@@ -35,11 +35,15 @@ This file tracks the current AZAI conversion status.
 - Group-specific verification gate base added.
 - Unverified users can only send /verify before group access.
 - Verification completion shows setup button that opens bot DM.
+- /verifyall and /unverifyall admin commands added.
+- /verified and /unverified status commands added.
+- Temporary gate file cleaned up.
+- Active gate plugin moved to AloneX/plugins/azai_group_gate.py.
 - Static AZAI text in newly added modules uses the existing font helper where safe.
 
 ## Partially Done
 
-- Verification lock base exists, but admin commands are still pending.
+- Verification lock base exists with admin controls, but live group testing is still needed.
 - Profile setup stores text profile data, but image profile card is pending.
 - AI status exists, but full AI chat memory and Groq reply system are pending.
 - Start panel is branded, but custom owner-set start media commands are pending.
@@ -47,9 +51,6 @@ This file tracks the current AZAI conversion status.
 
 ## Pending
 
-- Rename temporary group gate file to a clean AZAI plugin name.
-- Add /verifyall and /unverifyall admin commands.
-- Add /verified and /unverified status commands.
 - Clean public/default branding values in config.py.
 - Old base repository names may still exist in internal session names and database names.
 - Full AI chat with Groq is not completed yet.
@@ -64,14 +65,13 @@ This file tracks the current AZAI conversion status.
 
 ## Safe Next Steps
 
-1. Rename the temporary group gate file to a clean plugin name.
-2. Add /verifyall and /unverifyall admin commands.
-3. Add /verified and /unverified status commands.
-4. Add basic economy base.
-5. Add basic shop and vault base.
-6. Add quiz base.
-7. Add birthday and festival scheduler base.
-8. Add full AI chat with Groq.
+1. Add live test checklist for verification gate.
+2. Clean public/default branding values in config.py if safe.
+3. Add basic economy base after naming approval.
+4. Add basic shop and vault base after item/name approval.
+5. Add quiz base.
+6. Add birthday and festival scheduler base.
+7. Add full AI chat with Groq.
 
 ## Notes
 
