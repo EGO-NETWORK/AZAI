@@ -54,7 +54,7 @@ def gate_text(question: str) -> str:
         + font("Only /verify is allowed before verification.") + "\n"
         + font("Solve this to unlock chat access in this group.") + "\n\n"
         + font("Question:") + f" {question}\n\n"
-        + font("Powered By:") + " EGO Network - EST. 2026"
+        + font("Powered By:") + " " + font("EGO Network - EST. 2026")
     )
 
 
@@ -155,6 +155,87 @@ async def is_admin_user(event) -> bool:
         return False
 
 
+async def require_admin(event) -> bool:
+    if event.is_private:
+        await event.reply(font("This command works only inside groups."))
+        return False
+    if event.is_channel and not event.is_group:
+        return False
+    if not await is_admin_user(event):
+        await event.reply(font("Only group admins can use this command."))
+        return False
+    return True
+
+
+async def verifyall_handler(event):
+    if not await require_admin(event):
+        return
+
+    msg = await event.reply(font("Marking current group members as verified..."))
+    total = 0
+    skipped = 0
+    try:
+        async for user in event.client.iter_participants(event.chat_id):
+            if getattr(user, "bot", False):
+                skipped += 1
+                continue
+            await mark_gate_done(event.chat_id, user.id)
+            total += 1
+    except Exception as exc:
+        await msg.edit(font("Failed to verify all members. Make sure AZAI has proper group access."))
+        return
+
+    await msg.edit(
+        font("❂ VERIFY ALL COMPLETE") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Verified Members:") + f" {total}\n"
+        + font("Skipped Bots:") + f" {skipped}"
+    )
+
+
+async def unverifyall_handler(event):
+    if not await require_admin(event):
+        return
+
+    result = await gate_db.update_many(
+        {"chat_id": event.chat_id},
+        {"$set": {"done": False, "updated_at": now_ist()}},
+    )
+    active_to_remove = [key for key in active_gate if key[0] == event.chat_id]
+    for key in active_to_remove:
+        active_gate.pop(key, None)
+
+    await event.reply(
+        font("❂ UNVERIFY ALL COMPLETE") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Known members marked unverified:") + f" {result.modified_count}\n"
+        + font("Now users must send /verify before chatting.")
+    )
+
+
+async def verified_handler(event):
+    if not await require_admin(event):
+        return
+    count = await gate_db.count_documents({"chat_id": event.chat_id, "done": True})
+    await event.reply(
+        font("❂ VERIFIED USERS") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Verified count:") + f" {count}"
+    )
+
+
+async def unverified_handler(event):
+    if not await require_admin(event):
+        return
+    count = await gate_db.count_documents({"chat_id": event.chat_id, "done": False})
+    await event.reply(
+        font("❂ UNVERIFIED USERS") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Known unverified count:") + f" {count}\n"
+        + font("Note: Users not seen by AZAI yet are also treated as unverified.")
+    )
+
+
 async def group_gate_guard(event):
     if event.is_private:
         return
@@ -189,6 +270,10 @@ async def group_gate_guard(event):
 
 if "azai_group_gate" not in tbot.handlers_loaded:
     tbot.add_event_handler(verify_handler, events.NewMessage(pattern=f"^{prefix_cmds}verify$", incoming=True))
+    tbot.add_event_handler(verifyall_handler, events.NewMessage(pattern=f"^{prefix_cmds}verifyall$", incoming=True))
+    tbot.add_event_handler(unverifyall_handler, events.NewMessage(pattern=f"^{prefix_cmds}unverifyall$", incoming=True))
+    tbot.add_event_handler(verified_handler, events.NewMessage(pattern=f"^{prefix_cmds}verified$", incoming=True))
+    tbot.add_event_handler(unverified_handler, events.NewMessage(pattern=f"^{prefix_cmds}unverified$", incoming=True))
     tbot.add_event_handler(gate_answer, events.CallbackQuery(pattern=b"azg|"))
     tbot.add_event_handler(group_gate_guard, events.NewMessage(incoming=True))
     tbot.handlers_loaded.add("azai_group_gate")
