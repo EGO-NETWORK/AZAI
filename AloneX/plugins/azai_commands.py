@@ -24,7 +24,8 @@ def user_commands_text() -> str:
         + "/help - " + font("Open help menu") + "\n"
         + "/commands - " + font("Open command center") + "\n"
         + "/aistatus - " + font("Check AI key status safely") + "\n"
-        + "/logstatus - " + font("Check logger guard status") + "\n\n"
+        + "/logstatus - " + font("Check logger guard status") + "\n"
+        + "/toneguard - " + font("Check AZAI tone mode") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
 
@@ -62,15 +63,32 @@ def admin_commands_text() -> str:
     return (
         font("ADMIN COMMANDS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Currently active:") + "\n"
+        + font("Group:") + "\n"
+        + "/group\n"
+        + "/settings\n"
+        + "/setting\n"
+        + "/rules\n\n"
+        + font("Verification:") + "\n"
         + "/verifyall\n"
         + "/unverifyall\n"
         + "/verified\n"
         + "/unverified\n\n"
-        + font("Coming next:") + "\n"
-        + "/group\n"
-        + "/settings\n"
-        + "/rules\n\n"
+        + font("Owner:") + "\n"
+        + "/owner\n\n"
+        + font("Powered By:") + " " + BRAND
+    )
+
+
+def media_commands_text() -> str:
+    return (
+        font("STICKER COMMANDS") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + "/stickerpack - " + font("Open sticker help") + "\n"
+        + "/stickerpack add <pack> <mood> - " + font("Add mood pack") + "\n"
+        + "/stickerpack remove <pack> - " + font("Remove pack") + "\n"
+        + "/stickerpack list - " + font("Show saved packs") + "\n"
+        + "/stickermood <mood> - " + font("Send random sticker from mood") + "\n\n"
+        + font("Auto:") + " " + font("Sticker echo works when a user sends a sticker.") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
 
@@ -79,12 +97,11 @@ def coming_soon_text() -> str:
     return (
         font("COMING SOON") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("AI Chat Base") + "\n"
         + font("Economy Base") + "\n"
         + font("Shop And Vault Base") + "\n"
         + font("Anime Quiz And GK Quiz") + "\n"
         + font("Birthday And Festival System") + "\n"
-        + font("Owner Panel And Group Panel") + "\n\n"
+        + font("Full Owner Panel Actions") + "\n\n"
         + font("Images, banners, items, and economy names will be added only after owner approval.") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
@@ -94,7 +111,7 @@ def command_buttons():
     return [
         [Button.inline(font("User"), b"azcmd_user"), Button.inline(font("Profile"), b"azcmd_profile")],
         [Button.inline(font("Verification"), b"azcmd_verify"), Button.inline(font("Admin"), b"azcmd_admin")],
-        [Button.inline(font("Coming Soon"), b"azcmd_soon")],
+        [Button.inline(font("Stickers"), b"azcmd_media"), Button.inline(font("Coming Soon"), b"azcmd_soon")],
         [Button.inline(font("Close"), b"azcmd_close")],
     ]
 
@@ -121,6 +138,8 @@ async def commands_callback(event):
         await event.edit(verification_commands_text(), buttons=back_buttons())
     elif data == "azcmd_admin":
         await event.edit(admin_commands_text(), buttons=back_buttons())
+    elif data == "azcmd_media":
+        await event.edit(media_commands_text(), buttons=back_buttons())
     elif data == "azcmd_soon":
         await event.edit(coming_soon_text(), buttons=back_buttons())
     elif data == "azcmd_close":
