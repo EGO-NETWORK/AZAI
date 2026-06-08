@@ -8,7 +8,7 @@ from telethon import Button, events
 from AloneX import START_TIME, BOT_USERNAME, font, prefix_cmds, tbot
 
 IST = pytz.timezone("Asia/Kolkata")
-AZAI_PANEL_MEDIA = "https://files.catbox.moe/1gxuh7.jpg"
+AZAI_PANEL_MEDIA = None
 UPDATES_LINK = "https://t.me/EGOxUPDATES"
 SUPPORT_LINK = "https://t.me/EGOxSUPPORT"
 MASTER_LINK = "https://t.me/EGOISTICxPRIME"
@@ -37,22 +37,22 @@ def azai_home_text() -> str:
     uptime = readable_time(time.time() - START_TIME)
     ist_time = datetime.now(IST).strftime("%d %b %Y - %I:%M:%S %p")
     return (
-        font("❂ AZAI IS ONLINE") + "\n"
+        font("AZAI IS ONLINE") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Network:") + " `EGO Network - EST. 2026`\n"
-        + font("Owner:") + " `MR EGO`\n"
-        + font("Uptime:") + f" `{uptime}`\n"
-        + font("Time:") + f" `{ist_time}`\n\n"
+        + font("Network:") + " " + font("EGO Network - EST. 2026") + "\n"
+        + font("Owner:") + " " + font("MR EGO") + "\n"
+        + font("Uptime:") + f" {uptime}\n"
+        + font("Time:") + f" {ist_time}\n\n"
         + font("Summon AZAI To Your Empire") + "\n"
         + font("Turn your group into a royal command center with protection, rewards, quizzes, events, and premium EGO Network control.") + "\n\n"
         + font("Core: Verification, AI Chat, Economy, Quiz, Shop, Vault, Events.") + "\n\n"
-        + font("Powered By:") + " `EGO Network - EST. 2026`"
+        + font("Powered By:") + " " + font("EGO Network - EST. 2026")
     )
 
 
 def azai_help_text() -> str:
     return (
-        font("❂ AZAI HELP MENU") + "\n"
+        font("AZAI HELP MENU") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Security: Verification, Anti-Spam, Warnings, Group Control") + "\n"
         + font("Profile: Profile Setup, Cards, Titles, Badges") + "\n"
@@ -61,23 +61,23 @@ def azai_help_text() -> str:
         + font("Shop: Items, Images, Gifts, Permanent Vault") + "\n"
         + font("Events: Birthday Wishes, Festival Wishes, Custom Events") + "\n"
         + font("Media: Start Media, Premium Panels, Button Controls") + "\n\n"
-        + font("Powered By:") + " `EGO Network - EST. 2026`"
+        + font("Powered By:") + " " + font("EGO Network - EST. 2026")
     )
 
 
 def azai_buttons():
     return [
-        [Button.inline(font("❂ Help"), b"azai_help_menu"), Button.inline(font("❂ System Stats"), b"azai_system_stats")],
-        [Button.url(font("❂ Add AZAI To Your Empire"), add_to_group_link())],
-        [Button.url(font("❂ Updates"), UPDATES_LINK), Button.url(font("❂ Support"), SUPPORT_LINK)],
-        [Button.url(font("❂ My Master"), MASTER_LINK), Button.inline(font("❂ Close"), b"azai_close_panel")],
+        [Button.inline(font("Help"), b"azai_help_menu"), Button.inline(font("System Stats"), b"azai_system_stats")],
+        [Button.url(font("Add AZAI To Your Empire"), add_to_group_link())],
+        [Button.url(font("Updates"), UPDATES_LINK), Button.url(font("Support"), SUPPORT_LINK)],
+        [Button.url(font("My Master"), MASTER_LINK), Button.inline(font("Close"), b"azai_close_panel")],
     ]
 
 
 def azai_help_buttons():
     return [
-        [Button.url(font("❂ Add AZAI To Your Empire"), add_to_group_link())],
-        [Button.inline(font("❂ Back"), b"azai_back_home"), Button.inline(font("❂ Close"), b"azai_close_panel")],
+        [Button.url(font("Add AZAI To Your Empire"), add_to_group_link())],
+        [Button.inline(font("Back"), b"azai_back_home"), Button.inline(font("Close"), b"azai_close_panel")],
     ]
 
 
@@ -110,20 +110,20 @@ async def azai_system_stats(event):
     uptime = readable_time(time.time() - START_TIME)
     ist_time = datetime.now(IST).strftime("%d %b %Y - %I:%M:%S %p")
     text = (
-        font("❂ AZAI SYSTEM STATS") + "\n"
+        font("AZAI SYSTEM STATS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Brand:") + " `EGO Network - EST. 2026`\n\n"
+        + font("Brand:") + " " + font("EGO Network - EST. 2026") + "\n\n"
         + font("Performance:") + "\n"
-        + font("CPU:") + f" `{cpu:.1f}%`\n"
-        + font("RAM:") + f" `{memory.percent:.1f}%`\n"
-        + font("Storage:") + f" `{disk.percent:.1f}%`\n\n"
+        + font("CPU:") + f" {cpu:.1f}%\n"
+        + font("RAM:") + f" {memory.percent:.1f}%\n"
+        + font("Storage:") + f" {disk.percent:.1f}%\n\n"
         + font("Runtime:") + "\n"
-        + font("Uptime:") + f" `{uptime}`\n"
-        + font("Time:") + f" `{ist_time}`"
+        + font("Uptime:") + f" {uptime}\n"
+        + font("Time:") + f" {ist_time}"
     )
     buttons = [
-        [Button.inline(font("❂ Back"), b"azai_back_home"), Button.inline(font("❂ Refresh"), b"azai_system_stats")],
-        [Button.inline(font("❂ Close"), b"azai_close_panel")],
+        [Button.inline(font("Back"), b"azai_back_home"), Button.inline(font("Refresh"), b"azai_system_stats")],
+        [Button.inline(font("Close"), b"azai_close_panel")],
     ]
     await event.edit(text, buttons=buttons)
 
