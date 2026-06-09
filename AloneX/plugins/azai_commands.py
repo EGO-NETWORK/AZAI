@@ -99,6 +99,41 @@ def moderation_commands_text() -> str:
     )
 
 
+def economy_commands_text() -> str:
+    return (
+        font("ECONOMY COMMANDS") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + "/wallet - " + font("Show your wallet") + "\n"
+        + "/balance - " + font("Show your balance") + "\n"
+        + "/daily - " + font("Claim 100 EC daily reward") + "\n"
+        + "/send amount - " + font("Reply to a user and send credits with 3% fee") + "\n"
+        + "/rep - " + font("Reply to a user and give daily REP") + "\n"
+        + "/myrep - " + font("Show your REP") + "\n"
+        + "/leaderboard - " + font("Open richest, XP, and REP leaderboard") + "\n"
+        + "/inventory - " + font("Show saved inventory") + "\n"
+        + "/refer - " + font("Referral system, coming next") + "\n"
+        + "/redeemref - " + font("Redeem referral code, coming next") + "\n\n"
+        + font("Currency:") + " EGO CREDIT (EC)\n"
+        + font("Powered By:") + " " + BRAND
+    )
+
+
+def market_commands_text() -> str:
+    return (
+        font("MARKET COMMANDS") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + "/shop - " + font("Open market panel") + "\n"
+        + "/garage - " + font("Show your bought cars and bikes") + "\n"
+        + "/vault - " + font("Open rare and owner-gifted item vault") + "\n"
+        + "/setcar item_id - " + font("Set active car") + "\n"
+        + "/setbike item_id - " + font("Set active bike") + "\n"
+        + "/gift item_name - " + font("Reply to a user and send a gift") + "\n\n"
+        + font("Current market:") + "\n"
+        + font("Cars, Bikes, Gifts, Boosters, Garage, Inventory, Vault") + "\n\n"
+        + font("Powered By:") + " " + BRAND
+    )
+
+
 def media_commands_text() -> str:
     return (
         font("STICKER COMMANDS") + "\n"
@@ -117,12 +152,12 @@ def coming_soon_text() -> str:
     return (
         font("COMING SOON") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Economy Base") + "\n"
-        + font("Shop And Vault Base") + "\n"
+        + font("Refer Earn Full Logic") + "\n"
+        + font("Family Tree / Social Tree") + "\n"
         + font("Anime Quiz And GK Quiz") + "\n"
         + font("Birthday And Festival System") + "\n"
         + font("Full Owner Panel Actions") + "\n\n"
-        + font("Images, banners, items, and economy names will be added only after owner approval.") + "\n\n"
+        + font("Images, banners, gift media, and final visuals will be added after owner approval.") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
 
@@ -131,7 +166,8 @@ def command_buttons():
     return [
         [Button.inline(font("User"), b"azcmd_user"), Button.inline(font("Profile"), b"azcmd_profile")],
         [Button.inline(font("Verification"), b"azcmd_verify"), Button.inline(font("Admin"), b"azcmd_admin")],
-        [Button.inline(font("Moderation"), b"azcmd_mod"), Button.inline(font("Stickers"), b"azcmd_media")],
+        [Button.inline(font("Moderation"), b"azcmd_mod"), Button.inline(font("Economy"), b"azcmd_eco")],
+        [Button.inline(font("Market"), b"azcmd_market"), Button.inline(font("Stickers"), b"azcmd_media")],
         [Button.inline(font("Coming Soon"), b"azcmd_soon"), Button.inline(font("Close"), b"azcmd_close")],
     ]
 
@@ -160,6 +196,10 @@ async def commands_callback(event):
         await event.edit(admin_commands_text(), buttons=back_buttons())
     elif data == "azcmd_mod":
         await event.edit(moderation_commands_text(), buttons=back_buttons())
+    elif data == "azcmd_eco":
+        await event.edit(economy_commands_text(), buttons=back_buttons())
+    elif data == "azcmd_market":
+        await event.edit(market_commands_text(), buttons=back_buttons())
     elif data == "azcmd_media":
         await event.edit(media_commands_text(), buttons=back_buttons())
     elif data == "azcmd_soon":
