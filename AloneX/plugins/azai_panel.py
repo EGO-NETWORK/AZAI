@@ -67,7 +67,8 @@ def azai_help_text() -> str:
 
 def azai_buttons():
     return [
-        [Button.inline(font("Help"), b"azai_help_menu"), Button.inline(font("System Stats"), b"azai_system_stats")],
+        [Button.inline(font("Help"), b"azai_help_menu"), Button.inline(font("Commands"), b"azai_commands_menu")],
+        [Button.inline(font("System Stats"), b"azai_system_stats")],
         [Button.url(font("Add AZAI To Your Empire"), add_to_group_link())],
         [Button.url(font("Updates"), UPDATES_LINK), Button.url(font("Support"), SUPPORT_LINK)],
         [Button.url(font("My Master"), MASTER_LINK), Button.inline(font("Close"), b"azai_close_panel")],
@@ -76,6 +77,7 @@ def azai_buttons():
 
 def azai_help_buttons():
     return [
+        [Button.inline(font("Commands"), b"azai_commands_menu")],
         [Button.url(font("Add AZAI To Your Empire"), add_to_group_link())],
         [Button.inline(font("Back"), b"azai_back_home"), Button.inline(font("Close"), b"azai_close_panel")],
     ]
@@ -100,6 +102,12 @@ async def azai_help_command(event):
 async def azai_help_menu(event):
     await event.answer(font("Opening AZAI help menu..."))
     await event.edit(azai_help_text(), buttons=azai_help_buttons(), file=AZAI_PANEL_MEDIA)
+
+
+async def azai_commands_menu(event):
+    await event.answer(font("Opening command center..."))
+    from AloneX.plugins.azai_commands import command_buttons, commands_home_text
+    await event.edit(commands_home_text(), buttons=command_buttons())
 
 
 async def azai_system_stats(event):
@@ -144,6 +152,7 @@ if "azai_panel" not in tbot.handlers_loaded:
     tbot.add_event_handler(azai_panel_handler, events.NewMessage(pattern=f"^{prefix_cmds}startpanel$", incoming=True))
     tbot.add_event_handler(azai_help_command, events.NewMessage(pattern=f"^{prefix_cmds}help$", incoming=True))
     tbot.add_event_handler(azai_help_menu, events.CallbackQuery(pattern=b"azai_help_menu"))
+    tbot.add_event_handler(azai_commands_menu, events.CallbackQuery(pattern=b"azai_commands_menu"))
     tbot.add_event_handler(azai_system_stats, events.CallbackQuery(pattern=b"azai_system_stats"))
     tbot.add_event_handler(azai_back_home, events.CallbackQuery(pattern=b"azai_back_home"))
     tbot.add_event_handler(azai_close_panel, events.CallbackQuery(pattern=b"azai_close_panel"))
