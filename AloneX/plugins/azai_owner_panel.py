@@ -49,8 +49,8 @@ def owner_home_text() -> str:
         font("AZAI OWNER PANEL") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Access:") + " " + font("Owner Only") + "\n"
-        + font("Use buttons below to check core system status.") + "\n\n"
-        + font("Private data is not shown in this panel.") + "\n\n"
+        + font("Control Center:") + " " + font("Core status, modules, and launch checklist") + "\n\n"
+        + font("Private data is hidden. Secrets are never shown here.") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
 
@@ -81,6 +81,7 @@ def ai_status_text() -> str:
         font("AI STATUS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Provider:") + " " + font("Groq") + "\n"
+        + font("Memory:") + " " + font("Short context enabled") + "\n"
         + font("Key Status:") + f" {status}\n"
         + font("Secret Safety:") + " " + font("Hidden") + "\n\n"
         + font("Powered By:") + " " + BRAND
@@ -93,7 +94,7 @@ def logs_status_text() -> str:
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Public logger:") + " " + font("Disabled by AZAI log guard") + "\n"
         + font("Normal user messages:") + " " + font("Should not be logged") + "\n"
-        + font("Important logs:") + " " + font("Owner-safe mode pending") + "\n\n"
+        + font("Owner-safe mode:") + " " + font("Enabled for sensitive checks") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
 
@@ -109,11 +110,80 @@ def database_status_text() -> str:
     )
 
 
+def security_text() -> str:
+    return (
+        font("SECURITY CONTROL") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Verification:") + " /verify /verifyall /unverifyall\n"
+        + font("Moderation:") + " /mod /warn /mute /ban\n"
+        + font("Anti-link:") + " /antilink on | off\n"
+        + font("Removed shortcuts:") + " /prop /weds /ageverify guarded\n\n"
+        + font("Use these in group where AZAI is admin.")
+    )
+
+
+def economy_text() -> str:
+    return (
+        font("ECONOMY CONTROL") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Wallet:") + " /wallet /daily /send\n"
+        + font("Inventory:") + " /inventory /garage /vault\n"
+        + font("Market:") + " /shop /setcar /setbike /gift\n"
+        + font("Referral:") + " /refer /redeemref\n\n"
+        + font("Currency:") + " EGO CREDIT (EC)"
+    )
+
+
+def quiz_text() -> str:
+    return (
+        font("QUIZ CONTROL") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Add anime quiz:") + "\n"
+        + "/addanimeq answer | option1 | option2 | option3 | option4\n\n"
+        + font("Play:") + " /animeguess /quiz\n"
+        + font("Stats:") + " /quizstats /quiztop\n"
+        + font("Auto:") + " /quizon /quizoff\n\n"
+        + font("Reward:") + " +100 EC +15 XP, 5 streak = +200 EC"
+    )
+
+
+def market_text() -> str:
+    return (
+        font("MARKET MEDIA CONTROL") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Set item image:") + "\n"
+        + "/setitempic item_id " + font("by replying to item photo") + "\n\n"
+        + font("Examples:") + "\n"
+        + "/setitempic bike_splendor\n"
+        + "/setitempic car_scorpio_s11_black\n"
+        + "/setitempic rose\n\n"
+        + font("Buy/Garage/Gift will show image with caption when saved.")
+    )
+
+
+def launch_text() -> str:
+    return (
+        font("LAUNCH CHECKLIST") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + "1. " + font("Restart bot after latest repo update") + "\n"
+        + "2. " + font("Test /start and /commands") + "\n"
+        + "3. " + font("Test /verify and group admin permissions") + "\n"
+        + "4. " + font("Set market item images using /setitempic") + "\n"
+        + "5. " + font("Add 3-5 anime quiz questions") + "\n"
+        + "6. " + font("Test /wallet /daily /shop /garage") + "\n"
+        + "7. " + font("Fix errors for 1-2 days, then publish")
+    )
+
+
 def maintenance_text() -> str:
     return (
         font("MAINTENANCE") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Restart controls, broadcast, and maintenance toggle will be added after core modules are stable.") + "\n\n"
+        + font("Runtime restart must be done from hosting panel for now.") + "\n"
+        + font("Recommended before launch:") + "\n"
+        + "• " + font("Restart") + "\n"
+        + "• " + font("Check logs") + "\n"
+        + "• " + font("Run live group test") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
 
@@ -121,9 +191,11 @@ def maintenance_text() -> str:
 def owner_buttons():
     return [
         [Button.inline(font("Bot Status"), b"azown_bot"), Button.inline(font("AI Status"), b"azown_ai")],
-        [Button.inline(font("Log Status"), b"azown_logs"), Button.inline(font("Database"), b"azown_db")],
-        [Button.inline(font("Commands"), b"azown_commands"), Button.inline(font("Maintenance"), b"azown_maintenance")],
-        [Button.inline(font("Close"), b"azown_close")],
+        [Button.inline(font("Database"), b"azown_db"), Button.inline(font("Logs"), b"azown_logs")],
+        [Button.inline(font("Security"), b"azown_security"), Button.inline(font("Economy"), b"azown_economy")],
+        [Button.inline(font("Quiz"), b"azown_quiz"), Button.inline(font("Market Media"), b"azown_market")],
+        [Button.inline(font("Launch Check"), b"azown_launch"), Button.inline(font("Commands"), b"azown_commands")],
+        [Button.inline(font("Maintenance"), b"azown_maintenance"), Button.inline(font("Close"), b"azown_close")],
     ]
 
 
@@ -153,6 +225,16 @@ async def owner_callback(event):
         await event.edit(logs_status_text(), buttons=back_buttons())
     elif data == "azown_db":
         await event.edit(database_status_text(), buttons=back_buttons())
+    elif data == "azown_security":
+        await event.edit(security_text(), buttons=back_buttons())
+    elif data == "azown_economy":
+        await event.edit(economy_text(), buttons=back_buttons())
+    elif data == "azown_quiz":
+        await event.edit(quiz_text(), buttons=back_buttons())
+    elif data == "azown_market":
+        await event.edit(market_text(), buttons=back_buttons())
+    elif data == "azown_launch":
+        await event.edit(launch_text(), buttons=back_buttons())
     elif data == "azown_commands":
         await event.edit(font("Use /commands to open the public command center."), buttons=back_buttons())
     elif data == "azown_maintenance":
