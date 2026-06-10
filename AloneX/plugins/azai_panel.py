@@ -60,7 +60,7 @@ def azai_help_cmds_text() -> str:
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Choose a category below to see commands and usage.") + "\n"
         + font("Owner-only commands stay hidden from public users.") + "\n\n"
-        + font("Available: Core, Profile, Verify, Moderation, Economy, Market, Social, AI, Owner.") + "\n\n"
+        + font("Available: Core, Profile, Verify, Moderation, Economy, Market, Family, AI, Owner.") + "\n\n"
         + font("Powered By:") + " " + brand()
     )
 
@@ -156,13 +156,10 @@ def market_text() -> str:
     )
 
 
-def social_text() -> str:
+def family_text() -> str:
     return (
-        font("SOCIAL COMMANDS") + "\n"
+        font("FAMILY COMMANDS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + "/ageverify - " + font("Confirm access for restricted social commands") + "\n"
-        + "/prop - " + font("Send Prime Bond request by reply") + "\n"
-        + "/weds - " + font("Send Duo Bond request by reply") + "\n"
         + "/brother - " + font("Send brother link request") + "\n"
         + "/sister - " + font("Send sister link request") + "\n"
         + "/adopt - " + font("Send member link request") + "\n"
@@ -210,7 +207,7 @@ def help_cmds_buttons():
         [Button.inline(font("Core"), b"azai_sec_core"), Button.inline(font("Profile"), b"azai_sec_profile")],
         [Button.inline(font("Verify"), b"azai_sec_verify"), Button.inline(font("Moderation"), b"azai_sec_mod")],
         [Button.inline(font("Economy"), b"azai_sec_economy"), Button.inline(font("Market"), b"azai_sec_market")],
-        [Button.inline(font("Social"), b"azai_sec_social"), Button.inline(font("AI"), b"azai_sec_ai")],
+        [Button.inline(font("Family"), b"azai_sec_family"), Button.inline(font("AI"), b"azai_sec_ai")],
         [Button.inline(font("Owner"), b"azai_sec_owner")],
         [Button.inline(font("Back"), b"azai_back_home"), Button.inline(font("Close"), b"azai_close_panel")],
     ]
@@ -254,7 +251,7 @@ async def azai_section_callback(event):
         "azai_sec_mod": mod_text,
         "azai_sec_economy": economy_text,
         "azai_sec_market": market_text,
-        "azai_sec_social": social_text,
+        "azai_sec_family": family_text,
         "azai_sec_ai": ai_text,
         "azai_sec_owner": owner_text,
     }
