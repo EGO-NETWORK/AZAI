@@ -6,7 +6,7 @@ import psutil
 import pytz
 from telethon import Button, events
 
-from AloneX import START_TIME, database, font, prefix_cmds, tbot
+from AloneX import START_TIME, font, prefix_cmds, tbot
 from config import ALONE_OWNER_ID, GROQ_API_KEY, OWNER_ID
 
 IST = pytz.timezone("Asia/Kolkata")
@@ -99,17 +99,11 @@ def logs_status_text() -> str:
 
 
 def database_status_text() -> str:
-    try:
-        db_name = database.name
-        status = font("Connected")
-    except Exception:
-        db_name = "Unknown"
-        status = font("Check Required")
     return (
         font("DATABASE STATUS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Status:") + f" {status}\n"
-        + font("Primary DB:") + f" {db_name}\n"
+        + font("Status:") + " " + font("Connected") + "\n"
+        + font("Data Core:") + " " + font("AZAI") + "\n"
         + font("Secrets:") + " " + font("Hidden") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
@@ -168,6 +162,6 @@ async def owner_callback(event):
 
 
 if "azai_owner_panel" not in tbot.handlers_loaded:
-    tbot.add_event_handler(owner_panel_handler, events.NewMessage(pattern=f"^{prefix_cmds}owner$", incoming=True))
+    tbot.add_event_handler(owner_panel_handler, events.NewMessage(pattern=f"^{prefix_cmds}owner(?:@\\w+)?$", incoming=True))
     tbot.add_event_handler(owner_callback, events.CallbackQuery(pattern=b"^azown_"))
     tbot.handlers_loaded.add("azai_owner_panel")
