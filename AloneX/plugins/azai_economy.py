@@ -48,6 +48,46 @@ def wallet_key(user_id: int) -> dict:
     return {"user_id": int(user_id)}
 
 
+def public_name(user) -> str:
+    name = getattr(user, "first_name", None) or getattr(user, "username", None) or "Unknown User"
+    username = getattr(user, "username", None)
+    if username:
+        return f"{name} (@{username})"
+    return name
+
+
+async def touch_user(user):
+    if not user:
+        return
+    await wallet_db.update_one(
+        wallet_key(user.id),
+        {
+            "$set": {
+                "name": getattr(user, "first_name", None) or getattr(user, "username", None) or "Unknown User",
+                "username": getattr(user, "username", None),
+                "updated_at": now_ist(),
+            }
+        },
+        upsert=True,
+    )
+
+
+async def display_from_row(row: dict) -> str:
+    user_id = int(row.get("user_id", 0) or 0)
+    name = row.get("name") or "Unknown User"
+    username = row.get("username")
+    try:
+        user = await tbot.get_entity(user_id)
+        name = getattr(user, "first_name", None) or getattr(user, "username", None) or name
+        username = getattr(user, "username", None) or username
+        await wallet_db.update_one(wallet_key(user_id), {"$set": {"name": name, "username": username}}, upsert=True)
+    except Exception:
+        pass
+    if username:
+        return f"{name} (@{username})"
+    return name
+
+
 async def get_wallet(user_id: int) -> dict:
     user_id = int(user_id)
     data = await wallet_db.find_one(wallet_key(user_id))
@@ -94,7 +134,7 @@ async def is_verified_in_group(chat_id: int, user_id: int) -> bool:
 
 
 def wallet_text(user, wallet: dict) -> str:
-    name = getattr(user, "first_name", "User") or "User"
+    name = public_name(user)
     bal = int(wallet.get("balance", 0))
     xp = int(wallet.get("xp", 0))
     lvl = int(wallet.get("level", level_from_xp(xp)))
@@ -115,12 +155,14 @@ def wallet_buttons():
 
 async def wallet_handler(event):
     sender = await event.get_sender()
+    await touch_user(sender)
     wallet = await get_wallet(sender.id)
     await event.reply(wallet_text(sender, wallet), buttons=wallet_buttons())
 
 
 async def daily_handler(event):
     sender = await event.get_sender()
+    await touch_user(sender)
     wallet = await get_wallet(sender.id)
     today = today_key()
     if wallet.get("daily_at") == today:
@@ -142,6 +184,8 @@ async def send_handler(event):
         return
     target = await reply.get_sender()
     sender = await event.get_sender()
+    await touch_user(sender)
+    await touch_user(target)
     if not target or getattr(target, "bot", False):
         await event.reply(font("You cannot send credits to this target."))
         return
@@ -180,6 +224,8 @@ async def rep_handler(event):
         return
     target = await reply.get_sender()
     sender = await event.get_sender()
+    await touch_user(sender)
+    await touch_user(target)
     if not target or getattr(target, "bot", False):
         await event.reply(font("You cannot give REP to this target."))
         return
@@ -198,6 +244,7 @@ async def rep_handler(event):
 
 async def myrep_handler(event):
     sender = await event.get_sender()
+    await touch_user(sender)
     wallet = await get_wallet(sender.id)
     rep = int(wallet.get("rep", 0))
     await event.reply(font("Your REP:") + f" {rep}")
@@ -205,6 +252,7 @@ async def myrep_handler(event):
 
 async def inventory_handler(event):
     sender = await event.get_sender()
+    await touch_user(sender)
     wallet = await get_wallet(sender.id)
     inv = wallet.get("inventory", []) or []
     if not inv:
@@ -223,7 +271,8 @@ async def leaderboard_text(kind: str = "balance") -> str:
     rank = 1
     async for row in rows:
         value = int(row.get(kind, 0))
-        text += f"{rank}. {row.get('user_id')} - {value}\n"
+        display = await display_from_row(row)
+        text += f"{rank}. {display} - {value}\n"
         rank += 1
     if rank == 1:
         text += font("No data yet.")
@@ -238,6 +287,8 @@ def leaderboard_buttons():
 
 
 async def leaderboard_handler(event):
+    sender = await event.get_sender()
+    await touch_user(sender)
     await event.reply(await leaderboard_text("balance"), buttons=leaderboard_buttons())
 
 
@@ -266,6 +317,7 @@ async def chat_reward_handler(event):
     sender = await event.get_sender()
     if not sender or getattr(sender, "bot", False):
         return
+    await touch_user(sender)
     if not await is_verified_in_group(event.chat_id, sender.id):
         return
     key = (int(event.chat_id), int(sender.id))
@@ -282,13 +334,13 @@ async def chat_reward_handler(event):
 
 
 if "azai_economy" not in tbot.handlers_loaded:
-    tbot.add_event_handler(wallet_handler, events.NewMessage(pattern=f"^{prefix_cmds}(wallet|balance)$", incoming=True))
-    tbot.add_event_handler(daily_handler, events.NewMessage(pattern=f"^{prefix_cmds}daily$", incoming=True))
+    tbot.add_event_handler(wallet_handler, events.NewMessage(pattern=f"^{prefix_cmds}(wallet|balance)(?:@\\w+)?$", incoming=True))
+    tbot.add_event_handler(daily_handler, events.NewMessage(pattern=f"^{prefix_cmds}daily(?:@\\w+)?$", incoming=True))
     tbot.add_event_handler(send_handler, events.NewMessage(pattern=f"^{prefix_cmds}send(?: .*)?$", incoming=True))
-    tbot.add_event_handler(rep_handler, events.NewMessage(pattern=f"^{prefix_cmds}rep$", incoming=True))
-    tbot.add_event_handler(myrep_handler, events.NewMessage(pattern=f"^{prefix_cmds}myrep$", incoming=True))
-    tbot.add_event_handler(inventory_handler, events.NewMessage(pattern=f"^{prefix_cmds}inventory$", incoming=True))
-    tbot.add_event_handler(leaderboard_handler, events.NewMessage(pattern=f"^{prefix_cmds}leaderboard$", incoming=True))
+    tbot.add_event_handler(rep_handler, events.NewMessage(pattern=f"^{prefix_cmds}rep(?:@\\w+)?$", incoming=True))
+    tbot.add_event_handler(myrep_handler, events.NewMessage(pattern=f"^{prefix_cmds}myrep(?:@\\w+)?$", incoming=True))
+    tbot.add_event_handler(inventory_handler, events.NewMessage(pattern=f"^{prefix_cmds}inventory(?:@\\w+)?$", incoming=True))
+    tbot.add_event_handler(leaderboard_handler, events.NewMessage(pattern=f"^{prefix_cmds}leaderboard(?:@\\w+)?$", incoming=True))
     tbot.add_event_handler(economy_callback, events.CallbackQuery(pattern=b"^azeco_"))
     tbot.add_event_handler(chat_reward_handler, events.NewMessage(incoming=True))
     tbot.handlers_loaded.add("azai_economy")
