@@ -49,7 +49,7 @@ def owner_home_text() -> str:
         font("AZAI OWNER PANEL") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Access:") + " " + font("Owner Only") + "\n"
-        + font("Control Center:") + " " + font("Core status, modules, and launch checklist") + "\n\n"
+        + font("Control Center:") + " " + font("Core status, modules, launch checklist, and setup guide") + "\n\n"
         + font("Private data is hidden. Secrets are never shown here.") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
@@ -75,7 +75,7 @@ def bot_status_text() -> str:
 
 
 def ai_status_text() -> str:
-    groq_key = GROQ_API_KEY or os.getenv("GROQ_API_KEY") or os.getenv("GQRI_API_KEY")
+    groq_key = GROQ_API_KEY or os.getenv("GROQ_API_KEY") or os.getenv("GRQI_API_KEY") or os.getenv("GQRI_API_KEY")
     status = font("Configured") if has_value(groq_key) else font("Missing")
     return (
         font("AI STATUS") + "\n"
@@ -83,6 +83,7 @@ def ai_status_text() -> str:
         + font("Provider:") + " " + font("Groq") + "\n"
         + font("Memory:") + " " + font("Short context enabled") + "\n"
         + font("Key Status:") + f" {status}\n"
+        + font("Accepted env:") + " GROQ_API_KEY / GRQI_API_KEY / GQRI_API_KEY\n"
         + font("Secret Safety:") + " " + font("Hidden") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
@@ -90,11 +91,11 @@ def ai_status_text() -> str:
 
 def logs_status_text() -> str:
     return (
-        font("LOG STATUS") + "\n"
+        font("LOGGER STATUS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Public logger:") + " " + font("Disabled by AZAI log guard") + "\n"
-        + font("Normal user messages:") + " " + font("Should not be logged") + "\n"
-        + font("Owner-safe mode:") + " " + font("Enabled for sensitive checks") + "\n\n"
+        + font("Logger:") + " " + font("Allowed by owner control") + "\n"
+        + font("Controls:") + " /logon /logoff /logstatus\n"
+        + font("Note:") + " LOG_GROUP_ID must be numeric.\n\n"
         + font("Powered By:") + " " + BRAND
     )
 
@@ -129,7 +130,8 @@ def economy_text() -> str:
         + font("Wallet:") + " /wallet /daily /send\n"
         + font("Inventory:") + " /inventory /garage /vault\n"
         + font("Market:") + " /shop /setcar /setbike /gift\n"
-        + font("Referral:") + " /refer /redeemref\n\n"
+        + font("Referral:") + " /refer /redeemref\n"
+        + font("Vault Items:") + " /addvaultitem /vaultitems /buyvault /myvault\n\n"
         + font("Currency:") + " EGO CREDIT (EC)"
     )
 
@@ -138,8 +140,11 @@ def quiz_text() -> str:
     return (
         font("QUIZ CONTROL") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Add anime quiz:") + "\n"
-        + "/addanimeq answer | option1 | option2 | option3 | option4\n\n"
+        + font("Easy add steps:") + "\n"
+        + "1. Send anime/character image\n"
+        + "2. Reply to that image\n"
+        + "3. Use this:\n"
+        + "/addanimeq Naruto | Naruto | Luffy | Gojo | Eren\n\n"
         + font("Play:") + " /animeguess /quiz\n"
         + font("Stats:") + " /quizstats /quiztop\n"
         + font("Auto:") + " /quizon /quizoff\n\n"
@@ -151,13 +156,40 @@ def market_text() -> str:
     return (
         font("MARKET MEDIA CONTROL") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Set start panel image:") + "\n"
+        + "1. Send image/video\n2. Reply to it\n3. /setstartpic\n\n"
         + font("Set item image:") + "\n"
-        + "/setitempic item_id " + font("by replying to item photo") + "\n\n"
+        + "1. Send item image\n2. Reply to it\n3. /setitempic item_id\n\n"
         + font("Examples:") + "\n"
         + "/setitempic bike_splendor\n"
         + "/setitempic car_scorpio_s11_black\n"
         + "/setitempic rose\n\n"
-        + font("Buy/Garage/Gift will show image with caption when saved.")
+        + font("Set vehicles after buy:") + "\n"
+        + "/garage\n/setbike bike_splendor\n/setcar car_scorpio_s11_black"
+    )
+
+
+def guide_text() -> str:
+    return (
+        font("AZAI SETUP GUIDE") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("START PIC:") + "\n"
+        + "Send image/video -> reply -> /setstartpic\n\n"
+        + font("ITEM PICS:") + "\n"
+        + "Send item image -> reply -> /setitempic item_id\n"
+        + "Example: /setitempic bike_splendor\n\n"
+        + font("ANIME QUIZ:") + "\n"
+        + "Send quiz image -> reply -> /addanimeq answer | option1 | option2 | option3 | option4\n"
+        + "Example: /addanimeq Naruto | Naruto | Luffy | Gojo | Eren\n\n"
+        + font("VEHICLE SET:") + "\n"
+        + "/garage -> copy ID -> /setbike bike_id or /setcar car_id\n\n"
+        + font("VAULT ITEM:") + "\n"
+        + "/addvaultitem id | name | price | stock\n"
+        + "Example: /addvaultitem royal_crown | Royal Crown | 5000 | 10\n\n"
+        + font("BROADCAST:") + "\n"
+        + "/broadcast text\n/broadcastpin text\n\n"
+        + font("AI KEY:") + "\n"
+        + "Replit Secrets me GROQ_API_KEY ya GRQI_API_KEY add karo."
     )
 
 
@@ -167,11 +199,12 @@ def launch_text() -> str:
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + "1. " + font("Restart bot after latest repo update") + "\n"
         + "2. " + font("Test /start and /commands") + "\n"
-        + "3. " + font("Test /verify and group admin permissions") + "\n"
-        + "4. " + font("Set market item images using /setitempic") + "\n"
-        + "5. " + font("Add 3-5 anime quiz questions") + "\n"
-        + "6. " + font("Test /wallet /daily /shop /garage") + "\n"
-        + "7. " + font("Fix errors for 1-2 days, then publish")
+        + "3. " + font("Test /settings and /msettings") + "\n"
+        + "4. " + font("Test /verify and group admin permissions") + "\n"
+        + "5. " + font("Set start and item images") + "\n"
+        + "6. " + font("Add 3-5 anime quiz questions") + "\n"
+        + "7. " + font("Test /wallet /daily /shop /garage /broadcast") + "\n"
+        + "8. " + font("Fix errors for 1-2 days, then publish")
     )
 
 
@@ -190,12 +223,13 @@ def maintenance_text() -> str:
 
 def owner_buttons():
     return [
-        [Button.inline(font("Bot Status"), b"azown_bot"), Button.inline(font("AI Status"), b"azown_ai")],
-        [Button.inline(font("Database"), b"azown_db"), Button.inline(font("Logs"), b"azown_logs")],
-        [Button.inline(font("Security"), b"azown_security"), Button.inline(font("Economy"), b"azown_economy")],
-        [Button.inline(font("Quiz"), b"azown_quiz"), Button.inline(font("Market Media"), b"azown_market")],
-        [Button.inline(font("Launch Check"), b"azown_launch"), Button.inline(font("Commands"), b"azown_commands")],
-        [Button.inline(font("Maintenance"), b"azown_maintenance"), Button.inline(font("Close"), b"azown_close")],
+        [Button.inline(font("Guide"), b"azown_guide"), Button.inline(font("Bot Status"), b"azown_bot")],
+        [Button.inline(font("AI Status"), b"azown_ai"), Button.inline(font("Database"), b"azown_db")],
+        [Button.inline(font("Logs"), b"azown_logs"), Button.inline(font("Security"), b"azown_security")],
+        [Button.inline(font("Economy"), b"azown_economy"), Button.inline(font("Quiz"), b"azown_quiz")],
+        [Button.inline(font("Market Media"), b"azown_market"), Button.inline(font("Launch Check"), b"azown_launch")],
+        [Button.inline(font("Commands"), b"azown_commands"), Button.inline(font("Maintenance"), b"azown_maintenance")],
+        [Button.inline(font("Close"), b"azown_close")],
     ]
 
 
@@ -217,6 +251,8 @@ async def owner_callback(event):
     data = event.data.decode()
     if data == "azown_home":
         await event.edit(owner_home_text(), buttons=owner_buttons())
+    elif data == "azown_guide":
+        await event.edit(guide_text(), buttons=back_buttons())
     elif data == "azown_bot":
         await event.edit(bot_status_text(), buttons=back_buttons())
     elif data == "azown_ai":
