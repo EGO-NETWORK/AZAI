@@ -5,14 +5,66 @@ import psutil
 import pytz
 from telethon import Button, events
 
-from AloneX import START_TIME, BOT_USERNAME, font, prefix_cmds, tbot
+from AloneX import START_TIME, BOT_USERNAME, database, font, prefix_cmds, tbot
+from config import ALONE_OWNER_ID, OWNER_ID
 
 IST = pytz.timezone("Asia/Kolkata")
-AZAI_PANEL_MEDIA = None
 UPDATES_LINK = "https://t.me/EGOxUPDATES"
 SUPPORT_LINK = "https://t.me/EGOxSUPPORT"
 MASTER_LINK = "https://t.me/EGOISTICxPRIME"
 AZAI_BOT_USERNAME = "Urxazaibot"
+
+media_db = database["azai_media_assets"]
+
+
+def owner_ids() -> set[int]:
+    ids = set()
+    for value in (ALONE_OWNER_ID, OWNER_ID):
+        try:
+            value = int(value)
+            if value:
+                ids.add(value)
+        except Exception:
+            pass
+    return ids
+
+
+async def is_owner(event) -> bool:
+    sender = await event.get_sender()
+    return bool(sender and int(sender.id) in owner_ids())
+
+
+async def save_media_asset(key: str, reply):
+    await media_db.update_one(
+        {"key": key},
+        {"$set": {"key": key, "chat_id": int(reply.chat_id), "msg_id": int(reply.id)}},
+        upsert=True,
+    )
+
+
+async def get_media_asset(key: str):
+    data = await media_db.find_one({"key": key})
+    if not data:
+        return None
+    try:
+        msg = await tbot.get_messages(int(data["chat_id"]), ids=int(data["msg_id"]))
+        if msg and msg.media:
+            return msg.media
+    except Exception:
+        return None
+    return None
+
+
+async def set_startpic_handler(event):
+    if not await is_owner(event):
+        await event.reply(font("Owner only."))
+        return
+    reply = await event.get_reply_message()
+    if not reply or not reply.media:
+        await event.reply(font("Reply to start panel photo first."))
+        return
+    await save_media_asset("start", reply)
+    await event.reply(font("Start panel image saved."))
 
 
 def readable_time(seconds: int) -> str:
@@ -48,8 +100,7 @@ def azai_home_text() -> str:
         + font("Uptime:") + f" {uptime}\n"
         + font("Time:") + f" {ist_time}\n\n"
         + font("Summon AZAI To Your Empire") + "\n"
-        + font("Turn your group into a royal command center with protection, rewards, quizzes, events, and premium EGO Network control.") + "\n\n"
-        + font("Core: Verification, AI Chat, Economy, Quiz, Shop, Vault, Events.") + "\n\n"
+        + font("Turn your group into a royal command center with protection, rewards, quiz, AI chat, economy, and premium EGO Network control.") + "\n\n"
         + font("Powered By:") + " " + brand()
     )
 
@@ -151,7 +202,8 @@ def market_text() -> str:
         + "/vault - " + font("Open vault") + "\n"
         + "/setcar item_id - " + font("Set active car") + "\n"
         + "/setbike item_id - " + font("Set active bike") + "\n"
-        + "/gift item_name - " + font("Send gift by reply") + "\n\n"
+        + "/gift item_name - " + font("Send gift by reply") + "\n"
+        + "/setitempic item_id - " + font("Save item image") + "\n\n"
         + font("Powered By:") + " " + brand()
     )
 
@@ -187,8 +239,10 @@ def owner_text() -> str:
         font("OWNER COMMANDS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + "/owner - " + font("Open owner panel") + "\n"
-        + "/logstatus - " + font("Check log guard") + "\n"
-        + font("More owner action buttons pending after live test.") + "\n\n"
+        + "/setstartpic - " + font("Set start panel image by reply") + "\n"
+        + "/setleaderpic - " + font("Set leaderboard image by reply") + "\n"
+        + "/setitempic item_id - " + font("Set market item image by reply") + "\n"
+        + "/logstatus - " + font("Check log guard") + "\n\n"
         + font("Powered By:") + " " + brand()
     )
 
@@ -217,12 +271,20 @@ def section_buttons():
     return [[Button.inline(font("Back To Help"), b"azai_help_cmds_menu")], [Button.inline(font("Home"), b"azai_back_home"), Button.inline(font("Close"), b"azai_close_panel")]]
 
 
+async def send_panel(event, text, buttons):
+    media = await get_media_asset("start")
+    if media:
+        await tbot.send_file(event.chat_id, media, caption=text, buttons=buttons)
+    else:
+        await event.reply(text, buttons=buttons)
+
+
 async def azai_panel_handler(event):
     if event.is_channel and not event.is_group:
         return
     if event.fwd_from:
         return
-    await event.reply(azai_home_text(), file=AZAI_PANEL_MEDIA, buttons=azai_buttons())
+    await send_panel(event, azai_home_text(), azai_buttons())
 
 
 async def azai_help_command(event):
@@ -230,12 +292,12 @@ async def azai_help_command(event):
         return
     if event.fwd_from:
         return
-    await event.reply(azai_help_cmds_text(), file=AZAI_PANEL_MEDIA, buttons=help_cmds_buttons())
+    await send_panel(event, azai_help_cmds_text(), help_cmds_buttons())
 
 
 async def azai_help_cmds_menu(event):
     await event.answer(font("Opening help and commands..."))
-    await event.edit(azai_help_cmds_text(), buttons=help_cmds_buttons(), file=AZAI_PANEL_MEDIA)
+    await event.edit(azai_help_cmds_text(), buttons=help_cmds_buttons())
 
 
 async def azai_commands_menu(event):
@@ -288,7 +350,7 @@ async def azai_system_stats(event):
 
 async def azai_back_home(event):
     await event.answer()
-    await event.edit(azai_home_text(), buttons=azai_buttons(), file=AZAI_PANEL_MEDIA)
+    await event.edit(azai_home_text(), buttons=azai_buttons())
 
 
 async def azai_close_panel(event):
@@ -297,10 +359,11 @@ async def azai_close_panel(event):
 
 
 if "azai_panel" not in tbot.handlers_loaded:
+    tbot.add_event_handler(set_startpic_handler, events.NewMessage(pattern=f"^{prefix_cmds}setstartpic(?:@\\w+)?$", incoming=True))
     tbot.add_event_handler(azai_panel_handler, events.NewMessage(pattern=f"^{prefix_cmds}start(?: .*)?$", incoming=True))
-    tbot.add_event_handler(azai_panel_handler, events.NewMessage(pattern=f"^{prefix_cmds}azai$", incoming=True))
-    tbot.add_event_handler(azai_panel_handler, events.NewMessage(pattern=f"^{prefix_cmds}startpanel$", incoming=True))
-    tbot.add_event_handler(azai_help_command, events.NewMessage(pattern=f"^{prefix_cmds}help$", incoming=True))
+    tbot.add_event_handler(azai_panel_handler, events.NewMessage(pattern=f"^{prefix_cmds}azai(?:@\\w+)?$", incoming=True))
+    tbot.add_event_handler(azai_panel_handler, events.NewMessage(pattern=f"^{prefix_cmds}startpanel(?:@\\w+)?$", incoming=True))
+    tbot.add_event_handler(azai_help_command, events.NewMessage(pattern=f"^{prefix_cmds}help(?:@\\w+)?$", incoming=True))
     tbot.add_event_handler(azai_help_cmds_menu, events.CallbackQuery(pattern=b"azai_help_cmds_menu"))
     tbot.add_event_handler(azai_commands_menu, events.CallbackQuery(pattern=b"azai_commands_menu"))
     tbot.add_event_handler(azai_section_callback, events.CallbackQuery(pattern=b"^azai_sec_"))
