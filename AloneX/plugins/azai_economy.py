@@ -5,6 +5,7 @@ import pytz
 from telethon import Button, events
 
 from AloneX import database, font, prefix_cmds, tbot
+from config import ALONE_OWNER_ID, OWNER_ID
 
 IST = pytz.timezone("Asia/Kolkata")
 BRAND = font("EGO Network - EST. 2026")
@@ -20,6 +21,7 @@ wallet_db = database["azai_wallets"]
 rep_db = database["azai_reputation"]
 ref_db = database["azai_referrals"]
 gate_db = database["azai_group_gate"]
+media_db = database["azai_media_assets"]
 
 activity_cache = {}
 
@@ -46,6 +48,23 @@ def level_from_xp(xp: int) -> int:
 
 def wallet_key(user_id: int) -> dict:
     return {"user_id": int(user_id)}
+
+
+def owner_ids() -> set[int]:
+    ids = set()
+    for value in (ALONE_OWNER_ID, OWNER_ID):
+        try:
+            value = int(value)
+            if value:
+                ids.add(value)
+        except Exception:
+            pass
+    return ids
+
+
+async def is_owner(event) -> bool:
+    sender = await event.get_sender()
+    return bool(sender and int(sender.id) in owner_ids())
 
 
 def public_name(user) -> str:
@@ -88,19 +107,44 @@ async def display_from_row(row: dict) -> str:
     return name
 
 
+async def save_media_asset(key: str, reply):
+    await media_db.update_one(
+        {"key": key},
+        {"$set": {"key": key, "chat_id": int(reply.chat_id), "msg_id": int(reply.id)}},
+        upsert=True,
+    )
+
+
+async def get_media_asset(key: str):
+    data = await media_db.find_one({"key": key})
+    if not data:
+        return None
+    try:
+        msg = await tbot.get_messages(int(data["chat_id"]), ids=int(data["msg_id"]))
+        if msg and msg.media:
+            return msg.media
+    except Exception:
+        return None
+    return None
+
+
+async def set_leaderpic_handler(event):
+    if not await is_owner(event):
+        await event.reply(font("Owner only."))
+        return
+    reply = await event.get_reply_message()
+    if not reply or not reply.media:
+        await event.reply(font("Reply to leaderboard photo first."))
+        return
+    await save_media_asset("leaderboard", reply)
+    await event.reply(font("Leaderboard image saved."))
+
+
 async def get_wallet(user_id: int) -> dict:
     user_id = int(user_id)
     data = await wallet_db.find_one(wallet_key(user_id))
     if not data:
-        data = {
-            "user_id": user_id,
-            "balance": 0,
-            "xp": 0,
-            "level": 1,
-            "daily_at": None,
-            "messages": 0,
-            "created_at": now_ist(),
-        }
+        data = {"user_id": user_id, "balance": 0, "xp": 0, "level": 1, "daily_at": None, "messages": 0, "created_at": now_ist()}
         await wallet_db.insert_one(data)
     return data
 
@@ -110,10 +154,7 @@ async def add_balance(user_id: int, amount: int, xp: int = 0):
     new_xp = int(wallet.get("xp", 0)) + int(xp)
     await wallet_db.update_one(
         wallet_key(user_id),
-        {
-            "$inc": {"balance": int(amount), "xp": int(xp)},
-            "$set": {"level": level_from_xp(new_xp), "updated_at": now_ist()},
-        },
+        {"$inc": {"balance": int(amount), "xp": int(xp)}, "$set": {"level": level_from_xp(new_xp), "updated_at": now_ist()}},
         upsert=True,
     )
 
@@ -121,11 +162,7 @@ async def add_balance(user_id: int, amount: int, xp: int = 0):
 async def set_balance(user_id: int, amount: int):
     wallet = await get_wallet(user_id)
     xp = int(wallet.get("xp", 0))
-    await wallet_db.update_one(
-        wallet_key(user_id),
-        {"$set": {"balance": max(int(amount), 0), "level": level_from_xp(xp), "updated_at": now_ist()}},
-        upsert=True,
-    )
+    await wallet_db.update_one(wallet_key(user_id), {"$set": {"balance": max(int(amount), 0), "level": level_from_xp(xp), "updated_at": now_ist()}}, upsert=True)
 
 
 async def is_verified_in_group(chat_id: int, user_id: int) -> bool:
@@ -170,11 +207,7 @@ async def daily_handler(event):
         return
     await add_balance(sender.id, DAILY_REWARD, 0)
     await wallet_db.update_one(wallet_key(sender.id), {"$set": {"daily_at": today, "updated_at": now_ist()}}, upsert=True)
-    await event.reply(
-        font("DAILY REWARD CLAIMED") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Reward:") + f" {DAILY_REWARD} {CURRENCY}"
-    )
+    await event.reply(font("DAILY REWARD CLAIMED") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Reward:") + f" {DAILY_REWARD} {CURRENCY}")
 
 
 async def send_handler(event):
@@ -208,13 +241,7 @@ async def send_handler(event):
     receive_amount = amount - fee
     await add_balance(sender.id, -amount, 0)
     await add_balance(target.id, receive_amount, 0)
-    await event.reply(
-        font("CREDITS SENT") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Sent:") + f" {amount} {CURRENCY}\n"
-        + font("Receiver gets:") + f" {receive_amount} {CURRENCY}\n"
-        + font("Fee:") + f" {fee} {CURRENCY}"
-    )
+    await event.reply(font("CREDITS SENT") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Sent:") + f" {amount} {CURRENCY}\n" + font("Receiver gets:") + f" {receive_amount} {CURRENCY}\n" + font("Fee:") + f" {fee} {CURRENCY}")
 
 
 async def rep_handler(event):
@@ -286,24 +313,42 @@ def leaderboard_buttons():
     ]
 
 
+async def send_leaderboard(chat_id: int, text: str, buttons=None):
+    media = await get_media_asset("leaderboard")
+    if media:
+        await tbot.send_file(chat_id, media, caption=text, buttons=buttons)
+    else:
+        await tbot.send_message(chat_id, text, buttons=buttons)
+
+
 async def leaderboard_handler(event):
     sender = await event.get_sender()
     await touch_user(sender)
-    await event.reply(await leaderboard_text("balance"), buttons=leaderboard_buttons())
+    await send_leaderboard(event.chat_id, await leaderboard_text("balance"), leaderboard_buttons())
 
 
 async def economy_callback(event):
     data = event.data.decode()
     if data == "azeco_close":
         await event.delete()
-    elif data == "azeco_leader":
-        await event.edit(await leaderboard_text("balance"), buttons=leaderboard_buttons())
+        return
+    if data == "azeco_leader":
+        kind = "balance"
     elif data == "azeco_lb_balance":
-        await event.edit(await leaderboard_text("balance"), buttons=leaderboard_buttons())
+        kind = "balance"
     elif data == "azeco_lb_xp":
-        await event.edit(await leaderboard_text("xp"), buttons=leaderboard_buttons())
+        kind = "xp"
     elif data == "azeco_lb_rep":
-        await event.edit(await leaderboard_text("rep"), buttons=leaderboard_buttons())
+        kind = "rep"
+    else:
+        return
+    text = await leaderboard_text(kind)
+    media = await get_media_asset("leaderboard")
+    if media:
+        await event.delete()
+        await tbot.send_file(event.chat_id, media, caption=text, buttons=leaderboard_buttons())
+    else:
+        await event.edit(text, buttons=leaderboard_buttons())
 
 
 async def chat_reward_handler(event):
@@ -334,6 +379,7 @@ async def chat_reward_handler(event):
 
 
 if "azai_economy" not in tbot.handlers_loaded:
+    tbot.add_event_handler(set_leaderpic_handler, events.NewMessage(pattern=f"^{prefix_cmds}setleaderpic(?:@\\w+)?$", incoming=True))
     tbot.add_event_handler(wallet_handler, events.NewMessage(pattern=f"^{prefix_cmds}(wallet|balance)(?:@\\w+)?$", incoming=True))
     tbot.add_event_handler(daily_handler, events.NewMessage(pattern=f"^{prefix_cmds}daily(?:@\\w+)?$", incoming=True))
     tbot.add_event_handler(send_handler, events.NewMessage(pattern=f"^{prefix_cmds}send(?: .*)?$", incoming=True))
