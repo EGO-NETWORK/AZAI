@@ -32,7 +32,7 @@ GIFTS = {
     "surprise_box": {"name": "Surprise Box", "price": 2500},
     "puppy": {"name": "Puppy", "price": 3000},
     "cake": {"name": "Cake", "price": 1000},
-    "letter": {"name": "Love Letter", "price": 400},
+    "letter": {"name": "Letter", "price": 400},
     "cat": {"name": "Cat", "price": 2500},
     "tulip": {"name": "Tulip", "price": 1500},
 }
@@ -61,7 +61,7 @@ def item_line(item_id: str, item: dict) -> str:
     color = item.get("color", "Default")
     price = int(item.get("price", 0))
     rarity = item.get("rarity", "Normal")
-    return f"• {name} ({color}) - {price} {CURRENCY} [{rarity}]"
+    return f"• {name} ({color}) - {price} {CURRENCY} [{rarity}]\n  ID: {item_id}"
 
 
 def shop_home_text() -> str:
@@ -70,7 +70,9 @@ def shop_home_text() -> str:
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Choose a category below.") + "\n"
         + font("Bought vehicles go to Garage.") + "\n"
-        + font("Vault is for rare and owner-gifted items.") + "\n\n"
+        + font("Use /inventory or /garage to see item IDs.") + "\n"
+        + font("Set bike: /setbike bike_splendor") + "\n"
+        + font("Set car: /setcar car_scorpio_s11_black") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
 
@@ -114,8 +116,8 @@ def category_text(title: str, items: dict) -> str:
 def gift_text() -> str:
     text = font("GIFTS") + "\n" + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
     for key, item in GIFTS.items():
-        text += f"• {item['name']} - {item['price']} {CURRENCY}\n"
-    text += "\n" + font("Use: /gift item_name by replying to a user.")
+        text += f"• {item['name']} - {item['price']} {CURRENCY}\n  ID: {key}\n"
+    text += "\n" + font("Use: /gift item_id by replying to a user.")
     return text
 
 
@@ -127,7 +129,8 @@ def view_item_text(item_id: str, item: dict) -> str:
         + font("Color:") + f" {item.get('color', 'Default')}\n"
         + font("Rarity:") + f" {item.get('rarity', 'Normal')}\n"
         + font("Price:") + f" {item.get('price', 0)} {CURRENCY}\n\n"
-        + font("Item ID:") + f" {item_id}"
+        + font("Item ID:") + f" {item_id}\n\n"
+        + font("After buy, use /inventory or /garage to check IDs.")
     )
 
 
@@ -165,12 +168,18 @@ async def buy_item(event, item_id: str):
     if item_id.startswith("bike_"):
         update["$addToSet"]["garage.bikes"] = item_id
     await wallet_db.update_one({"user_id": int(sender.id)}, update, upsert=True)
+    guide = ""
+    if item_id.startswith("bike_"):
+        guide = f"\n\nNext:\n/inventory\n/setbike {item_id}"
+    if item_id.startswith("car_"):
+        guide = f"\n\nNext:\n/inventory\n/setcar {item_id}"
     await event.edit(
         font("PURCHASE COMPLETE") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Item:") + f" {item['name']}\n"
-        + font("Paid:") + f" {price} {CURRENCY}\n\n"
-        + font("Saved to your Garage/Inventory."),
+        + font("Item ID:") + f" {item_id}\n"
+        + font("Paid:") + f" {price} {CURRENCY}\n"
+        + font("Saved to your Garage/Inventory.") + guide,
         buttons=back_buttons(),
     )
 
@@ -190,9 +199,9 @@ async def garage_text(user_id: int) -> str:
     text += font("Active Car:") + f" {active_car or 'None'}\n"
     text += font("Active Bike:") + f" {active_bike or 'None'}\n\n"
     text += font("Cars:") + "\n"
-    text += "\n".join([f"• {CARS.get(x, {}).get('name', x)}" for x in cars]) if cars else font("No cars owned yet.")
+    text += "\n".join([f"• {CARS.get(x, {}).get('name', x)}\n  ID: {x}\n  Use: /setcar {x}" for x in cars]) if cars else font("No cars owned yet.")
     text += "\n\n" + font("Bikes:") + "\n"
-    text += "\n".join([f"• {BIKES.get(x, {}).get('name', x)}" for x in bikes]) if bikes else font("No bikes owned yet.")
+    text += "\n".join([f"• {BIKES.get(x, {}).get('name', x)}\n  ID: {x}\n  Use: /setbike {x}" for x in bikes]) if bikes else font("No bikes owned yet.")
     return text
 
 
@@ -222,11 +231,11 @@ async def set_vehicle(event, kind: str):
     garage = wallet.get("garage", {}) or {}
     owned_list = garage.get("cars" if kind == "car" else "bikes", []) or []
     if item_id not in owned_list:
-        await event.reply(font("You do not own this item."))
+        await event.reply(font("You do not own this item. Open /garage to check item IDs."))
         return
     field = "garage.active_car" if kind == "car" else "garage.active_bike"
     await wallet_db.update_one({"user_id": int(sender.id)}, {"$set": {field: item_id, "updated_at": now_ist()}}, upsert=True)
-    await event.reply(font("Active vehicle updated."))
+    await event.reply(font("Active vehicle updated:") + f" {item_id}")
 
 
 async def setcar_handler(event):
@@ -240,7 +249,7 @@ async def setbike_handler(event):
 async def gift_handler(event):
     reply = await event.get_reply_message()
     if not reply:
-        await event.reply(font("Reply to a user and use /gift item_name."))
+        await event.reply(font("Reply to a user and use /gift item_id."))
         return
     sender = await event.get_sender()
     target = await reply.get_sender()
@@ -274,6 +283,7 @@ async def gift_handler(event):
         font("GIFT SENT") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Gift:") + f" {item['name']}\n"
+        + font("Item ID:") + f" {key}\n"
         + font("Paid:") + f" {price} {CURRENCY}"
     )
 
@@ -298,7 +308,7 @@ async def market_callback(event):
     elif data == "azm_vault":
         await event.edit(font("VAULT") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Rare and owner-gifted items will appear here."), buttons=back_buttons())
     elif data == "azm_inventory":
-        await event.edit(font("Open /inventory to view saved items."), buttons=back_buttons())
+        await event.edit(font("Open /inventory or /garage to view saved item IDs."), buttons=back_buttons())
     elif data.startswith("azm_view_"):
         item_id = data.replace("azm_view_", "", 1)
         item = all_market_items().get(item_id)
@@ -312,9 +322,9 @@ async def market_callback(event):
 
 
 if "azai_market" not in tbot.handlers_loaded:
-    tbot.add_event_handler(shop_handler, events.NewMessage(pattern=f"^{prefix_cmds}shop$", incoming=True))
-    tbot.add_event_handler(garage_handler, events.NewMessage(pattern=f"^{prefix_cmds}garage$", incoming=True))
-    tbot.add_event_handler(vault_handler, events.NewMessage(pattern=f"^{prefix_cmds}vault$", incoming=True))
+    tbot.add_event_handler(shop_handler, events.NewMessage(pattern=f"^{prefix_cmds}shop(?:@\\w+)?$", incoming=True))
+    tbot.add_event_handler(garage_handler, events.NewMessage(pattern=f"^{prefix_cmds}garage(?:@\\w+)?$", incoming=True))
+    tbot.add_event_handler(vault_handler, events.NewMessage(pattern=f"^{prefix_cmds}vault(?:@\\w+)?$", incoming=True))
     tbot.add_event_handler(setcar_handler, events.NewMessage(pattern=f"^{prefix_cmds}setcar(?: .*)?$", incoming=True))
     tbot.add_event_handler(setbike_handler, events.NewMessage(pattern=f"^{prefix_cmds}setbike(?: .*)?$", incoming=True))
     tbot.add_event_handler(gift_handler, events.NewMessage(pattern=f"^{prefix_cmds}gift(?: .*)?$", incoming=True))
