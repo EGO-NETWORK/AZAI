@@ -64,15 +64,9 @@ def admin_commands_text() -> str:
         font("ADMIN COMMANDS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Group:") + "\n"
-        + "/group\n"
-        + "/settings\n"
-        + "/setting\n"
-        + "/rules\n\n"
+        + "/group\n/settings\n/setting\n/rules\n\n"
         + font("Verification:") + "\n"
-        + "/verifyall\n"
-        + "/unverifyall\n"
-        + "/verified\n"
-        + "/unverified\n\n"
+        + "/verifyall\n/unverifyall\n/verified\n/unverified\n\n"
         + font("Owner:") + "\n"
         + "/owner\n\n"
         + font("Powered By:") + " " + BRAND
@@ -134,6 +128,33 @@ def market_commands_text() -> str:
     )
 
 
+def events_commands_text() -> str:
+    return (
+        font("EVENT COMMANDS") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + "/events - " + font("Open event panel") + "\n"
+        + "/birthday DD/MM - " + font("Save your birthday") + "\n"
+        + "/birthdays - " + font("Show today's saved birthdays") + "\n"
+        + "/todayevents - " + font("Show today's events") + "\n"
+        + "/addevent DD/MM | title | text - " + font("Owner: add event") + "\n"
+        + "/delevent title - " + font("Owner: delete event") + "\n\n"
+        + font("Powered By:") + " " + BRAND
+    )
+
+
+def games_commands_text() -> str:
+    return (
+        font("GAME COMMANDS") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + "/games - " + font("Open game panel") + "\n"
+        + "/dice - " + font("Free clean dice mini-game") + "\n"
+        + "/dart - " + font("Free clean dart mini-game") + "\n"
+        + "/basketball - " + font("Free clean basketball mini-game") + "\n\n"
+        + font("Rule:") + " " + font("No betting, no wager, no unsafe game logic.") + "\n\n"
+        + font("Powered By:") + " " + BRAND
+    )
+
+
 def media_commands_text() -> str:
     return (
         font("STICKER COMMANDS") + "\n"
@@ -154,10 +175,8 @@ def coming_soon_text() -> str:
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Refer Earn Full Logic") + "\n"
         + font("Family Tree / Social Tree") + "\n"
-        + font("Anime Quiz And GK Quiz") + "\n"
-        + font("Birthday And Festival System") + "\n"
+        + font("Festival Auto Wishes") + "\n"
         + font("Full Owner Panel Actions") + "\n\n"
-        + font("Images, banners, gift media, and final visuals will be added after owner approval.") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
 
@@ -167,7 +186,8 @@ def command_buttons():
         [Button.inline(font("User"), b"azcmd_user"), Button.inline(font("Profile"), b"azcmd_profile")],
         [Button.inline(font("Verification"), b"azcmd_verify"), Button.inline(font("Admin"), b"azcmd_admin")],
         [Button.inline(font("Moderation"), b"azcmd_mod"), Button.inline(font("Economy"), b"azcmd_eco")],
-        [Button.inline(font("Market"), b"azcmd_market"), Button.inline(font("Stickers"), b"azcmd_media")],
+        [Button.inline(font("Market"), b"azcmd_market"), Button.inline(font("Events"), b"azcmd_events")],
+        [Button.inline(font("Games"), b"azcmd_games"), Button.inline(font("Stickers"), b"azcmd_media")],
         [Button.inline(font("Coming Soon"), b"azcmd_soon"), Button.inline(font("Close"), b"azcmd_close")],
     ]
 
@@ -200,6 +220,10 @@ async def commands_callback(event):
         await event.edit(economy_commands_text(), buttons=back_buttons())
     elif data == "azcmd_market":
         await event.edit(market_commands_text(), buttons=back_buttons())
+    elif data == "azcmd_events":
+        await event.edit(events_commands_text(), buttons=back_buttons())
+    elif data == "azcmd_games":
+        await event.edit(games_commands_text(), buttons=back_buttons())
     elif data == "azcmd_media":
         await event.edit(media_commands_text(), buttons=back_buttons())
     elif data == "azcmd_soon":
