@@ -66,12 +66,20 @@ def parse_add(text):
     return key, aliases, action
 
 
-def fun_text():
-    return font("FUN ZONE") + "\n━━━━━━━━━━━━━━━━━━━━\n\n" + font("Reply to a member and use a fun action.") + "\n\n/hug\n/huggy\n/pat\n/dance"
+async def fun_text():
+    rows = await fun_db.find({}).sort("key", 1).to_list(length=25)
+    text = font("FUN ZONE") + "\n━━━━━━━━━━━━━━━━━━━━\n\n" + font("Reply to a member and use a fun action.") + "\n\n"
+    if rows:
+        for row in rows:
+            aliases = row.get("aliases", [])[:4]
+            text += "• " + ", ".join(f"/{x}" for x in aliases) + "\n"
+    else:
+        text += "/hug\n/huggy\n/pat\n/dance\n/kiss"
+    return text
 
 
 def owner_guide():
-    return font("FUN ZONE GUIDE") + "\n━━━━━━━━━━━━━━━━━━━━\n\n" + font("Reply to media and use:") + "\n/addfun key | alias1,alias2 | action\n\n" + font("Example:") + "\n/addfun hug | hug,huggy | hugged\n\n/funlist\n/delfun key"
+    return font("FUN ZONE GUIDE") + "\n━━━━━━━━━━━━━━━━━━━━\n\n" + font("Reply to media and use:") + "\n/addfun key | alias1,alias2 | action\n\n" + font("Examples:") + "\n/addfun hug | hug,huggy | hugged\n/addfun kiss | kiss | sent a cute kiss to\n\n/funlist\n/delfun key"
 
 
 async def addfun(event):
@@ -160,7 +168,7 @@ start_panel.help_buttons = help_buttons
 
 
 async def fun_help(event):
-    await event.edit(fun_text(), buttons=start_panel.close_back_buttons())
+    await event.edit(await fun_text(), buttons=start_panel.close_back_buttons())
     raise events.StopPropagation
 
 
