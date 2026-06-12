@@ -47,9 +47,13 @@ async def events_panel(event):
     text = (
         font("AZAI EVENTS PANEL") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("/todayevents") + "\n"
-        + font("/addevent DD/MM | title | text") + "\n"
-        + font("/delevent title")
+        + font("User Commands") + "\n"
+        + "/birthday DD/MM\n"
+        + "/birthdays\n"
+        + "/todayevents\n\n"
+        + font("Owner Commands") + "\n"
+        + "/addevent DD/MM | title | text\n"
+        + "/delevent title"
     )
     await event.reply(text)
     raise events.StopPropagation
