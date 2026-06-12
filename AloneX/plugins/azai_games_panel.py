@@ -22,7 +22,7 @@ def games_text():
         + "/dice\n"
         + "/dart\n"
         + "/basketball\n\n"
-        + font("Gameplay module will be attached after live safety test.")
+        + font("Clean mini-game handlers are active.")
     )
 
 
