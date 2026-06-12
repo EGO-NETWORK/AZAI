@@ -6,7 +6,7 @@ from telethon import Button, events
 from AloneX import database, font, prefix_cmds, tbot
 
 IST = pytz.timezone("Asia/Kolkata")
-BRAND = font("EGO Network - EST. 2026")
+BRAND = font("AZAI - EGO Network")
 family_db = database["azai_family_tree"]
 pending_family = {}
 
@@ -14,6 +14,11 @@ LINK_LABELS = {
     "brother": "Brother Link",
     "sister": "Sister Link",
     "adopt": "Adopted Member Link",
+    "parent": "Parent Link",
+    "wife": "Wife Link",
+    "hubby": "Husband Link",
+    "child": "Child Link",
+    "cousin": "Cousin Link",
 }
 
 
@@ -49,6 +54,11 @@ async def remove_links(chat_id: int, user_id: int) -> int:
     return int(result.deleted_count)
 
 
+async def remove_specific_link(chat_id: int, from_user_id: int, to_user_id: int, link_type: str) -> bool:
+    result = await family_db.delete_one(pair_query(chat_id, from_user_id, to_user_id, link_type))
+    return result.deleted_count > 0
+
+
 def request_text(from_user, to_user, link_type: str) -> str:
     label = LINK_LABELS.get(link_type, "Family Link")
     return (
@@ -57,7 +67,7 @@ def request_text(from_user, to_user, link_type: str) -> str:
         + font("From:") + f" {clean_name(from_user)}\n"
         + font("To:") + f" {clean_name(to_user)}\n"
         + font("Type:") + f" {label}\n\n"
-        + font("This will be saved only after the selected user accepts.") + "\n\n"
+        + font("This will be saved only after you accept.") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
 
@@ -85,9 +95,26 @@ async def link_request(event, link_type: str):
     if await existing_link(event.chat_id, from_user.id, to_user.id, link_type):
         await event.reply(font("This family link already exists."))
         return
+    
     key = make_key(event.chat_id, from_user.id, to_user.id, link_type)
-    pending_family[key] = {"chat_id": int(event.chat_id), "from_id": int(from_user.id), "to_id": int(to_user.id), "link_type": link_type, "created_at": now_ist()}
-    await event.reply(request_text(from_user, to_user, link_type), buttons=request_buttons(key))
+    pending_family[key] = {
+        "chat_id": int(event.chat_id),
+        "from_id": int(from_user.id),
+        "to_id": int(to_user.id),
+        "link_type": link_type,
+        "created_at": now_ist()
+    }
+    
+    # Extract media from reply message if present
+    media_to_send = None
+    if reply.media:
+        media_to_send = reply.media
+    
+    # Send request with media (if attached)
+    if media_to_send:
+        await event.reply(request_text(from_user, to_user, link_type), file=media_to_send, buttons=request_buttons(key))
+    else:
+        await event.reply(request_text(from_user, to_user, link_type), buttons=request_buttons(key))
 
 
 async def brother_handler(event):
@@ -100,6 +127,26 @@ async def sister_handler(event):
 
 async def adopt_handler(event):
     await link_request(event, "adopt")
+
+
+async def parent_handler(event):
+    await link_request(event, "parent")
+
+
+async def wife_handler(event):
+    await link_request(event, "wife")
+
+
+async def hubby_handler(event):
+    await link_request(event, "hubby")
+
+
+async def child_handler(event):
+    await link_request(event, "child")
+
+
+async def cousin_handler(event):
+    await link_request(event, "cousin")
 
 
 async def family_handler(event):
@@ -128,6 +175,51 @@ async def leavefamily_handler(event):
     sender = await event.get_sender()
     removed = await remove_links(event.chat_id, sender.id)
     await event.reply(font("Family links removed:") + f" {removed}")
+
+
+async def removefamily_handler(event):
+    if event.is_private:
+        await event.reply(font("Use /removefamily inside a group by replying to a user."))
+        return
+    
+    reply = await event.get_reply_message()
+    if not reply:
+        await event.reply(font("Reply to a user to remove a specific family link."))
+        return
+    
+    from_user = await event.get_sender()
+    to_user = await reply.get_sender()
+    
+    if not to_user or getattr(to_user, "bot", False):
+        await event.reply(font("This target cannot be selected."))
+        return
+    
+    # Check if user is owner/admin (basic check - can be enhanced with proper auth)
+    # For now, allowing any user but showing only their relations
+    sender = await event.get_sender()
+    
+    # Get all relations between sender and target
+    rows = family_db.find({
+        "chat_id": int(event.chat_id),
+        "$or": [
+            {"user_a": int(sender.id), "user_b": int(to_user.id)},
+            {"user_a": int(to_user.id), "user_b": int(sender.id)}
+        ]
+    })
+    
+    relations = []
+    async for row in rows:
+        relations.append(row)
+    
+    if not relations:
+        await event.reply(font("No family link found with this user."))
+        return
+    
+    # Remove all relations
+    for relation in relations:
+        await family_db.delete_one({"_id": relation["_id"]})
+    
+    await event.reply(font("Family link removed successfully."))
 
 
 async def family_callback(event):
@@ -165,7 +257,13 @@ if "azai_family_tree" not in tbot.handlers_loaded:
     tbot.add_event_handler(brother_handler, events.NewMessage(pattern=f"^{prefix_cmds}brother$", incoming=True))
     tbot.add_event_handler(sister_handler, events.NewMessage(pattern=f"^{prefix_cmds}sister$", incoming=True))
     tbot.add_event_handler(adopt_handler, events.NewMessage(pattern=f"^{prefix_cmds}adopt$", incoming=True))
+    tbot.add_event_handler(parent_handler, events.NewMessage(pattern=f"^{prefix_cmds}parent$", incoming=True))
+    tbot.add_event_handler(wife_handler, events.NewMessage(pattern=f"^{prefix_cmds}wife$", incoming=True))
+    tbot.add_event_handler(hubby_handler, events.NewMessage(pattern=f"^{prefix_cmds}hubby$", incoming=True))
+    tbot.add_event_handler(child_handler, events.NewMessage(pattern=f"^{prefix_cmds}child$", incoming=True))
+    tbot.add_event_handler(cousin_handler, events.NewMessage(pattern=f"^{prefix_cmds}cousin$", incoming=True))
     tbot.add_event_handler(family_handler, events.NewMessage(pattern=f"^{prefix_cmds}family$", incoming=True))
     tbot.add_event_handler(leavefamily_handler, events.NewMessage(pattern=f"^{prefix_cmds}leavefamily$", incoming=True))
+    tbot.add_event_handler(removefamily_handler, events.NewMessage(pattern=f"^{prefix_cmds}removefamily$", incoming=True))
     tbot.add_event_handler(family_callback, events.CallbackQuery(pattern=b"^azfam_"))
     tbot.handlers_loaded.add("azai_family_tree")
