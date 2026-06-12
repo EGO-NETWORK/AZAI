@@ -54,7 +54,8 @@ async def events_panel(event):
         + "/todayevents\n\n"
         + font("Owner Commands") + "\n"
         + "/addevent DD/MM | title | text\n"
-        + "/delevent title"
+        + "/delevent title\n"
+        + "/eventauto on | off | status"
     )
     await event.reply(text)
     raise events.StopPropagation
@@ -107,7 +108,7 @@ async def today_events_handler(event):
     saved = await bday_db.find({"day": now.day, "month": now.month}).to_list(length=50)
     lines = [font("AZAI TODAY EVENTS"), "━━━━━━━━━━━━━━━━━━━━━━━━━━━━", f"{font('Date:')} {now.day:02d}/{now.month:02d}", ""]
     if saved:
-        lines.append(font("Saved Dates"))
+        lines.append(font("Special Dates"))
         for index, row in enumerate(saved, 1):
             lines.append(f"{index}. {row.get('name', 'User')}")
         lines.append("")
