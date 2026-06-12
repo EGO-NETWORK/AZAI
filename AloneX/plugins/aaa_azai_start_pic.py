@@ -78,20 +78,87 @@ def start_buttons():
     ]
 
 
-def back_buttons():
+def close_back_buttons():
+    return [[Button.inline(font("Help Menu"), b"azai_help_cmds_menu"), Button.inline(font("Close"), b"azai_close_panel")]]
+
+
+def home_back_buttons():
     return [[Button.inline(font("Back"), b"azai_start_home"), Button.inline(font("Close"), b"azai_close_panel")]]
+
+
+def help_buttons():
+    return [
+        [Button.inline(font("Core"), b"azai_help_core"), Button.inline(font("Owner"), b"azai_help_owner")],
+        [Button.inline(font("Economy"), b"azai_help_economy"), Button.inline(font("Market"), b"azai_help_market")],
+        [Button.inline(font("Family"), b"azai_help_family"), Button.inline(font("Games"), b"azai_help_games")],
+        [Button.inline(font("Media"), b"azai_help_media"), Button.inline(font("System"), b"azai_system_stats")],
+        [Button.inline(font("Back"), b"azai_start_home"), Button.inline(font("Close"), b"azai_close_panel")],
+    ]
 
 
 def help_text() -> str:
     return (
         font("AZAI HELP & COMMANDS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Core:") + " /start /help /ping /alive\n"
-        + font("Owner:") + " /owner /settings /logstatus\n"
-        + font("Economy:") + " /wallet /daily /leaderboard\n"
-        + font("Market:") + " /shop /inventory /garage\n"
-        + font("Family:") + " /brother /sister /adopt /familytree\n"
-        + font("Media:") + " /setstartpic /setitempic item_id"
+        + font("Choose a panel below.") + "\n\n"
+        + font("Core, Owner, Economy, Market, Family, Games, Media, System")
+    )
+
+
+def core_text() -> str:
+    return (
+        font("CORE COMMANDS") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + "/start\n/help\n/ping\n/alive\n/repo"
+    )
+
+
+def owner_text() -> str:
+    return (
+        font("OWNER COMMANDS") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + "/owner\n/settings\n/logstatus\n/logon\n/logoff"
+    )
+
+
+def economy_text() -> str:
+    return (
+        font("ECONOMY COMMANDS") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + "/wallet\n/balance\n/daily\n/send\n/leaderboard"
+    )
+
+
+def market_text() -> str:
+    return (
+        font("MARKET COMMANDS") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + "/shop\n/inventory\n/garage\n/setbike item_id\n/setcar item_id"
+    )
+
+
+def family_text() -> str:
+    return (
+        font("FAMILY COMMANDS") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + "/brother\n/sister\n/adopt\n/family\n/familytree\n/leavefamily"
+    )
+
+
+def games_text() -> str:
+    return (
+        font("GAMES COMMANDS") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + "/dice\n/dart\n/basketball\n/slot\n\n"
+        + font("Use games in group for fun and activity.")
+    )
+
+
+def media_text() -> str:
+    return (
+        font("MEDIA COMMANDS") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + "/setstartpic\n/setitempic item_id\n/setleaderpic"
     )
 
 
@@ -146,9 +213,23 @@ async def start_pic_handler(event):
 async def start_callback_handler(event):
     data = event.data.decode()
     if data == "azai_help_cmds_menu":
-        await event.edit(help_text(), buttons=back_buttons())
+        await event.edit(help_text(), buttons=help_buttons())
+    elif data == "azai_help_core":
+        await event.edit(core_text(), buttons=close_back_buttons())
+    elif data == "azai_help_owner":
+        await event.edit(owner_text(), buttons=close_back_buttons())
+    elif data == "azai_help_economy":
+        await event.edit(economy_text(), buttons=close_back_buttons())
+    elif data == "azai_help_market":
+        await event.edit(market_text(), buttons=close_back_buttons())
+    elif data == "azai_help_family":
+        await event.edit(family_text(), buttons=close_back_buttons())
+    elif data == "azai_help_games":
+        await event.edit(games_text(), buttons=close_back_buttons())
+    elif data == "azai_help_media":
+        await event.edit(media_text(), buttons=close_back_buttons())
     elif data == "azai_system_stats":
-        await event.edit(stats_text(), buttons=back_buttons())
+        await event.edit(stats_text(), buttons=home_back_buttons())
     elif data == "azai_start_home":
         await event.edit(start_text(), buttons=start_buttons())
     elif data == "azai_close_panel":
@@ -160,5 +241,5 @@ if "aaa_azai_start_pic" not in tbot.handlers_loaded:
     tbot.add_event_handler(set_start_pic, events.NewMessage(pattern=f"^{prefix_cmds}setstartpic$", incoming=True))
     tbot.add_event_handler(start_pic_handler, events.NewMessage(pattern=f"^{prefix_cmds}start(?:@\\w+)?(?: .*)?$", incoming=True))
     tbot.add_event_handler(start_pic_handler, events.NewMessage(pattern=f"^{prefix_cmds}help(?:@\\w+)?$", incoming=True))
-    tbot.add_event_handler(start_callback_handler, events.CallbackQuery(pattern=b"^azai_(help_cmds_menu|system_stats|start_home|close_panel)$"))
+    tbot.add_event_handler(start_callback_handler, events.CallbackQuery(pattern=b"^azai_(help_cmds_menu|help_core|help_owner|help_economy|help_market|help_family|help_games|help_media|system_stats|start_home|close_panel)$"))
     tbot.handlers_loaded.add("aaa_azai_start_pic")
