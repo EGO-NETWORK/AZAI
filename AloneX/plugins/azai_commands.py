@@ -134,10 +134,11 @@ def events_commands_text() -> str:
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + "/events - " + font("Open event panel") + "\n"
         + "/birthday DD/MM - " + font("Save your birthday") + "\n"
-        + "/birthdays - " + font("Show today's saved birthdays") + "\n"
-        + "/todayevents - " + font("Show today's events") + "\n"
+        + "/birthdays - " + font("Show today's saved dates") + "\n"
+        + "/todayevents - " + font("Show today's events and saved dates") + "\n"
         + "/addevent DD/MM | title | text - " + font("Owner: add event") + "\n"
-        + "/delevent title - " + font("Owner: delete event") + "\n\n"
+        + "/delevent title - " + font("Owner: delete event") + "\n"
+        + "/eventauto on | off | status - " + font("Owner: control auto wishes") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
 
