@@ -178,7 +178,7 @@ def events_text() -> str:
         + font("Today:") + " /todayevents\n"
         + font("Owner Add:") + " /addevent DD/MM | title | text\n"
         + font("Owner Delete:") + " /delevent title\n\n"
-        + font("Status:") + " " + font("Basic event and birthday modules saved.")
+        + font("Status:") + " " + font("Event and birthday modules active.")
     )
 
 
@@ -188,8 +188,8 @@ def games_text() -> str:
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Panel:") + " /games\n"
         + font("Commands:") + " /dice /dart /basketball\n"
-        + font("Rule:") + " " + font("Free clean mini-games only. No betting or wager logic.") + "\n\n"
-        + font("Status:") + " " + font("Command center guide added. Gameplay plugin still needs live-safe module.")
+        + font("Rule:") + " " + font("Free clean mini-games only.") + "\n\n"
+        + font("Status:") + " " + font("Game panel and basic handlers active.")
     )
 
 
