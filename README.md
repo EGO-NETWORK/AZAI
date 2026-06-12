@@ -1,270 +1,164 @@
 <h1 align="center">𓆩⚚ 𝐀𝐙𝐀𝐈 ⚚𓆪</h1>
 
-<h3 align="center">𝐄ɢᴏ 𝐍ᴇᴛᴡᴏʀᴋ • 𝐄𝐒𝐓. 2026</h3>
+<h3 align="center">𝐄𝐆𝐎 𝐍𝐄𝐓𝐖𝐎𝐑𝐊 · 𝐄𝐒𝐓. 2026</h3>
 
 <p align="center">
-  <b>𝐀ᴅᴠᴀɴᴄᴇᴅ 𝐓ᴇʟᴇɢʀᴀᴍ 𝐂ᴏᴍᴍᴜɴɪᴛʏ 𝐒ʏꜱᴛᴇᴍ</b><br>
-  𝐁ᴜɪʟᴛ 𝐅ᴏʀ 𝐕ᴇʀɪꜰɪᴄᴀᴛɪᴏɴ, 𝐏ʀᴏᴛᴇᴄᴛɪᴏɴ, 𝐀𝐈 𝐂ʜᴀᴛ, 𝐄ᴄᴏɴᴏᴍʏ, 𝐐ᴜɪᴢᴢᴇꜱ, 𝐆ᴀᴍᴇꜱ, 𝐒ʜᴏᴘ, 𝐕ᴀᴜʟᴛ, 𝐁ɪʀᴛʜᴅᴀʏꜱ, 𝐅ᴇꜱᴛɪᴠᴀʟꜱ, 𝐄ᴠᴇɴᴛꜱ, 𝐃ᴏɴᴀᴛɪᴏɴꜱ, 𝐀ɴᴅ 𝐂ʟᴇᴀɴ 𝐆ʀᴏᴜᴘ 𝐂ᴏɴᴛʀᴏʟ.
-</p>
-
-<p align="center">
-  <b>𝐎ꜰꜰɪᴄɪᴀʟ 𝐈ᴍᴀɢᴇ:</b> 𝐏ᴇɴᴅɪɴɢ 𝐎ᴡɴᴇʀ 𝐀ᴘᴘʀᴏᴠᴀʟ
+  <b>Official Telegram Community Automation System</b><br>
+  Built for verification, protection, economy, anime quiz, shop, garage, gifts, AI chat, owner control, and clean group management.
 </p>
 
 ---
 
-## 𓆩⚚ 𝐎ᴡɴᴇʀ ⚚𓆪
+## Owner
 
-<p align="center">
-  <b>𝐌𝐑 𝐄𝐆𝐎</b><br>
-  𝐅ᴏᴜɴᴅᴇʀ 𝐀ɴᴅ 𝐎ᴡɴᴇʀ 𝐎ꜰ 𝐄ɢᴏ 𝐍ᴇᴛᴡᴏʀᴋ
-</p>
+**MR EGO**  
+Founder and Owner of EGO NETWORK
 
-<p align="center">
-  <a href="https://t.me/EGOISTICxPRIME">𝐌ᴀꜱᴛᴇʀ</a> •
-  <a href="https://t.me/EGOxUPDATES">𝐔ᴘᴅᴀᴛᴇꜱ</a> •
-  <a href="https://t.me/EGOxSUPPORT">𝐒ᴜᴘᴘᴏʀᴛ</a>
-</p>
+- Master: https://t.me/EGOISTICxPRIME
+- Updates: https://t.me/EGOxUPDATES
+- Support: https://t.me/EGOxSUPPORT
 
 ---
 
-## 𓆩⚚ 𝐀ʙᴏᴜᴛ 𝐀𝐙𝐀𝐈 ⚚𓆪
+## About AZAI
 
-𝐀𝐙𝐀𝐈 𝐈ꜱ 𝐓ʜᴇ 𝐎ꜰꜰɪᴄɪᴀʟ 𝐂ᴏᴍᴍᴜɴɪᴛʏ 𝐀ᴜᴛᴏᴍᴀᴛɪᴏɴ 𝐒ʏꜱᴛᴇᴍ 𝐎ꜰ 𝐄ɢᴏ 𝐍ᴇᴛᴡᴏʀᴋ.
+AZAI is the official community automation system of EGO NETWORK.
 
-𝐈ᴛ 𝐈ꜱ 𝐃ᴇꜱɪɢɴᴇᴅ 𝐅ᴏʀ 𝐓ᴇʟᴇɢʀᴀᴍ 𝐂ᴏᴍᴍᴜɴɪᴛɪᴇꜱ 𝐓ʜᴀᴛ 𝐍ᴇᴇᴅ 𝐒ᴀꜰᴇᴛʏ, 𝐄ɴɢᴀɢᴇᴍᴇɴᴛ, 𝐀ᴜᴛᴏᴍᴀᴛɪᴏɴ, 𝐑ᴇᴡᴀʀᴅꜱ, 𝐐ᴜɪᴢᴢᴇꜱ, 𝐒ʜᴏᴘ 𝐒ʏꜱᴛᴇᴍꜱ, 𝐕ᴀᴜʟᴛ 𝐈ᴛᴇᴍꜱ, 𝐁ɪʀᴛʜᴅᴀʏ 𝐀ɴᴅ 𝐅ᴇꜱᴛɪᴠᴀʟ 𝐑ᴇᴡᴀʀᴅꜱ, 𝐌ᴇᴅɪᴀ 𝐂ᴏɴᴛʀᴏʟ, 𝐀ɴᴅ 𝐏ʀᴇᴍɪᴜᴍ 𝐆ʀᴏᴜᴘ 𝐌ᴀɴᴀɢᴇᴍᴇɴᴛ.
+It is designed for Telegram communities that need verification, moderation, economy, rewards, anime quiz, shop and garage systems, owner tools, and AI chat in one organized bot.
 
-𝐓ʜɪꜱ 𝐑ᴇᴘᴏꜱɪᴛᴏʀʏ 𝐈ꜱ 𝐁ᴇɪɴɢ 𝐂ᴏɴᴠᴇʀᴛᴇᴅ 𝐈ɴᴛᴏ 𝐀ɴ 𝐎ʀɪɢɪɴᴀʟ 𝐀𝐙𝐀𝐈 × 𝐄ɢᴏ 𝐍ᴇᴛᴡᴏʀᴋ 𝐒ʏꜱᴛᴇᴍ.
-
----
-
-## 𓆩⚚ 𝐂ᴏʀᴇ 𝐅ᴇᴀᴛᴜʀᴇꜱ ⚚𓆪
-
-### 𝐏ʀᴏᴛᴇᴄᴛɪᴏɴ
-
-- 𝐕ᴇʀɪꜰɪᴄᴀᴛɪᴏɴ-𝐁ᴀꜱᴇᴅ 𝐂ᴏᴍᴍᴜɴɪᴛʏ 𝐀ᴄᴄᴇꜱꜱ
-- 𝐍ᴇᴡ 𝐀ɴᴅ 𝐎ʟᴅ 𝐌ᴇᴍʙᴇʀ 𝐕ᴇʀɪꜰɪᴄᴀᴛɪᴏɴ
-- 𝐂ᴀᴘᴛᴄʜᴀ / 𝐒ᴇᴛᴜᴘ 𝐅ʟᴏᴡ
-- 𝐆ʀᴏᴜᴘ 𝐒ᴀꜰᴇᴛʏ 𝐂ᴏɴᴛʀᴏʟꜱ
-- 𝐀ɴᴛɪ-𝐒ᴘᴀᴍ 𝐀ɴᴅ 𝐅ʟᴏᴏᴅ 𝐂ᴏɴᴛʀᴏʟ
-- 𝐀ɴᴛɪ-𝐋ɪɴᴋ 𝐀ɴᴅ 𝐌ᴇᴅɪᴀ 𝐂ᴏɴᴛʀᴏʟ
-- 𝐖ᴀʀɴɪɴɢ, 𝐌ᴜᴛᴇ, 𝐁ᴀɴ, 𝐀ɴᴅ 𝐏ᴜʀɢᴇ 𝐒ᴜᴘᴘᴏʀᴛ
-- 𝐎ᴡɴᴇʀ-𝐌ᴀɴᴀɢᴇᴅ 𝐂ᴏᴍᴍᴜɴɪᴛʏ 𝐂ᴏɴᴛʀᴏʟ
-
-### 𝐏ʀᴏꜰɪʟᴇ 𝐒ʏꜱᴛᴇᴍ
-
-- 𝐔ꜱᴇʀ 𝐏ʀᴏꜰɪʟᴇ 𝐒ᴇᴛᴜᴘ
-- 𝐍ᴀᴍᴇ, 𝐆ᴇɴᴅᴇʀ, 𝐁ɪʀᴛʜᴅᴀʏ, 𝐀ɴᴅ 𝐏ʀᴇꜰᴇʀᴇɴᴄᴇ 𝐒ᴜᴘᴘᴏʀᴛ
-- 𝐏ʀᴏꜰɪʟᴇ 𝐂ᴀʀᴅꜱ
-- 𝐓ɪᴛʟᴇꜱ, 𝐁ᴀᴅɢᴇꜱ, 𝐅ʀᴀᴍᴇꜱ
-- 𝐋ᴇᴠᴇʟ, 𝐗𝐏, 𝐑𝐄𝐏, 𝐑ᴀɴᴋ, 𝐀ɴᴅ 𝐕ᴀᴜʟᴛ 𝐒ᴛᴀᴛꜱ
-
-### 𝐄ᴄᴏɴᴏᴍʏ
-
-- 𝐄ɢᴏ 𝐂ʀᴇᴅɪᴛꜱ 𝐒ʏꜱᴛᴇᴍ
-- 𝐆ʟᴏʙᴀʟ 𝐁ᴀʟᴀɴᴄᴇ
-- 𝐃ᴀɪʟʏ 𝐑ᴇᴡᴀʀᴅꜱ
-- 𝐒ᴛʀᴇᴀᴋ 𝐁ᴏɴᴜꜱ
-- 𝐗𝐏, 𝐑𝐄𝐏, 𝐋ᴇᴠᴇʟꜱ, 𝐀ɴᴅ 𝐑ᴀɴᴋɪɴɢꜱ
-- 𝐎ᴡɴᴇʀ 𝐄ᴄᴏɴᴏᴍʏ 𝐂ᴏɴᴛʀᴏʟ
-- 𝐄ᴄᴏɴᴏᴍʏ 𝐋ᴏɢꜱ
-
-### 𝐐ᴜɪᴢ 𝐒ʏꜱᴛᴇᴍ
-
-- 𝐀ɴɪᴍᴇ 𝐂ʜᴀʀᴀᴄᴛᴇʀ 𝐈ᴍᴀɢᴇ 𝐐ᴜɪᴢ
-- 𝐆𝐊 𝐐ᴜɪᴢ 𝐖ɪᴛʜ 𝐈ɴᴛᴇʀᴀᴄᴛɪᴠᴇ 𝐁ᴜᴛᴛᴏɴꜱ
-- 𝐎ɴᴇ-𝐀ᴛᴛᴇᴍᴘᴛ 𝐀ɴꜱᴡᴇʀ 𝐏ʀᴏᴛᴇᴄᴛɪᴏɴ
-- 𝐂ᴏʀʀᴇᴄᴛ 𝐀ɴꜱᴡᴇʀ 𝐑ᴇᴡᴀʀᴅꜱ
-- 𝐀ᴜᴛᴏ 𝐐ᴜɪᴢ 𝐌ᴏᴅᴇ
-- 𝐂ᴜꜱᴛᴏᴍ 𝐀ɴɪᴍᴇ 𝐈ᴍᴀɢᴇ 𝐒ᴜᴘᴘᴏʀᴛ
-- 𝐐ᴜɪᴢ 𝐋ᴇᴀᴅᴇʀʙᴏᴀʀᴅ
-
-### 𝐆ᴀᴍᴇꜱ
-
-- 𝐃ɪᴄᴇ
-- 𝐃ᴀʀᴛ
-- 𝐁ᴀꜱᴋᴇᴛʙᴀʟʟ
-- 𝐅ᴏᴏᴛʙᴀʟʟ
-- 𝐁ᴏᴡʟɪɴɢ
-- 𝐒ʟᴏᴛ
-- 𝐂ᴏᴏʟᴅᴏᴡɴ 𝐀ɴᴅ 𝐀ɴᴛɪ-𝐅ᴀʀᴍ 𝐒ᴜᴘᴘᴏʀᴛ
-- 𝐒ᴍᴀʟʟ 𝐑ᴇᴡᴀʀᴅꜱ 𝐅ᴏʀ 𝐆ᴀᴍᴇ 𝐏ʟᴀʏ
-
-### 𝐒ʜᴏᴘ 𝐀ɴᴅ 𝐕ᴀᴜʟᴛ
-
-- 𝐏ᴇᴛꜱ, 𝐕ᴇʜɪᴄʟᴇꜱ, 𝐇ᴏᴍᴇꜱ, 𝐋ᴜxᴜʀʏ, 𝐆ɪꜰᴛꜱ
-- 𝐅ʀᴀᴍᴇꜱ, 𝐓ɪᴛʟᴇꜱ, 𝐁ᴀᴅɢᴇꜱ, 𝐀ɴᴅ 𝐋ɪᴍɪᴛᴇᴅ 𝐈ᴛᴇᴍꜱ
-- 𝐌ᴇᴅɪᴀ-𝐒ᴜᴘᴘᴏʀᴛᴇᴅ 𝐏ᴜʀᴄʜᴀꜱᴇ 𝐅ʟᴏᴡ
-- 𝐈ᴛᴇᴍ 𝐈ᴍᴀɢᴇ / 𝐆𝐈𝐅 𝐒ᴜᴘᴘᴏʀᴛ
-- 𝐏ᴇʀᴍᴀɴᴇɴᴛ 𝐕ᴀᴜʟᴛ 𝐎ᴡɴᴇʀꜱʜɪᴘ
-- 𝐆ɪꜰᴛɪɴɢ 𝐒ᴜᴘᴘᴏʀᴛ
-- 𝐂ᴜꜱᴛᴏᴍ 𝐒ʜᴏᴘ 𝐌ᴇᴅɪᴀ 𝐂ᴏɴᴛʀᴏʟ
-
-### 𝐁ɪʀᴛʜᴅᴀʏ 𝐒ʏꜱᴛᴇᴍ
-
-- 𝐀ᴜᴛᴏ 𝐁ɪʀᴛʜᴅᴀʏ 𝐖ɪꜱʜ
-- 𝐃𝐌 𝐁ɪʀᴛʜᴅᴀʏ 𝐖ɪꜱʜ
-- 𝐆ʀᴏᴜᴘ 𝐁ɪʀᴛʜᴅᴀʏ 𝐏ᴏꜱᴛ
-- 𝐁ɪʀᴛʜᴅᴀʏ 𝐑ᴇᴡᴀʀᴅꜱ
-- 𝐁ɪʀᴛʜᴅᴀʏ 𝐁ᴀᴅɢᴇꜱ
-- 𝐂ᴜꜱᴛᴏᴍ 𝐁ɪʀᴛʜᴅᴀʏ 𝐌ᴇᴅɪᴀ 𝐒ᴜᴘᴘᴏʀᴛ
-
-### 𝐅ᴇꜱᴛɪᴠᴀʟ 𝐒ʏꜱᴛᴇᴍ
-
-- 𝐀ᴜᴛᴏ 𝐅ᴇꜱᴛɪᴠᴀʟ 𝐖ɪꜱʜ
-- 𝐆ʟᴏʙᴀʟ 𝐅ᴇꜱᴛɪᴠᴀʟ 𝐑ᴇᴡᴀʀᴅꜱ
-- 𝐂ᴜꜱᴛᴏᴍ 𝐅ᴇꜱᴛɪᴠᴀʟ 𝐄ᴠᴇɴᴛꜱ
-- 𝐅ᴇꜱᴛɪᴠᴀʟ 𝐁ᴀᴅɢᴇꜱ
-- 𝐅ᴇꜱᴛɪᴠᴀʟ 𝐆ʀᴏᴜᴘ 𝐏ᴏꜱᴛꜱ
-- 𝐅ᴇꜱᴛɪᴠᴀʟ 𝐃𝐌 𝐖ɪꜱʜᴇꜱ
-- 𝐎ᴡɴᴇʀ 𝐎ᴠᴇʀʀɪᴅᴇ 𝐒ᴜᴘᴘᴏʀᴛ
-
-### 𝐄ᴠᴇɴᴛ 𝐒ʏꜱᴛᴇᴍ
-
-- 𝐂ᴜꜱᴛᴏᴍ 𝐄ᴠᴇɴᴛ 𝐂ʀᴇᴀᴛɪᴏɴ
-- 𝐄ᴠᴇɴᴛ 𝐑ᴇᴡᴀʀᴅꜱ
-- 𝐄ᴠᴇɴᴛ 𝐁ᴀᴅɢᴇꜱ
-- 𝐄ᴠᴇɴᴛ 𝐏ɪɴ 𝐒ᴜᴘᴘᴏʀᴛ
-- 𝐄ᴠᴇɴᴛ 𝐒ᴛᴀᴛꜱ
-- 𝐄ᴠᴇɴᴛ 𝐏ᴀɴᴇʟꜱ
-- 𝐀ᴜᴛᴏ 𝐒ᴄʜᴇᴅᴜʟᴇ 𝐒ᴜᴘᴘᴏʀᴛ
-
-### 𝐐ᴜᴇꜱᴛ 𝐒ʏꜱᴛᴇᴍ
-
-- 𝐃ᴀɪʟʏ 𝐐ᴜᴇꜱᴛꜱ
-- 𝐐ᴜɪᴢ 𝐐ᴜᴇꜱᴛꜱ
-- 𝐆ᴀᴍᴇ 𝐐ᴜᴇꜱᴛꜱ
-- 𝐌ᴇꜱꜱᴀɢᴇ 𝐀ᴄᴛɪᴠɪᴛʏ 𝐐ᴜᴇꜱᴛꜱ
-- 𝐈ɴᴠɪᴛᴇ 𝐐ᴜᴇꜱᴛꜱ
-- 𝐐ᴜᴇꜱᴛ 𝐑ᴇᴡᴀʀᴅꜱ
-- 𝐂ʀᴀᴛᴇ 𝐂ʜᴀɴᴄᴇ 𝐒ᴜᴘᴘᴏʀᴛ
-
-### 𝐑ᴇꜰᴇʀʀᴀʟ 𝐒ʏꜱᴛᴇᴍ
-
-- 𝐈ɴᴠɪᴛᴇ 𝐓ʀᴀᴄᴋɪɴɢ
-- 𝐑ᴇᴡᴀʀᴅ 𝐀ꜰᴛᴇʀ 𝐕ᴇʀɪꜰɪᴄᴀᴛɪᴏɴ
-- 𝐈ɴᴠɪᴛᴇ 𝐂ᴏᴜɴᴛ
-- 𝐈ɴᴠɪᴛᴇ 𝐌ɪʟᴇꜱᴛᴏɴᴇ 𝐁ᴀᴅɢᴇꜱ
-
-### 𝐅ᴀᴍᴇ 𝐀ɴᴅ 𝐋ᴇᴀᴅᴇʀʙᴏᴀʀᴅ
-
-- 𝐓ᴏᴘ 𝐄ᴄᴏɴᴏᴍʏ 𝐔ꜱᴇʀꜱ
-- 𝐓ᴏᴘ 𝐗𝐏 𝐔ꜱᴇʀꜱ
-- 𝐓ᴏᴘ 𝐑𝐄𝐏 𝐔ꜱᴇʀꜱ
-- 𝐓ᴏᴘ 𝐐ᴜɪᴢ 𝐏ʟᴀʏᴇʀꜱ
-- 𝐓ᴏᴘ 𝐈ɴᴠɪᴛᴇ 𝐔ꜱᴇʀꜱ
-- 𝐑ᴀʀᴇ 𝐈ᴛᴇᴍ 𝐎ᴡɴᴇʀꜱ
-- 𝐂ᴜꜱᴛᴏᴍ 𝐋ᴇᴀᴅᴇʀʙᴏᴀʀᴅ 𝐈ᴍᴀɢᴇꜱ
-
-### 𝐒ᴏᴄɪᴀʟ 𝐒ʏꜱᴛᴇᴍ
-
-- 𝐑𝐄𝐏 𝐒ʏꜱᴛᴇᴍ
-- 𝐑ᴇʟᴀᴛɪᴏɴꜱʜɪᴘ 𝐒ʏꜱᴛᴇᴍ
-- 𝐅ᴀᴍɪʟʏ 𝐒ʏꜱᴛᴇᴍ
-- 𝐀ᴅᴏᴘᴛ 𝐒ʏꜱᴛᴇᴍ
-- 𝐅ᴀᴍɪʟʏ 𝐑ᴀɴᴋꜱ
-- 𝐍ᴏ 𝐔ɴꜱᴀꜰᴇ 𝐎ʀ 𝐂ʀᴇᴇᴘʏ 𝐁ᴇʜᴀᴠɪᴏᴜʀ
-
-### 𝐀𝐈 𝐂ʜᴀᴛ
-
-- 𝐏ʀᴇᴍɪᴜᴍ 𝐂ᴏᴍᴍᴜɴɪᴛʏ 𝐂ʜᴀᴛ 𝐒ᴜᴘᴘᴏʀᴛ
-- 𝐇ɪɴɢʟɪꜱʜ 𝐂ᴏᴍᴍᴜɴɪᴛʏ 𝐑ᴇᴘʟɪᴇꜱ
-- 𝐎ᴡɴᴇʀ-𝐀ᴡᴀʀᴇ 𝐁ᴇʜᴀᴠɪᴏᴜʀ
-- 𝐏ʀᴏꜰɪʟᴇ-𝐀ᴡᴀʀᴇ 𝐑ᴇᴘʟɪᴇꜱ
-- 𝐑ᴇᴘʟʏ 𝐂ᴏɴᴛᴇxᴛ 𝐌ᴇᴍᴏʀʏ
-- 𝐒ʜᴏʀᴛ 𝐂ᴏɴᴠᴇʀꜱᴀᴛɪᴏɴ 𝐌ᴇᴍᴏʀʏ
-
-### 𝐌ᴇᴅɪᴀ 𝐀ɴᴅ 𝐏ᴀɴᴇʟ 𝐂ᴏɴᴛʀᴏʟ
-
-- 𝐂ᴜꜱᴛᴏᴍ 𝐒ᴛᴀʀᴛ 𝐕ɪᴅᴇᴏ / 𝐈ᴍᴀɢᴇ
-- 𝐂ᴜꜱᴛᴏᴍ 𝐒ᴛᴀʀᴛ 𝐐ᴜᴏᴛᴇ
-- 𝐂ᴜꜱᴛᴏᴍ 𝐏ʀᴏꜰɪʟᴇ 𝐁ᴀᴄᴋɢʀᴏᴜɴᴅ
-- 𝐂ᴜꜱᴛᴏᴍ 𝐒ʜᴏᴘ 𝐌ᴇᴅɪᴀ
-- 𝐂ᴜꜱᴛᴏᴍ 𝐕ᴀᴜʟᴛ 𝐌ᴇᴅɪᴀ
-- 𝐂ᴜꜱᴛᴏᴍ 𝐄ᴠᴇɴᴛ 𝐌ᴇᴅɪᴀ
-- 𝐂ᴜꜱᴛᴏᴍ 𝐁ɪʀᴛʜᴅᴀʏ 𝐌ᴇᴅɪᴀ
-- 𝐏ʀᴇᴍɪᴜᴍ 𝐌ᴇᴅɪᴀ + 𝐓ᴇxᴛ + 𝐁ᴜᴛᴛᴏɴ 𝐏ᴀɴᴇʟꜱ
-
-### 𝐃ᴏɴᴀᴛɪᴏɴ 𝐒ʏꜱᴛᴇᴍ
-
-- 𝐃ᴏɴᴀᴛɪᴏɴ 𝐏ᴀɴᴇʟ
-- 𝐒ᴜᴘᴘᴏʀᴛ𝐞ʀ 𝐁ᴀᴅɢᴇꜱ
-- 𝐒ᴜᴘᴘᴏʀᴛ𝐞ʀ 𝐅ʀᴀᴍᴇꜱ
-- 𝐍ᴏ 𝐏ᴀʏ-𝐓ᴏ-𝐖ɪɴ 𝐑ᴇᴡᴀʀᴅꜱ
-- 𝐃ᴏɴᴀᴛɪᴏɴ 𝐋ᴏɢꜱ
-
-### 𝐌ɪɴɪ 𝐀ᴘᴘ 𝐒ʏꜱᴛᴇᴍ
-
-- 𝐇ᴏᴍᴇ 𝐏ᴀɢᴇ
-- 𝐏ʀᴏꜰɪʟᴇ 𝐏ᴀɢᴇ
-- 𝐒ʜᴏᴘ 𝐏ᴀɢᴇ
-- 𝐕ᴀᴜʟᴛ 𝐏ᴀɢᴇ
-- 𝐐ᴜᴇꜱᴛ 𝐏ᴀɢᴇ
-- 𝐃ᴏɴᴀᴛᴇ 𝐏ᴀɢᴇ
-- 𝐅ᴀᴍᴇ 𝐏ᴀɢᴇ
-- 𝐒ᴇᴛᴛɪɴɢꜱ 𝐏ᴀɢᴇ
-- 𝐏ʀɪᴠᴀᴄʏ 𝐏ᴀɢᴇ
-
-### 𝐒ᴇᴛᴛɪɴɢꜱ
-
-- 𝐔ꜱᴇʀ 𝐒ᴇᴛᴛɪɴɢꜱ
-- 𝐆ʀᴏᴜᴘ 𝐒ᴇᴛᴛɪɴɢꜱ
-- 𝐐ᴜɪᴢ 𝐎ɴ / 𝐎ꜰꜰ
-- 𝐄ᴠᴇɴᴛ 𝐎ɴ / 𝐎ꜰꜰ
-- 𝐕ᴇʀɪꜰɪᴄᴀᴛɪᴏɴ 𝐎ɴ / 𝐎ꜰꜰ
-- 𝐌ᴇᴅɪᴀ 𝐂ᴏɴᴛʀᴏʟꜱ
-- 𝐏ʀɪᴠᴀᴄʏ 𝐏ʀᴇꜰᴇʀᴇɴᴄᴇꜱ
-
-### 𝐎ᴡɴᴇʀ 𝐂ᴏɴᴛʀᴏʟ
-
-- 𝐒ʏꜱᴛᴇᴍ 𝐒ᴛᴀᴛꜱ
-- 𝐁ʀᴏᴀᴅᴄᴀꜱᴛ
-- 𝐁ᴀᴄᴋᴜᴘ 𝐀ɴᴅ 𝐑ᴇꜱᴛᴏʀᴇ
-- 𝐄ᴠᴇɴᴛ 𝐂ᴏɴᴛʀᴏʟ
-- 𝐄ᴄᴏɴᴏᴍʏ 𝐂ᴏɴᴛʀᴏʟ
-- 𝐌ᴇᴅɪᴀ 𝐂ᴏɴᴛʀᴏʟ
-- 𝐅ᴇᴇᴅʙᴀᴄᴋ 𝐀ɴᴅ 𝐒ᴜɢɢᴇꜱᴛɪᴏɴꜱ
-- 𝐌ᴀɪɴᴛᴇɴᴀɴᴄᴇ 𝐌ᴏᴅᴇ
+This repository is maintained as a private EGO Network system.
 
 ---
 
-## 𓆩⚚ 𝐒ᴛᴀᴛᴜꜱ ⚚𓆪
+## Current Ready Features
 
-𝐀𝐙𝐀𝐈 𝐈ꜱ 𝐔ɴᴅᴇʀ 𝐀ᴄᴛɪᴠᴇ 𝐂ᴏɴᴠᴇʀꜱɪᴏɴ.
+### Protection
 
-| 𝐌ᴏᴅᴜʟᴇ | 𝐒ᴛᴀᴛᴜꜱ |
-|---|---|
-| 𝐁ʀᴀɴᴅɪɴɢ | 𝐈ɴ 𝐏ʀᴏɢʀᴇꜱꜱ |
-| 𝐒ᴛᴀʀᴛ 𝐏ᴀɴᴇʟ | 𝐏ᴇɴᴅɪɴɢ 𝐀𝐙𝐀𝐈 𝐂ᴏɴᴠᴇʀꜱɪᴏɴ |
-| 𝐏ʀᴏᴛᴇᴄᴛɪᴏɴ | 𝐏ʟᴀɴɴᴇᴅ |
-| 𝐏ʀᴏꜰɪʟᴇ 𝐒ʏꜱᴛᴇᴍ | 𝐏ʟᴀɴɴᴇᴅ |
-| 𝐄ᴄᴏɴᴏᴍʏ | 𝐏ʟᴀɴɴᴇᴅ |
-| 𝐐ᴜɪᴢᴢᴇꜱ | 𝐏ʟᴀɴɴᴇᴅ |
-| 𝐒ʜᴏᴘ / 𝐕ᴀᴜʟᴛ | 𝐏ʟᴀɴɴᴇᴅ |
-| 𝐁ɪʀᴛʜᴅᴀʏ / 𝐅ᴇꜱᴛɪᴠᴀʟꜱ | 𝐏ʟᴀɴɴᴇᴅ |
-| 𝐄ᴠᴇɴᴛꜱ | 𝐏ʟᴀɴɴᴇᴅ |
-| 𝐌ɪɴɪ 𝐀ᴘᴘ | 𝐏ʟᴀɴɴᴇᴅ |
-| 𝐀𝐈 𝐂ʜᴀᴛ | 𝐏ʟᴀɴɴᴇᴅ |
+- Verification system
+- /verify, /verifyall, /unverifyall
+- Verified and unverified user tracking
+- Owner-managed group safety flow
+
+### Economy
+
+- Ego Credits wallet
+- /wallet and /balance
+- /daily rewards
+- /send transfer
+- REP, XP, activity reward support
+- /leaderboard with display names and usernames
+
+### Market / Garage
+
+- /shop
+- /buy item_id
+- /inventory
+- /garage
+- /setbike item_id
+- /setcar item_id
+- Item ID guide after buying
+- Vehicle ID guide inside garage
+- Item picture support through /setitempic
+
+### Gift System
+
+- /gift item_id
+- Gift is sent as a reply to the target user's message
+- Sender and receiver display name support
+- Gift price deduction from wallet
+- Gift image support when item media is set
+
+### Anime Quiz
+
+- Anime character image quiz
+- Four-option answer buttons
+- One-attempt answer protection
+- Correct answer rewards
+- Daily quiz limit and streak reward support
+
+### Family System
+
+- /brother
+- /sister
+- /adopt
+- /family
+- /familytree
+- /leavefamily
+- Name and username display instead of raw user IDs
+
+### AI Chat
+
+- AZAI group and DM AI replies
+- Groq API support
+- Short chat memory
+- Owner recognition
+- Bhabhi Ji / Ma'am respectful address support
+
+### Owner Tools
+
+- /owner panel
+- Guide button
+- Start panel media setup through /setstartpic
+- Logger controls through /logon, /logoff, /logstatus
+- /alive, /ping, /repo branded AZAI responses
 
 ---
 
-## 𓆩⚚ 𝐒ᴇᴄᴜʀɪᴛʏ 𝐍ᴏᴛᴇ ⚚𓆪
+## Environment Notes
 
-𝐒ᴇɴꜱɪᴛɪᴠᴇ 𝐂ᴏɴꜰɪɢᴜʀᴀᴛɪᴏɴ 𝐌ᴜꜱᴛ 𝐁ᴇ 𝐊ᴇᴘᴛ 𝐏ʀɪᴠᴀᴛᴇ.
+Required secrets should be stored only in deployment environment variables. Never commit real tokens or database URLs.
 
-𝐃ᴏ 𝐍ᴏᴛ 𝐏ᴜʙʟɪꜱʜ 𝐏ʀɪᴠᴀᴛᴇ 𝐊ᴇʏꜱ, 𝐃ᴀᴛᴀʙᴀꜱᴇ 𝐋ɪɴᴋꜱ, 𝐒ᴇꜱꜱɪᴏɴꜱ, 𝐈ɴᴛᴇʀɴᴀʟ 𝐈𝐃ꜱ, 𝐎ʀ 𝐎ᴡɴᴇʀ-𝐎ɴʟʏ 𝐒ʏꜱᴛᴇᴍ 𝐃ᴇᴛᴀɪʟꜱ.
+Recommended AI variables:
+
+```env
+GROQ_API_KEY=your_groq_key
+GQRI_API_KEY=your_groq_key
+```
+
+If AI does not reply, first check the owner panel AI status and deployment secrets.
 
 ---
 
-## 𓆩⚚ 𝐃ᴇᴘʟᴏʏᴍᴇɴᴛ 𝐍ᴏᴛᴇ ⚚𓆪
+## Current Pending / Manual Features
 
-𝐓ʜɪꜱ 𝐑ᴇᴘᴏ 𝐈ꜱ 𝐁ᴇɪɴɢ 𝐂ᴏɴᴠᴇʀᴛᴇᴅ 𝐅ᴏʀ 𝐀𝐙𝐀𝐈.
+These are not marked ready yet:
 
-𝐃ᴏ 𝐍ᴏᴛ 𝐃ᴇᴘʟᴏʏ 𝐈ᴛ 𝐀ꜱ 𝐅ɪɴᴀʟ 𝐔ɴᴛɪʟ 𝐓ʜᴇ 𝐂ᴏɴᴠᴇʀꜱɪᴏɴ 𝐂ʜᴇᴄᴋʟɪꜱᴛ 𝐈ꜱ 𝐂ᴏᴍᴘʟᴇᴛᴇᴅ.
+- Broadcast system
+- Events / birthday panel
+- Full live restart test
+
+Telegram limitations still apply:
+
+- A bot cannot DM users unless they have started the bot.
+- A bot cannot send messages in groups where it lacks permission.
+- A bot cannot pin messages unless it is admin with pin permission.
 
 ---
 
-<p align="center">
-  𝐏ᴏᴡᴇʀᴇᴅ 𝐁ʏ <b>𝐄ɢᴏ 𝐍ᴇᴛᴡᴏʀᴋ</b> • 𝐄𝐒𝐓. 2026<br>
-  𝐁ᴜɪʟᴛ 𝐔ɴᴅᴇʀ 𝐓ʜᴇ 𝐎ᴡɴᴇʀꜱʜɪᴘ 𝐎ꜰ <b>𝐌𝐑 𝐄𝐆𝐎</b>
-</p>
+## Launch Checklist
+
+Before public use:
+
+- Restart the bot
+- Test /settings
+- Test /shop
+- Test /shop@botusername
+- Test /gift item_id by replying to a user message
+- Test /garage
+- Test /leaderboard
+- Test /animeguess
+- Test AI chat after setting Groq secrets
+- Check /owner panel
+- Check /ping
+
+---
+
+## Brand
+
+AZAI is part of EGO NETWORK · EST. 2026.
+
+Official links:
+
+- Master: https://t.me/EGOISTICxPRIME
+- Updates: https://t.me/EGOxUPDATES
+- Support: https://t.me/EGOxSUPPORT
