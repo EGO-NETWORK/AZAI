@@ -64,7 +64,7 @@ def start_text() -> str:
         + font("Owner:") + " " + font("MR EGO") + "\n"
         + font("Uptime:") + f" {uptime}\n"
         + font("Time:") + f" {ist_time}\n\n"
-        + font("Protection, AI chat, economy, anime quiz, market, and clean group control.") + "\n\n"
+        + font("Protection, economy, market, and clean group control.") + "\n\n"
         + font("Powered By:") + " " + brand()
     )
 
@@ -76,6 +76,36 @@ def start_buttons():
         [Button.url(font("Updates"), UPDATES_LINK), Button.url(font("Support"), SUPPORT_LINK)],
         [Button.url(font("My Master"), MASTER_LINK), Button.inline(font("Close"), b"azai_close_panel")],
     ]
+
+
+def back_buttons():
+    return [[Button.inline(font("Back"), b"azai_start_home"), Button.inline(font("Close"), b"azai_close_panel")]]
+
+
+def help_text() -> str:
+    return (
+        font("AZAI HELP & COMMANDS") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Core:") + " /start /help /ping /alive\n"
+        + font("Owner:") + " /owner /settings /logstatus\n"
+        + font("Economy:") + " /wallet /daily /leaderboard\n"
+        + font("Market:") + " /shop /inventory /garage\n"
+        + font("Family:") + " /brother /sister /adopt /familytree\n"
+        + font("Media:") + " /setstartpic /setitempic item_id"
+    )
+
+
+def stats_text() -> str:
+    uptime = readable_time(time.time() - START_TIME)
+    ist_time = datetime.now(IST).strftime("%d %b %Y - %I:%M:%S %p")
+    return (
+        font("AZAI SYSTEM STATS") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Status:") + " " + font("Online") + "\n"
+        + font("Uptime:") + f" {uptime}\n"
+        + font("Time:") + f" {ist_time}\n"
+        + font("Network:") + " " + brand()
+    )
 
 
 async def saved_pic():
@@ -99,11 +129,7 @@ async def set_start_pic(event):
     if not reply or not reply.media:
         await event.reply(font("Reply to start panel picture first."))
         raise events.StopPropagation
-    await media_db.update_one(
-        {"key": "start"},
-        {"$set": {"key": "start", "chat_id": int(reply.chat_id), "msg_id": int(reply.id)}},
-        upsert=True,
-    )
+    await media_db.update_one({"key": "start"}, {"$set": {"key": "start", "chat_id": int(reply.chat_id), "msg_id": int(reply.id)}}, upsert=True)
     await event.reply(font("Start panel picture saved."))
     raise events.StopPropagation
 
@@ -117,8 +143,22 @@ async def start_pic_handler(event):
     raise events.StopPropagation
 
 
+async def start_callback_handler(event):
+    data = event.data.decode()
+    if data == "azai_help_cmds_menu":
+        await event.edit(help_text(), buttons=back_buttons())
+    elif data == "azai_system_stats":
+        await event.edit(stats_text(), buttons=back_buttons())
+    elif data == "azai_start_home":
+        await event.edit(start_text(), buttons=start_buttons())
+    elif data == "azai_close_panel":
+        await event.delete()
+    raise events.StopPropagation
+
+
 if "aaa_azai_start_pic" not in tbot.handlers_loaded:
     tbot.add_event_handler(set_start_pic, events.NewMessage(pattern=f"^{prefix_cmds}setstartpic$", incoming=True))
     tbot.add_event_handler(start_pic_handler, events.NewMessage(pattern=f"^{prefix_cmds}start(?:@\\w+)?(?: .*)?$", incoming=True))
     tbot.add_event_handler(start_pic_handler, events.NewMessage(pattern=f"^{prefix_cmds}help(?:@\\w+)?$", incoming=True))
+    tbot.add_event_handler(start_callback_handler, events.CallbackQuery(pattern=b"^azai_(help_cmds_menu|system_stats|start_home|close_panel)$"))
     tbot.handlers_loaded.add("aaa_azai_start_pic")
