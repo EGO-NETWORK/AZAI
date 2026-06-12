@@ -25,6 +25,10 @@ def buttons():
     return [[Button.url(font("Updates"), UPDATES_LINK), Button.url(font("Support"), SUPPORT_LINK)], [Button.url(font("My Master"), MASTER_LINK)]]
 
 
+def support_buttons():
+    return [[Button.url(font("Support"), SUPPORT_LINK)], [Button.url(font("Updates"), UPDATES_LINK), Button.url(font("My Master"), MASTER_LINK)]]
+
+
 async def alive_handler(event):
     uptime = readable_time(time.time() - START_TIME)
     now = datetime.now(IST).strftime("%d %b %Y - %I:%M:%S %p")
@@ -45,10 +49,25 @@ async def alive_handler(event):
 
 
 async def ping_handler(event):
-    start = time.time()
-    msg = await event.reply(font("Pinging AZAI..."))
-    end = round((time.time() - start) * 1000, 2)
-    await msg.edit(font("AZAI Ping:") + f" {end} ms")
+    start = time.perf_counter()
+    msg = await event.reply(font("Checking AZAI latency..."))
+    end = round((time.perf_counter() - start) * 1000, 2)
+    uptime = readable_time(time.time() - START_TIME)
+    now = datetime.now(IST).strftime("%d %b %Y - %I:%M:%S %p")
+    cpu = psutil.cpu_percent(interval=0.2)
+    ram = psutil.virtual_memory().percent
+    text = (
+        font("AZAI SYSTEM PING") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Status:") + " " + font("Online") + "\n"
+        + font("Response:") + f" {end} ms\n"
+        + font("Uptime:") + f" {uptime}\n"
+        + font("Time:") + f" {now}\n"
+        + font("CPU:") + f" {cpu:.1f}%\n"
+        + font("RAM:") + f" {ram:.1f}%\n\n"
+        + font("Need help? Use the Support button below.")
+    )
+    await msg.edit(text, buttons=support_buttons())
     raise events.StopPropagation
 
 
