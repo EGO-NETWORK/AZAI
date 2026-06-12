@@ -169,6 +169,30 @@ def market_text() -> str:
     )
 
 
+def events_text() -> str:
+    return (
+        font("EVENT CONTROL") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Panel:") + " /events\n"
+        + font("Birthday:") + " /birthday DD/MM /birthdays\n"
+        + font("Today:") + " /todayevents\n"
+        + font("Owner Add:") + " /addevent DD/MM | title | text\n"
+        + font("Owner Delete:") + " /delevent title\n\n"
+        + font("Status:") + " " + font("Basic event and birthday modules saved.")
+    )
+
+
+def games_text() -> str:
+    return (
+        font("GAME CONTROL") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Panel:") + " /games\n"
+        + font("Commands:") + " /dice /dart /basketball\n"
+        + font("Rule:") + " " + font("Free clean mini-games only. No betting or wager logic.") + "\n\n"
+        + font("Status:") + " " + font("Command center guide added. Gameplay plugin still needs live-safe module.")
+    )
+
+
 def guide_text() -> str:
     return (
         font("AZAI SETUP GUIDE") + "\n"
@@ -181,13 +205,9 @@ def guide_text() -> str:
         + font("ANIME QUIZ:") + "\n"
         + "Send quiz image -> reply -> /addanimeq answer | option1 | option2 | option3 | option4\n"
         + "Example: /addanimeq Naruto | Naruto | Luffy | Gojo | Eren\n\n"
-        + font("VEHICLE SET:") + "\n"
-        + "/garage -> copy ID -> /setbike bike_id or /setcar car_id\n\n"
-        + font("VAULT ITEM:") + "\n"
-        + "/addvaultitem id | name | price | stock\n"
-        + "Example: /addvaultitem royal_crown | Royal Crown | 5000 | 10\n\n"
-        + font("BROADCAST:") + "\n"
-        + "/broadcast text\n/broadcastpin text\n\n"
+        + font("EVENTS:") + "\n"
+        + "/events -> check event commands\n"
+        + "/addevent DD/MM | title | text\n\n"
         + font("AI KEY:") + "\n"
         + "Replit Secrets me GROQ_API_KEY ya GRQI_API_KEY add karo."
     )
@@ -199,7 +219,7 @@ def launch_text() -> str:
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + "1. " + font("Restart bot after latest repo update") + "\n"
         + "2. " + font("Test /start and /commands") + "\n"
-        + "3. " + font("Test /settings and /msettings") + "\n"
+        + "3. " + font("Test /owner /events /quiz") + "\n"
         + "4. " + font("Test /verify and group admin permissions") + "\n"
         + "5. " + font("Set start and item images") + "\n"
         + "6. " + font("Add 3-5 anime quiz questions") + "\n"
@@ -227,6 +247,7 @@ def owner_buttons():
         [Button.inline(font("AI Status"), b"azown_ai"), Button.inline(font("Database"), b"azown_db")],
         [Button.inline(font("Logs"), b"azown_logs"), Button.inline(font("Security"), b"azown_security")],
         [Button.inline(font("Economy"), b"azown_economy"), Button.inline(font("Quiz"), b"azown_quiz")],
+        [Button.inline(font("Events"), b"azown_events"), Button.inline(font("Games"), b"azown_games")],
         [Button.inline(font("Market Media"), b"azown_market"), Button.inline(font("Launch Check"), b"azown_launch")],
         [Button.inline(font("Commands"), b"azown_commands"), Button.inline(font("Maintenance"), b"azown_maintenance")],
         [Button.inline(font("Close"), b"azown_close")],
@@ -267,6 +288,10 @@ async def owner_callback(event):
         await event.edit(economy_text(), buttons=back_buttons())
     elif data == "azown_quiz":
         await event.edit(quiz_text(), buttons=back_buttons())
+    elif data == "azown_events":
+        await event.edit(events_text(), buttons=back_buttons())
+    elif data == "azown_games":
+        await event.edit(games_text(), buttons=back_buttons())
     elif data == "azown_market":
         await event.edit(market_text(), buttons=back_buttons())
     elif data == "azown_launch":
