@@ -181,8 +181,9 @@ def events_text() -> str:
         + font("Birthday:") + " /birthday DD/MM /birthdays\n"
         + font("Today:") + " /todayevents\n"
         + font("Owner Add:") + " /addevent DD/MM | title | text\n"
-        + font("Owner Delete:") + " /delevent title\n\n"
-        + font("Status:") + " " + font("Event and birthday modules active.")
+        + font("Owner Delete:") + " /delevent title\n"
+        + font("Auto Wish:") + " /eventauto on | off | status\n\n"
+        + font("Status:") + " " + font("Event, saved-date, and auto-wish modules active.")
     )
 
 
@@ -212,7 +213,8 @@ def guide_text() -> str:
         + font("Example:") + " /addanimeq Naruto | Naruto | Luffy | Gojo | Eren\n\n"
         + font("EVENTS:") + "\n"
         + "/events\n"
-        + "/addevent DD/MM | title | text\n\n"
+        + "/addevent DD/MM | title | text\n"
+        + "/eventauto status\n\n"
         + font("AI KEY:") + "\n"
         + font("Replit Secrets me") + " GROQ_API_KEY / GRQI_API_KEY " + font("add karo.")
     )
@@ -229,7 +231,8 @@ def launch_text() -> str:
         + "5. " + font("Set start and item images") + "\n"
         + "6. " + font("Add 3-5 anime quiz questions") + "\n"
         + "7. " + font("Test") + " /wallet /daily /shop /garage /broadcast\n"
-        + "8. " + font("Fix errors for 1-2 days, then publish")
+        + "8. " + font("Test") + " /eventauto status /todayevents\n"
+        + "9. " + font("Fix errors for 1-2 days, then publish")
     )
 
 
