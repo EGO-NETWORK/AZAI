@@ -50,19 +50,22 @@ async def alive_handler(event):
 
 async def ping_handler(event):
     start = time.perf_counter()
-    msg = await event.reply(font("Checking AZAI latency..."))
+    msg = await event.reply(font("AZAI health check in progress..."))
     end = round((time.perf_counter() - start) * 1000, 2)
     uptime = readable_time(time.time() - START_TIME)
     now = datetime.now(IST).strftime("%d %b %Y - %I:%M:%S %p")
     cpu = psutil.cpu_percent(interval=0.2)
     ram = psutil.virtual_memory().percent
+    status = font("Excellent") if end < 120 else font("Stable") if end < 350 else font("Slow")
     text = (
-        font("AZAI SYSTEM PING") + "\n"
+        font("AZAI SYSTEM STATUS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Status:") + " " + font("Online") + "\n"
-        + font("Response:") + f" {end} ms\n"
+        + font("Connection:") + " " + font("Online") + "\n"
+        + font("Latency:") + f" {end} ms\n"
+        + font("Quality:") + f" {status}\n"
         + font("Uptime:") + f" {uptime}\n"
-        + font("Time:") + f" {now}\n"
+        + font("Checked At:") + f" {now}\n\n"
+        + font("Server Load") + "\n"
         + font("CPU:") + f" {cpu:.1f}%\n"
         + font("RAM:") + f" {ram:.1f}%\n\n"
         + font("Need help? Use the Support button below.")
