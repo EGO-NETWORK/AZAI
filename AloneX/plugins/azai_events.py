@@ -8,6 +8,7 @@ from config import ALONE_OWNER_ID, OWNER_ID
 
 IST = pytz.timezone("Asia/Kolkata")
 event_db = database["azai_events"]
+bday_db = database["azai_" + "birthdays"]
 
 
 def owner_ids():
@@ -103,13 +104,20 @@ async def delete_event_handler(event):
 async def today_events_handler(event):
     now = datetime.now(IST)
     rows = await event_db.find({"day": now.day, "month": now.month}).to_list(length=50)
+    saved = await bday_db.find({"day": now.day, "month": now.month}).to_list(length=50)
     lines = [font("AZAI TODAY EVENTS"), "━━━━━━━━━━━━━━━━━━━━━━━━━━━━", f"{font('Date:')} {now.day:02d}/{now.month:02d}", ""]
+    if saved:
+        lines.append(font("Saved Dates"))
+        for index, row in enumerate(saved, 1):
+            lines.append(f"{index}. {row.get('name', 'User')}")
+        lines.append("")
     if rows:
+        lines.append(font("Events"))
         for index, row in enumerate(rows, 1):
             lines.append(f"{index}. {font(row.get('title', 'Event'))}")
             lines.append(str(row.get("text", ""))[:250])
-    else:
-        lines.append(font("No saved events for today."))
+    if not rows and not saved:
+        lines.append(font("No saved records for today."))
     await event.reply("\n".join(lines))
     raise events.StopPropagation
 
