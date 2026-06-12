@@ -61,7 +61,7 @@ def item_line(item_id: str, item: dict) -> str:
     color = item.get("color", "Default")
     price = int(item.get("price", 0))
     rarity = item.get("rarity", "Normal")
-    return f"• {name} ({color}) - {price} {CURRENCY} [{rarity}]\n  ID: {item_id}"
+    return f"• {name} ({color}) - {price} {CURRENCY} [{rarity}]\n  {font('ID:')} {item_id}"
 
 
 def shop_home_text() -> str:
@@ -70,9 +70,9 @@ def shop_home_text() -> str:
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Choose a category below.") + "\n"
         + font("Bought vehicles go to Garage.") + "\n"
-        + font("Use /inventory or /garage to see item IDs.") + "\n"
-        + font("Set bike: /setbike bike_splendor") + "\n"
-        + font("Set car: /setcar car_scorpio_s11_black") + "\n\n"
+        + font("Use these commands to see item IDs:") + " /inventory /garage\n"
+        + font("Set bike:") + " /setbike bike_splendor\n"
+        + font("Set car:") + " /setcar car_scorpio_s11_black\n\n"
         + font("Powered By:") + " " + BRAND
     )
 
@@ -94,8 +94,7 @@ def items_buttons(items: dict, prefix: str):
     rows = []
     row = []
     for item_id, item in items.items():
-        label = font(item["name"])
-        row.append(Button.inline(label, f"azm_view_{item_id}".encode()))
+        row.append(Button.inline(font(item["name"]), f"azm_view_{item_id}".encode()))
         if len(row) == 2:
             rows.append(row)
             row = []
@@ -116,8 +115,8 @@ def category_text(title: str, items: dict) -> str:
 def gift_text() -> str:
     text = font("GIFTS") + "\n" + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
     for key, item in GIFTS.items():
-        text += f"• {item['name']} - {item['price']} {CURRENCY}\n  ID: {key}\n"
-    text += "\n" + font("Use: /gift item_id by replying to a user.")
+        text += f"• {item['name']} - {item['price']} {CURRENCY}\n  {font('ID:')} {key}\n"
+    text += "\n" + font("Use command by replying to a user:") + " /gift item_id"
     return text
 
 
@@ -130,7 +129,7 @@ def view_item_text(item_id: str, item: dict) -> str:
         + font("Rarity:") + f" {item.get('rarity', 'Normal')}\n"
         + font("Price:") + f" {item.get('price', 0)} {CURRENCY}\n\n"
         + font("Item ID:") + f" {item_id}\n\n"
-        + font("After buy, use /inventory or /garage to check IDs.")
+        + font("After buy, use these commands to check IDs:") + " /inventory /garage"
     )
 
 
@@ -170,9 +169,9 @@ async def buy_item(event, item_id: str):
     await wallet_db.update_one({"user_id": int(sender.id)}, update, upsert=True)
     guide = ""
     if item_id.startswith("bike_"):
-        guide = f"\n\nNext:\n/inventory\n/setbike {item_id}"
+        guide = "\n\n" + font("Next:") + f"\n/inventory\n/setbike {item_id}"
     if item_id.startswith("car_"):
-        guide = f"\n\nNext:\n/inventory\n/setcar {item_id}"
+        guide = "\n\n" + font("Next:") + f"\n/inventory\n/setcar {item_id}"
     await event.edit(
         font("PURCHASE COMPLETE") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
@@ -199,9 +198,9 @@ async def garage_text(user_id: int) -> str:
     text += font("Active Car:") + f" {active_car or 'None'}\n"
     text += font("Active Bike:") + f" {active_bike or 'None'}\n\n"
     text += font("Cars:") + "\n"
-    text += "\n".join([f"• {CARS.get(x, {}).get('name', x)}\n  ID: {x}\n  Use: /setcar {x}" for x in cars]) if cars else font("No cars owned yet.")
+    text += "\n".join([f"• {CARS.get(x, {}).get('name', x)}\n  {font('ID:')} {x}\n  {font('Use:')} /setcar {x}" for x in cars]) if cars else font("No cars owned yet.")
     text += "\n\n" + font("Bikes:") + "\n"
-    text += "\n".join([f"• {BIKES.get(x, {}).get('name', x)}\n  ID: {x}\n  Use: /setbike {x}" for x in bikes]) if bikes else font("No bikes owned yet.")
+    text += "\n".join([f"• {BIKES.get(x, {}).get('name', x)}\n  {font('ID:')} {x}\n  {font('Use:')} /setbike {x}" for x in bikes]) if bikes else font("No bikes owned yet.")
     return text
 
 
@@ -308,7 +307,7 @@ async def market_callback(event):
     elif data == "azm_vault":
         await event.edit(font("VAULT") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Rare and owner-gifted items will appear here."), buttons=back_buttons())
     elif data == "azm_inventory":
-        await event.edit(font("Open /inventory or /garage to view saved item IDs."), buttons=back_buttons())
+        await event.edit(font("Open these commands to view saved item IDs:") + " /inventory /garage", buttons=back_buttons())
     elif data.startswith("azm_view_"):
         item_id = data.replace("azm_view_", "", 1)
         item = all_market_items().get(item_id)
