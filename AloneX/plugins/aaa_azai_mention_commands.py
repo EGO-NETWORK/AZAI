@@ -7,7 +7,7 @@ from AloneX.plugins.azai_market import garage_handler, shop_handler, vault_handl
 
 
 def mention_pattern(command: str) -> str:
-    return rf"^[/!.]{command}(?:@\w+)?$"
+    return r"^[/!.](?:" + command + r")@\w+$"
 
 
 async def shop_mention(event):
