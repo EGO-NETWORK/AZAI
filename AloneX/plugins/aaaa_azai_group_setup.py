@@ -1,16 +1,34 @@
 from telethon import Button, events
 
 from AloneX import font, prefix_cmds, tbot
+from config import ALONE_OWNER_ID, OWNER_ID
 
 SUPPORT_LINK = "https://t.me/EGOxSUPPORT"
 UPDATES_LINK = "https://t.me/EGOxUPDATES"
 MASTER_LINK = "https://t.me/EGOISTICxPRIME"
 
 
+def owner_ids() -> set[int]:
+    ids = set()
+    for value in (ALONE_OWNER_ID, OWNER_ID):
+        try:
+            if int(value):
+                ids.add(int(value))
+        except Exception:
+            pass
+    return ids
+
+
+async def is_owner(event) -> bool:
+    sender = await event.get_sender()
+    return bool(sender and int(sender.id) in owner_ids())
+
+
 def home_text():
     return (
         font("AZAI GROUP SETUP") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Access:") + " " + font("Owner Only") + "\n"
         + font("Owner:") + " " + font("MR EGO") + "\n"
         + font("Network:") + " " + font("EGO Network - EST. 2026") + "\n\n"
         + font("Choose a setup panel below.")
@@ -43,7 +61,7 @@ def market_text():
 
 
 def media_text():
-    return panel("MEDIA SETUP", "/setstartpic\n/setitempic item_id\n/setleaderpic")
+    return panel("MEDIA SETUP", "/setstartpic\n/setitempic item_id\n/setleaderpic\n/stickerpack add <pack> <mood>\n/stickerpack remove <pack>\n/stickerpack list\n/stickermood <mood>")
 
 
 def fun_text():
@@ -51,11 +69,17 @@ def fun_text():
 
 
 async def settings_handler(event):
+    if not await is_owner(event):
+        await event.reply(font("Owner only."))
+        raise events.StopPropagation
     await event.reply(home_text(), buttons=buttons())
     raise events.StopPropagation
 
 
 async def settings_callback(event):
+    if not await is_owner(event):
+        await event.answer(font("Owner-only panel."), alert=True)
+        raise events.StopPropagation
     data = event.data.decode()
     if data == "azset_home":
         await event.edit(home_text(), buttons=buttons())
