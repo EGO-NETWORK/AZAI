@@ -19,16 +19,26 @@ def owner_ids() -> set[int]:
     return ids
 
 
-async def is_owner(event) -> bool:
+async def is_owner_or_admin(event) -> bool:
     sender = await event.get_sender()
-    return bool(sender and int(sender.id) in owner_ids())
+    if not sender:
+        return False
+    if int(sender.id) in owner_ids():
+        return True
+    if event.is_private:
+        return False
+    try:
+        perms = await event.client.get_permissions(event.chat_id, sender.id)
+        return bool(getattr(perms, "is_admin", False) or getattr(perms, "is_creator", False))
+    except Exception:
+        return False
 
 
 def home_text():
     return (
         font("AZAI GROUP SETUP") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Access:") + " " + font("Owner Only") + "\n"
+        + font("Access:") + " " + font("Group Admin / Bot Owner") + "\n"
         + font("Owner:") + " " + font("MR EGO") + "\n"
         + font("Network:") + " " + font("EGO Network - EST. 2026") + "\n\n"
         + font("Choose a setup panel below.")
@@ -69,16 +79,16 @@ def fun_text():
 
 
 async def settings_handler(event):
-    if not await is_owner(event):
-        await event.reply(font("Owner only."))
+    if not await is_owner_or_admin(event):
+        await event.reply(font("Group admin only."))
         raise events.StopPropagation
     await event.reply(home_text(), buttons=buttons())
     raise events.StopPropagation
 
 
 async def settings_callback(event):
-    if not await is_owner(event):
-        await event.answer(font("Owner-only panel."), alert=True)
+    if not await is_owner_or_admin(event):
+        await event.answer(font("Group admin only."), alert=True)
         raise events.StopPropagation
     data = event.data.decode()
     if data == "azset_home":
