@@ -5,10 +5,27 @@ import time
 from telethon import events, functions, types
 
 from AloneX import database, font, prefix_cmds, tbot
+from config import ALONE_OWNER_ID, OWNER_ID
 
 sticker_db = database["azai_sticker_packs"]
 sticker_cooldown = {}
 AUTO_REPLY_COOLDOWN = 4
+
+
+def owner_ids() -> set[int]:
+    ids = set()
+    for value in (ALONE_OWNER_ID, OWNER_ID):
+        try:
+            if int(value):
+                ids.add(int(value))
+        except Exception:
+            pass
+    return ids
+
+
+async def is_owner(event) -> bool:
+    sender = await event.get_sender()
+    return bool(sender and int(sender.id) in owner_ids())
 
 
 def clean_pack_name(value: str) -> str:
@@ -66,10 +83,9 @@ async def random_sticker_from_pack(pack: str):
 
 def sticker_help_text() -> str:
     return (
-        font("AZAI STICKER SYSTEM") + "\n"
+        font("AZAI STICKER CONTROL") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Auto sticker echo:") + " " + font("Active") + "\n"
-        + font("If someone sends a sticker, AZAI can reply with the same sticker.") + "\n\n"
+        + font("Access:") + " " + font("Owner Only") + "\n\n"
         + font("Commands:") + "\n"
         + "/stickerpack add <pack> <mood>\n"
         + "/stickerpack remove <pack>\n"
@@ -83,11 +99,14 @@ def sticker_help_text() -> str:
 
 
 async def stickerpack_handler(event):
+    if not await is_owner(event):
+        await event.reply(font("Owner only."))
+        raise events.StopPropagation
     text = (event.raw_text or "").strip()
     parts = text.split()
     if len(parts) < 2:
         await event.reply(sticker_help_text())
-        return
+        raise events.StopPropagation
 
     action = parts[1].lower()
     chat_id = event.chat_id
@@ -95,51 +114,56 @@ async def stickerpack_handler(event):
     if action == "add":
         if len(parts) < 3:
             await event.reply(font("Use: /stickerpack add <pack_link_or_name> <mood>"))
-            return
+            raise events.StopPropagation
         pack = clean_pack_name(parts[2])
         mood = clean_mood(parts[3] if len(parts) > 3 else "default")
         if not pack:
             await event.reply(font("Sticker pack name is invalid."))
-            return
+            raise events.StopPropagation
         await save_pack(chat_id, pack, mood)
         await event.reply(font("Sticker pack added.") + "\n" + font("Mood:") + f" {mood}\n" + font("Pack:") + f" {pack}")
-        return
+        raise events.StopPropagation
 
     if action in {"remove", "del", "delete"}:
         if len(parts) < 3:
             await event.reply(font("Use: /stickerpack remove <pack_name>"))
-            return
+            raise events.StopPropagation
         pack = clean_pack_name(parts[2])
         count = await remove_pack(chat_id, pack)
         await event.reply(font("Sticker pack removed:") + f" {count}")
-        return
+        raise events.StopPropagation
 
     if action == "list":
         packs = await list_packs(chat_id)
         if not packs:
             await event.reply(font("No sticker packs added yet."))
-            return
+            raise events.StopPropagation
         lines = [font("AZAI STICKER PACKS"), "━━━━━━━━━━━━━━━━━━━━━━━━━━━━", ""]
         for item in packs[:30]:
             lines.append(f"{item.get('mood', 'default')} - {item.get('pack')}")
         await event.reply("\n".join(lines))
-        return
+        raise events.StopPropagation
 
     await event.reply(sticker_help_text())
+    raise events.StopPropagation
 
 
 async def stickermood_handler(event):
+    if not await is_owner(event):
+        await event.reply(font("Owner only."))
+        raise events.StopPropagation
     parts = (event.raw_text or "").split()
     mood = clean_mood(parts[1] if len(parts) > 1 else "default")
     packs = await mood_packs(event.chat_id, mood)
     if not packs:
         await event.reply(font("No sticker pack found for this mood."))
-        return
+        raise events.StopPropagation
     sticker = await random_sticker_from_pack(random.choice(packs))
     if not sticker:
         await event.reply(font("Could not load sticker from saved packs."))
-        return
+        raise events.StopPropagation
     await event.reply(file=sticker)
+    raise events.StopPropagation
 
 
 async def sticker_echo_handler(event):
