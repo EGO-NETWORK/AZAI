@@ -23,9 +23,19 @@ def owner_ids() -> set[int]:
     return ids
 
 
-async def is_owner(event) -> bool:
+async def is_owner_or_admin(event) -> bool:
     sender = await event.get_sender()
-    return bool(sender and int(sender.id) in owner_ids())
+    if not sender:
+        return False
+    if int(sender.id) in owner_ids():
+        return True
+    if event.is_private:
+        return False
+    try:
+        perms = await event.client.get_permissions(event.chat_id, sender.id)
+        return bool(getattr(perms, "is_admin", False) or getattr(perms, "is_creator", False))
+    except Exception:
+        return False
 
 
 def clean_pack_name(value: str) -> str:
@@ -45,11 +55,7 @@ def clean_mood(value: str) -> str:
 
 
 async def save_pack(chat_id: int, pack: str, mood: str):
-    await sticker_db.update_one(
-        {"chat_id": chat_id, "pack": pack},
-        {"$set": {"chat_id": chat_id, "pack": pack, "mood": mood}},
-        upsert=True,
-    )
+    await sticker_db.update_one({"chat_id": chat_id, "pack": pack}, {"$set": {"chat_id": chat_id, "pack": pack, "mood": mood}}, upsert=True)
 
 
 async def remove_pack(chat_id: int, pack: str) -> int:
@@ -69,10 +75,7 @@ async def mood_packs(chat_id: int, mood: str) -> list[str]:
 
 async def random_sticker_from_pack(pack: str):
     try:
-        sticker_set = await tbot(functions.messages.GetStickerSetRequest(
-            stickerset=types.InputStickerSetShortName(pack),
-            hash=0,
-        ))
+        sticker_set = await tbot(functions.messages.GetStickerSetRequest(stickerset=types.InputStickerSetShortName(pack), hash=0))
         docs = list(getattr(sticker_set, "documents", []) or [])
         if not docs:
             return None
@@ -85,7 +88,7 @@ def sticker_help_text() -> str:
     return (
         font("AZAI STICKER CONTROL") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Access:") + " " + font("Owner Only") + "\n\n"
+        + font("Access:") + " " + font("Group Admin / Bot Owner") + "\n\n"
         + font("Commands:") + "\n"
         + "/stickerpack add <pack> <mood>\n"
         + "/stickerpack remove <pack>\n"
@@ -99,18 +102,16 @@ def sticker_help_text() -> str:
 
 
 async def stickerpack_handler(event):
-    if not await is_owner(event):
-        await event.reply(font("Owner only."))
+    if not await is_owner_or_admin(event):
+        await event.reply(font("Group admin only."))
         raise events.StopPropagation
     text = (event.raw_text or "").strip()
     parts = text.split()
     if len(parts) < 2:
         await event.reply(sticker_help_text())
         raise events.StopPropagation
-
     action = parts[1].lower()
     chat_id = event.chat_id
-
     if action == "add":
         if len(parts) < 3:
             await event.reply(font("Use: /stickerpack add <pack_link_or_name> <mood>"))
@@ -123,7 +124,6 @@ async def stickerpack_handler(event):
         await save_pack(chat_id, pack, mood)
         await event.reply(font("Sticker pack added.") + "\n" + font("Mood:") + f" {mood}\n" + font("Pack:") + f" {pack}")
         raise events.StopPropagation
-
     if action in {"remove", "del", "delete"}:
         if len(parts) < 3:
             await event.reply(font("Use: /stickerpack remove <pack_name>"))
@@ -132,7 +132,6 @@ async def stickerpack_handler(event):
         count = await remove_pack(chat_id, pack)
         await event.reply(font("Sticker pack removed:") + f" {count}")
         raise events.StopPropagation
-
     if action == "list":
         packs = await list_packs(chat_id)
         if not packs:
@@ -143,14 +142,13 @@ async def stickerpack_handler(event):
             lines.append(f"{item.get('mood', 'default')} - {item.get('pack')}")
         await event.reply("\n".join(lines))
         raise events.StopPropagation
-
     await event.reply(sticker_help_text())
     raise events.StopPropagation
 
 
 async def stickermood_handler(event):
-    if not await is_owner(event):
-        await event.reply(font("Owner only."))
+    if not await is_owner_or_admin(event):
+        await event.reply(font("Group admin only."))
         raise events.StopPropagation
     parts = (event.raw_text or "").split()
     mood = clean_mood(parts[1] if len(parts) > 1 else "default")
