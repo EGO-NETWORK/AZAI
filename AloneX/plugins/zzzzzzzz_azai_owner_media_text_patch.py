@@ -15,6 +15,9 @@ def media_text() -> str:
         + "/sethelppic, /setsettingspic, /seteconomypic\n"
         + "/setgamespic, /setfamilypic, /setquizpic\n"
         + "/setownerpic, /setcorepic\n\n"
+        + font("EGO Hustle media:") + "\n"
+        + "/setgamepic, /setworkpic, /setluckpic\n"
+        + "/setleaderboardpic, /setgameprofilepic\n\n"
         + font("How to use:") + "\n"
         + font("Send image or video, reply to it, then run the set command.")
     )
