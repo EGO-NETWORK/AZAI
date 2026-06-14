@@ -1,9 +1,27 @@
 from telethon import Button, events
 
 from AloneX import font, prefix_cmds, tbot
+from config import ALONE_OWNER_ID, OWNER_ID
 
 UPDATES_LINK = "https://t.me/EGOxUPDATES"
 SUPPORT_LINK = "https://t.me/EGOxSUPPORT"
+
+
+def owner_ids() -> set[int]:
+    ids = set()
+    for value in (ALONE_OWNER_ID, OWNER_ID):
+        try:
+            value = int(value)
+            if value:
+                ids.add(value)
+        except Exception:
+            pass
+    return ids
+
+
+async def is_owner(event) -> bool:
+    sender = await event.get_sender()
+    return bool(sender and int(sender.id) in owner_ids())
 
 
 def group_settings_text() -> str:
@@ -29,24 +47,29 @@ def group_settings_text() -> str:
 
 def media_settings_text() -> str:
     return (
-        font("AZAI BOT SETTINGS") + "\n"
+        font("AZAI OWNER MEDIA SETTINGS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Mode:") + " " + font("Admin setup") + "\n"
+        + font("Mode:") + " " + font("Owner-only setup") + "\n"
         + font("Network:") + " " + font("EGO Network - EST. 2026") + "\n\n"
-        + font("Media setup:") + "\n"
-        + "/setstartpic - " + font("Set start/help panel media") + "\n"
-        + "/setitempic item_id - " + font("Set shop/item media") + "\n"
-        + "/setleaderpic - " + font("Set leaderboard media") + "\n\n"
-        + font("Fun zone setup:") + "\n"
-        + font("Use Fun Zone panel from owner panel after adding media packs.") + "\n\n"
-        + font("Use this panel only in groups where AZAI is admin.")
+        + "/setstartpic - " + font("Set start and help panel media") + "\n"
+        + "/setitempic item_id - " + font("Attach media to shop items") + "\n"
+        + "/setleaderpic - " + font("Set leaderboard media card") + "\n\n"
+        + font("How to use:") + "\n"
+        + font("Send image/video, reply to it, then run the set command.")
     )
 
 
 def settings_buttons():
     return [
-        [Button.inline(font("Moderation"), b"azset_mod"), Button.inline(font("Media"), b"azset_media")],
+        [Button.inline(font("Moderation"), b"azset_mod")],
         [Button.url(font("Support"), SUPPORT_LINK), Button.url(font("Updates"), UPDATES_LINK)],
+        [Button.inline(font("Close"), b"azset_close")],
+    ]
+
+
+def owner_media_buttons():
+    return [
+        [Button.inline(font("Media Setup"), b"azset_media")],
         [Button.inline(font("Close"), b"azset_close")],
     ]
 
@@ -57,7 +80,10 @@ async def settings_handler(event):
 
 
 async def msettings_handler(event):
-    await event.reply(media_settings_text(), buttons=settings_buttons())
+    if not await is_owner(event):
+        await event.reply(font("Media setup is owner-only. Ask MR EGO to manage it from /owner."))
+        raise events.StopPropagation
+    await event.reply(media_settings_text(), buttons=owner_media_buttons())
     raise events.StopPropagation
 
 
@@ -75,7 +101,7 @@ async def settings_callback(event):
         )
         await event.edit(text, buttons=settings_buttons())
     elif data == "azset_media":
-        await event.edit(media_settings_text(), buttons=settings_buttons())
+        await event.edit(media_settings_text(), buttons=owner_media_buttons())
     elif data == "azset_close":
         await event.delete()
     raise events.StopPropagation
