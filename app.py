@@ -27,189 +27,127 @@ async def root_route_handler(request):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AloneX Bot</title>
+    <title>AZAI - EGO Network</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
         }
-
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #14213d 0%, #05060a 55%, #000 100%);
             color: #fff;
             line-height: 1.6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .hero {
+        .card {
+            width: 100%;
+            max-width: 900px;
+            padding: 36px 28px;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 24px;
+            background: rgba(255,255,255,0.06);
+            box-shadow: 0 0 60px rgba(0, 136, 255, 0.18);
             text-align: center;
-            padding: 60px 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            margin: 20px 0;
+            backdrop-filter: blur(14px);
         }
-
-        .hero img {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            margin-bottom: 20px;
-            border: 4px solid #4CAF50;
-        }
-
-        .hero h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            color: #4CAF50;
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            padding: 40px 0;
-        }
-
-        .feature-card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .feature-icon {
-            font-size: 40px;
-            margin-bottom: 15px;
-            color: #4CAF50;
-        }
-
-        .cta-button {
-            display: inline-block;
-            padding: 15px 35px;
-            background: linear-gradient(45deg, #4CAF50, #8BC34A);
-            color: white;
-            text-decoration: none;
-            border-radius: 30px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            margin-top: 20px;
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        .brand {
+            color: #9fd3ff;
+            letter-spacing: 3px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            font-size: 13px;
+            margin-bottom: 14px;
         }
-
-        .cta-button:hover {
-            background: linear-gradient(45deg, #45a049, #7CB342);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        h1 {
+            font-size: clamp(42px, 8vw, 84px);
+            line-height: 1;
+            margin-bottom: 18px;
+            background: linear-gradient(90deg, #ffffff, #8fd3ff, #f5c542);
+            -webkit-background-clip: text;
+            color: transparent;
         }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.2);
-            margin-top: 40px;
+        .subtitle {
+            font-size: 18px;
+            color: #d7e8ff;
+            margin-bottom: 26px;
         }
-
-        footer a {
-            color: #4CAF50;
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 14px;
+            margin: 26px 0;
+        }
+        .chip {
+            padding: 14px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.10);
+            color: #eef7ff;
+        }
+        .cta {
+            display: inline-block;
+            margin-top: 18px;
+            padding: 14px 28px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #0077ff, #f5c542);
+            color: #05060a;
+            font-weight: 800;
             text-decoration: none;
         }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 768px) {
-            .hero {
-                padding: 40px 20px;
-            }
-            
-            .features {
-                grid-template-columns: 1fr;
-            }
+        footer {
+            margin-top: 28px;
+            color: #a9b6c7;
+            font-size: 13px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="hero">
-            <img src="https://i.ibb.co/PZmh6bkf/file-337.jpg" alt="AloneX Kun">
-            <h1>AloneX Assistant Bot</h1>
-            <p>Your all-in-one Telegram assistant powered by AI</p>
-            <a href="https://t.me/AloneXkunbot?start=help" class="cta-button">Start Using Bot</a>
+    <main class="card">
+        <div class="brand">EGO Network · EST. 2026</div>
+        <h1>AZAI</h1>
+        <p class="subtitle">Official Telegram community automation system by MR EGO.</p>
+        <div class="grid">
+            <div class="chip">Protection</div>
+            <div class="chip">Economy</div>
+            <div class="chip">Games</div>
+            <div class="chip">Anime Quiz</div>
+            <div class="chip">Media Panels</div>
+            <div class="chip">AI Chat</div>
         </div>
-
-        <div class="features">
-            <div class="feature-card">
-                <div class="feature-icon">🤖</div>
-                <h3>AI Tools</h3>
-                <p>Advanced AI-powered features for chat, image generation, and more</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🎬</div>
-                <h3>Movies & Anime</h3>
-                <p>Access to a vast collection of movies and anime content</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">💬</div>
-                <h3>Smart Chatbot</h3>
-                <p>Intelligent conversation system for natural interactions</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">✨</div>
-                <h3>Font Styling</h3>
-                <p>Creative text formatting and stylish font options</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🧮</div>
-                <h3>Calculator</h3>
-                <p>Quick and easy calculations right in your chat</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">👥</div>
-                <h3>Group Management</h3>
-                <p>Comprehensive tools for managing Telegram groups</p>
-            </div>
-        </div>
-
-        <footer>
-            <p>Made with ❤️ by <a href="https://t.me/DEPSTEY" target="_blank">@Sahil</a></p>
-        </footer>
-    </div>
+        <a class="cta" href="https://t.me/EGOxSUPPORT" target="_blank">Support</a>
+        <footer>Controlled by MR EGO · Powered by EGO Network</footer>
+    </main>
 </body>
-</html>    
+</html>
     """
     return web.Response(text=html_content, content_type="text/html")
 
 
+@routes.get("/health", allow_head=True)
+@routes.get("/ping", allow_head=True)
+@routes.get("/_health", allow_head=True)
+async def health_route_handler(request):
+    return web.json_response(
+        {
+            "status": "ok",
+            "service": "AZAI",
+            "network": "EGO Network",
+            "owner": "MR EGO",
+        }
+    )
 
 
 ####################################################################################################
 
 
-
-
-
 class InvalidHash(Exception):
     message = "Invalid hash"
+
 
 class FIleNotFound(Exception):
     message = "File not found"
@@ -221,14 +159,12 @@ async def stream_handler(request: web.Request):
         path = request.match_info["path"]
         match = re.search(r"^([a-zA-Z0-9_-]{6})(\d+)$", path)
 
-
         if match:
             secure_hash = match.group(1)
             message_id = int(match.group(2))
         else:
             message_id = int(re.search(r"(\d+)(?:\/\S+)?", path).group(1))
             secure_hash = request.rel_url.query.get("hash")
-
 
         return web.Response(text=await render_page(message_id, secure_hash), content_type='text/html')
     except InvalidHash as e:
@@ -241,12 +177,12 @@ async def stream_handler(request: web.Request):
         logger.critical(e.with_traceback(None))
         raise web.HTTPInternalServerError(text=str(e))
 
+
 @routes.get(r"/{path:\S+}", allow_head=True)
 async def stream_handler(request: web.Request):
     try:
         path = request.match_info["path"]
         match = re.search(r"^([a-zA-Z0-9_-]{6})(\d+)$", path)
-
 
         if match:
             secure_hash = match.group(1)
@@ -254,7 +190,6 @@ async def stream_handler(request: web.Request):
         else:
             message_id = int(re.search(r"(\d+)(?:\/\S+)?", path).group(1))
             secure_hash = request.rel_url.query.get("hash")
-
 
         return await media_streamer(request, message_id, secure_hash)
     except InvalidHash as e:
@@ -268,8 +203,8 @@ async def stream_handler(request: web.Request):
         raise web.HTTPInternalServerError(text=str(e))
 
 
-
 class_cache = {}
+
 
 async def media_streamer(request: web.Request, message_id: int, secure_hash: str):
     range_header = request.headers.get("Range", 0)
@@ -283,12 +218,11 @@ async def media_streamer(request: web.Request, message_id: int, secure_hash: str
     if faster_client in class_cache:
         tg_connect = class_cache[faster_client]
         logger.debug(f"Using cached ByteStreamer object for client {index}")
-      
     else:
         logger.debug(f"Creating new ByteStreamer object for client {index}")
         tg_connect = pyro_utils.ByteStreamer(faster_client)
         class_cache[faster_client] = tg_connect
- 
+
     logger.debug("before calling get_file_properties")
     file_id = await tg_connect.get_file_properties(message_id)
     logger.debug("after calling get_file_properties")
@@ -298,7 +232,6 @@ async def media_streamer(request: web.Request, message_id: int, secure_hash: str
         raise InvalidHash
 
     file_size = file_id.file_size
-
     if range_header:
         from_bytes, until_bytes = range_header.replace("bytes=", "").split("-")
         from_bytes = int(from_bytes)
@@ -350,11 +283,10 @@ async def media_streamer(request: web.Request, message_id: int, secure_hash: str
         return_resp.headers.add("Content-Length", str(file_size))
 
     return return_resp
+
+
 ####################################################################################################
-def web_server():
-    web_app = web.Application(client_max_size=30000000)
-    web_app.add_routes(routes)
-    return web_app
+
 
 async def keep_alive():
     """
@@ -380,12 +312,16 @@ async def keep_alive():
     except asyncio.CancelledError:
         logger.info("keep_alive task cancelled, exiting cleanly.")
         raise
+
+
 async def _on_startup(app: web.Application):
     """Start background keep_alive task (if configured) and save it on app"""
     if config.WEB_URL:
         logger.debug("Starting keep_alive background task")
         task = asyncio.create_task(keep_alive(), name="keep_alive_task")
         app["keep_alive_task"] = task
+
+
 async def _on_cleanup(app: web.Application):
     """Cancel background task and await it so it doesn't remain pending"""
     task = app.get("keep_alive_task")
@@ -399,12 +335,13 @@ async def _on_cleanup(app: web.Application):
         logger.debug("keep_alive task cancelled successfully during cleanup")
     except Exception:
         logger.exception("Error while waiting for keep_alive task during cleanup")
+
+
 def web_server():
     web_app = web.Application(client_max_size=30000000)
     web_app.add_routes(routes)
     web_app.on_startup.append(_on_startup)
     web_app.on_cleanup.append(_on_cleanup)
-
     return web_app
 
 
