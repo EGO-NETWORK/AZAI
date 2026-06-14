@@ -1,0 +1,54 @@
+name: AZAI Build Check
+
+on:
+  push:
+    branches:
+      - ALONE
+  pull_request:
+    branches:
+      - ALONE
+  workflow_dispatch:
+
+jobs:
+  syntax-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Compile Python files
+        run: |
+          python - <<'PY'
+          import compileall
+          import pathlib
+          import sys
+
+          paths = []
+          for candidate in ["AloneX", "app.py", "config.py"]:
+              path = pathlib.Path(candidate)
+              if path.exists():
+                  paths.append(str(path))
+
+          if not paths:
+              print("No Python paths found for AZAI build check.")
+              sys.exit(1)
+
+          ok = True
+          for path in paths:
+              print(f"Checking: {path}")
+              ok = compileall.compile_file(path, quiet=1) if pathlib.Path(path).is_file() else compileall.compile_dir(path, quiet=1)
+              if not ok:
+                  break
+
+          if not ok:
+              print("AZAI build check failed: syntax error found.")
+              sys.exit(1)
+
+          print("AZAI build check passed.")
+          PY
