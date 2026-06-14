@@ -4,7 +4,7 @@ import time
 from telethon import Button, events
 
 from AloneX import database, font, prefix_cmds, tbot
-from config import ALONE_OWNER_ID, OWNER_ID
+from config import OWNER_ID
 from AloneX.plugins import aaa_azai_start_pic as start_panel
 try:
     from AloneX.plugins import azai_owner_panel as owner_panel
@@ -13,16 +13,23 @@ except Exception:
 
 fun_db = database["azai_fun_zone"]
 RESERVED = {"start", "help", "ping", "alive", "repo", "owner", "settings", "shop", "gift", "wallet", "daily", "send", "leaderboard", "inventory", "garage", "animeguess", "quiz", "quizstats", "quiztop", "addfun", "delfun", "funlist"}
+COOLDOWN = {}
+DEFAULT_ACTIONS = {
+    "hug": {"aliases": ["hug", "huggy"], "action": "gave a friendly hug to", "emoji": "🤝"},
+    "pat": {"aliases": ["pat", "patt"], "action": "cheered up", "emoji": "✨"},
+    "dance": {"aliases": ["dance", "nach"], "action": "started a fun dance vibe with", "emoji": "🎶"},
+    "highfive": {"aliases": ["highfive", "hifi"], "action": "gave a high-five to", "emoji": "🙌"},
+    "cheer": {"aliases": ["cheer", "support"], "action": "sent good energy to", "emoji": "🔥"},
+}
 
 
 def owner_ids():
     ids = set()
-    for value in (ALONE_OWNER_ID, OWNER_ID):
-        try:
-            if int(value):
-                ids.add(int(value))
-        except Exception:
-            pass
+    try:
+        if int(OWNER_ID):
+            ids.add(int(OWNER_ID))
+    except Exception:
+        pass
     return ids
 
 
@@ -59,7 +66,7 @@ def parse_add(text):
     key = word(parts[0])
     aliases = [word(x) for x in parts[1].split(",")]
     aliases = [x for x in aliases if x]
-    action = parts[2].strip()[:40]
+    action = re.sub(r"\s+", " ", parts[2].strip())[:40]
     if not key or not aliases or not action:
         return None
     aliases = list(dict.fromkeys([key] + aliases))[:12]
@@ -74,12 +81,13 @@ async def fun_text():
             aliases = row.get("aliases", [])[:4]
             text += "• " + ", ".join(f"/{x}" for x in aliases) + "\n"
     else:
-        text += "/hug\n/huggy\n/pat\n/dance\n/kiss"
+        text += "/hug\n/pat\n/dance\n/highfive\n/cheer"
+    text += "\n\n" + font("Owner can add media actions using /addfun.")
     return text
 
 
 def owner_guide():
-    return font("FUN ZONE GUIDE") + "\n━━━━━━━━━━━━━━━━━━━━\n\n" + font("Reply to media and use:") + "\n/addfun key | alias1,alias2 | action\n\n" + font("Examples:") + "\n/addfun hug | hug,huggy | hugged\n/addfun kiss | kiss | sent a cute kiss to\n\n/funlist\n/delfun key"
+    return font("FUN ZONE GUIDE") + "\n━━━━━━━━━━━━━━━━━━━━\n\n" + font("Default safe actions:") + "\n/hug\n/pat\n/dance\n/highfive\n/cheer\n\n" + font("To add media action, reply to media and use:") + "\n/addfun key | alias1,alias2 | action\n\n" + font("Examples:") + "\n/addfun hug | hug,huggy | gave a friendly hug to\n/addfun highfive | hifi,highfive | gave a high-five to\n\n/funlist\n/delfun key"
 
 
 async def addfun(event):
@@ -120,9 +128,21 @@ async def funlist(event):
         raise events.StopPropagation
     rows = await fun_db.find({}).sort("key", 1).to_list(length=50)
     text = font("FUN ZONE ACTIONS") + "\n━━━━━━━━━━━━━━━━━━━━\n\n"
-    text += font("No actions added yet.") if not rows else "".join(f"/{r.get('key')} - " + ", ".join(f"/{x}" for x in r.get("aliases", [])) + "\n" for r in rows)
+    text += font("Default actions:") + "\n" + "\n".join(f"/{k} - " + ", ".join(f"/{x}" for x in v["aliases"]) for k, v in DEFAULT_ACTIONS.items()) + "\n\n"
+    text += font("Custom actions:") + "\n"
+    text += font("No custom actions added yet.") if not rows else "".join(f"/{r.get('key')} - " + ", ".join(f"/{x}" for x in r.get("aliases", [])) + "\n" for r in rows)
     await event.reply(text)
     raise events.StopPropagation
+
+
+def default_for(cmd):
+    for key, data in DEFAULT_ACTIONS.items():
+        if cmd == key or cmd in data.get("aliases", []):
+            value = dict(data)
+            value["key"] = key
+            value["aliases"] = data.get("aliases", [])
+            return value
+    return None
 
 
 async def action(event):
@@ -134,18 +154,30 @@ async def action(event):
         return
     data = await fun_db.find_one({"aliases": cmd})
     if not data:
+        data = default_for(cmd)
+    if not data:
         return
+    now = time.time()
+    key = (int(event.chat_id), int(event.sender_id or 0), cmd)
+    if now - COOLDOWN.get(key, 0) < 5:
+        await event.reply(font("Fun Zone thoda slow. 5 sec ruk jao."))
+        raise events.StopPropagation
+    COOLDOWN[key] = now
     reply = await event.get_reply_message()
     if not reply:
         await event.reply(font(f"Reply to someone and use /{cmd}."))
         raise events.StopPropagation
     actor = await event.get_sender()
     target = await reply.get_sender()
-    caption = font("𓆩 AZAI FUN ZONE 𓆪") + "\n━━━━━━━━━━━━━━━━━━━━\n" + name(actor) + " " + font(data.get("action", "sent fun to")) + " " + name(target)
+    emoji = data.get("emoji", "✨")
+    caption = font("𓆩 AZAI FUN ZONE 𓆪") + "\n━━━━━━━━━━━━━━━━━━━━\n" + emoji + " " + name(actor) + " " + font(data.get("action", "sent fun to")) + " " + name(target)
     try:
-        m = await tbot.get_messages(int(data["chat_id"]), ids=int(data["msg_id"]))
-        if m and m.media:
-            await tbot.send_file(event.chat_id, m.media, caption=caption, reply_to=reply.id)
+        if data.get("chat_id") and data.get("msg_id"):
+            m = await tbot.get_messages(int(data["chat_id"]), ids=int(data["msg_id"]))
+            if m and m.media:
+                await tbot.send_file(event.chat_id, m.media, caption=caption, reply_to=reply.id)
+            else:
+                await event.reply(caption)
         else:
             await event.reply(caption)
     except Exception:
@@ -156,10 +188,9 @@ async def action(event):
 def help_buttons():
     return [
         [Button.inline(font("Core"), b"azai_help_core"), Button.inline(font("Owner"), b"azai_help_owner")],
-        [Button.inline(font("Economy"), b"azai_help_economy"), Button.inline(font("Market"), b"azai_help_market")],
-        [Button.inline(font("Family"), b"azai_help_family"), Button.inline(font("Games"), b"azai_help_games")],
-        [Button.inline(font("Fun Zone"), b"azai_help_fun"), Button.inline(font("Anime Quiz"), b"azai_help_quiz")],
-        [Button.inline(font("Media"), b"azai_help_media"), Button.inline(font("System"), b"azai_system_stats")],
+        [Button.inline(font("Economy"), b"azai_help_economy"), Button.inline(font("Games"), b"azai_help_games")],
+        [Button.inline(font("Family"), b"azai_help_family"), Button.inline(font("Fun Zone"), b"azai_help_fun")],
+        [Button.inline(font("Anime Quiz"), b"azai_help_quiz"), Button.inline(font("System"), b"azai_system_stats")],
         [Button.inline(font("Back"), b"azai_start_home"), Button.inline(font("Close"), b"azai_close_panel")],
     ]
 
