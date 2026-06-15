@@ -37,7 +37,9 @@ async def telegraph_create():
 
 db_client = AsyncIOMotorClient(DB_URL)
 database = db_client['AloneX']
-db2_client = AsyncIOMotorClient(DB_URL2)
+
+DB_URL2_SAFE = DB_URL2 or DB_URL
+db2_client = AsyncIOMotorClient(DB_URL2_SAFE)
 database2 = db2_client['AloneX2']
 
 async def send_restart(application: Application) -> None:
@@ -82,8 +84,9 @@ app = ApplicationBuilder().defaults(ptb_defaults).token(TOKEN).post_init(send_re
 pbot = Client("AloneX_pyro_bot", api_id=API_ID, api_hash=API_HASH, bot_token=TOKEN, max_concurrent_transmissions=5)
 #pytgcalls = PyTgCalls(user)
 
-# Pyrogram User Client
-user = Client("AloneX_pyro_user", api_id=API_ID, api_hash=API_HASH, session_string=USER_STRING, max_concurrent_transmissions=5)
+# Pyrogram User Client - optional. If USER_STRING is empty, do not start user client or Pyrogram will ask for phone number.
+USER_STRING_SAFE = str(USER_STRING or "").strip()
+user = Client("AloneX_pyro_user", api_id=API_ID, api_hash=API_HASH, session_string=USER_STRING_SAFE, max_concurrent_transmissions=5) if USER_STRING_SAFE else None
 
 # Telethon Bot Client
 tbot = TelegramClient("AloneX_telethon_bot", API_ID, API_HASH)
@@ -99,11 +102,14 @@ async def start_all_clients():
     await pbot.start()
     LOGGER.info("Pyrogram Bot Started!")
     
-    try:
-        await user.start()
-        LOGGER.info("Pyrogram User Started!")
-    except Exception as e:
-        LOGGER.warning(f"Pyrogram User not started: {e}")
+    if user:
+        try:
+            await user.start()
+            LOGGER.info("Pyrogram User Started!")
+        except Exception as e:
+            LOGGER.warning(f"Pyrogram User not started: {e}")
+    else:
+        LOGGER.info("Pyrogram User skipped: USER_STRING not set.")
     
     await tbot.start(bot_token=TOKEN)
     LOGGER.info("Telethon Bot Started!")
@@ -118,7 +124,8 @@ async def start_all_clients():
 
 async def stop_all_clients():
     await pbot.stop()
-    await user.stop()
+    if user:
+        await user.stop()
     await tbot.disconnect()
     LOGGER.info("All Clients Stopped!")
      
