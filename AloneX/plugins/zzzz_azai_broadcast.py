@@ -8,6 +8,23 @@ from config import ALONE_OWNER_ID, OWNER_ID
 
 targets = database["azai_broadcast_targets"]
 
+USAGE = (
+    font("AZAI Broadcast")
+    + "\n━━━━━━━━━━━━━━━━━━━━\n"
+    + "Use:\n"
+    + "• /broadcast -all message\n"
+    + "• /broadcast -users message\n"
+    + "• /broadcast -groups message\n"
+    + "• /broadcast -pin -all message\n"
+    + "• /broadcast -pin -users message\n"
+    + "• Reply media/message + /broadcast -all -pin\n\n"
+    + "Flags:\n"
+    + "-all = users + groups\n"
+    + "-users = private users only\n"
+    + "-groups = groups/channels only\n"
+    + "-pin = pin in groups where possible"
+)
+
 
 def owner_ids():
     ids = set()
@@ -54,21 +71,52 @@ async def remember_target(event):
     )
 
 
-async def get_broadcast_content(event):
+def parse_flags_and_text(raw_text: str, default_pin: bool = False):
+    parts = (raw_text or "").split(maxsplit=1)
+    body = parts[1] if len(parts) > 1 else ""
+    tokens = body.split()
+
+    pin = bool(default_pin)
+    mode = "all"
+    message_tokens = []
+
+    for token in tokens:
+        low = token.lower().strip()
+        if low in {"-pin", "pin", "--pin"}:
+            pin = True
+        elif low in {"-all", "all", "--all"}:
+            mode = "all"
+        elif low in {"-users", "-user", "users", "user", "-dm", "dm", "--users"}:
+            mode = "users"
+        elif low in {"-groups", "-group", "-chats", "-chat", "groups", "group", "chats", "chat", "--groups"}:
+            mode = "groups"
+        else:
+            message_tokens.append(token)
+
+    return mode, pin, " ".join(message_tokens).strip()
+
+
+async def get_broadcast_content(event, default_pin=False):
+    mode, pin, inline_text = parse_flags_and_text(event.raw_text or "", default_pin=default_pin)
     reply = await event.get_reply_message()
 
     if reply:
-        text = reply.message or ""
+        text = inline_text or reply.message or ""
         media = reply.media
-        return text, media
+        return mode, pin, text, media
 
-    raw = event.raw_text or ""
-    parts = raw.split(maxsplit=1)
+    if inline_text:
+        return mode, pin, inline_text, None
 
-    if len(parts) < 2:
-        return None, None
+    return mode, pin, None, None
 
-    return parts[1], None
+
+def query_for_mode(mode):
+    if mode == "users":
+        return {"type": "private"}
+    if mode == "groups":
+        return {"type": {"$in": ["group", "channel"]}}
+    return {}
 
 
 async def send_exact(chat_id, text, media, pin=False):
@@ -94,19 +142,15 @@ async def send_exact(chat_id, text, media, pin=False):
     return sent, pin_ok, dm_sent
 
 
-async def run_broadcast(event, pin=False):
+async def run_broadcast(event, default_pin=False):
     if not await is_owner(event):
         await event.reply(font("Owner only."))
         raise events.StopPropagation
 
-    text, media = await get_broadcast_content(event)
+    mode, pin, text, media = await get_broadcast_content(event, default_pin=default_pin)
 
     if text is None and media is None:
-        await event.reply(
-            font("Use: /broadcast your message")
-            + "\n"
-            + font("Or reply to any message/media with /broadcast")
-        )
+        await event.reply(USAGE)
         raise events.StopPropagation
 
     sent_count = 0
@@ -115,7 +159,21 @@ async def run_broadcast(event, pin=False):
     pin_failed_count = 0
     dm_count = 0
 
-    async for item in targets.find({}):
+    query = query_for_mode(mode)
+    total = await targets.count_documents(query)
+
+    if total <= 0:
+        await event.reply(font("No broadcast targets found yet."))
+        raise events.StopPropagation
+
+    status = await event.reply(
+        font("Broadcast started.")
+        + f"\nMode: {mode}"
+        + f"\nPin: {'yes' if pin else 'no'}"
+        + f"\nTargets: {total}"
+    )
+
+    async for item in targets.find(query):
         chat_id = int(item.get("chat_id", 0) or 0)
         if not chat_id:
             continue
@@ -143,31 +201,30 @@ async def run_broadcast(event, pin=False):
         except Exception:
             failed_count += 1
 
+    result = (
+        font("Broadcast finished.")
+        + f"\nMode: {mode}"
+        + f"\nSent: {sent_count}/{total}"
+        + f"\nFailed: {failed_count}"
+    )
+
     if pin:
-        await event.reply(
-            font("Pinned broadcast done.")
-            + f"\nSent: {sent_count}"
-            + f"\nPinned: {pinned_count}"
-            + f"\nPin Failed: {pin_failed_count}"
-            + f"\nDM Sent: {dm_count}"
-            + f"\nFailed Send: {failed_count}"
-        )
-    else:
-        await event.reply(
-            font("Broadcast done.")
-            + f"\nSent: {sent_count}"
-            + f"\nFailed: {failed_count}"
-        )
+        result += f"\nPinned: {pinned_count}\nPin Failed: {pin_failed_count}\nDM Sent: {dm_count}"
+
+    try:
+        await status.edit(result)
+    except Exception:
+        await event.reply(result)
 
     raise events.StopPropagation
 
 
 async def broadcast_handler(event):
-    await run_broadcast(event, pin=False)
+    await run_broadcast(event, default_pin=False)
 
 
 async def broadcastpin_handler(event):
-    await run_broadcast(event, pin=True)
+    await run_broadcast(event, default_pin=True)
 
 
 async def broadcastchats_handler(event):
@@ -184,6 +241,8 @@ async def broadcastchats_handler(event):
         + f"\nTotal: {total}"
         + f"\nGroups: {groups}"
         + f"\nUsers: {users}"
+        + "\n\n"
+        + USAGE
     )
 
     raise events.StopPropagation
