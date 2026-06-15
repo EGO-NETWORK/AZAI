@@ -3,8 +3,16 @@ import re
 
 from telethon import Button, events
 
-from AloneX import font, prefix_cmds, tbot
+from AloneX import database, font, prefix_cmds, tbot
 from config import OWNER_ID, BOT_USERNAME
+
+try:
+    from config import BHABHI_ID, ALIZA_ID
+except Exception:
+    BHABHI_ID = 0
+    ALIZA_ID = 0
+
+profile_db = database["azai_profile_modes"]
 
 GAME_COMMANDS = {"dice", "dart", "basketball", "slot"}
 GAME_USAGE_TEXT = font("GAMES COMMANDS") + "\n━━━━━━━━━━━━━━━━━━━━\n\n" + "\n".join([
@@ -12,9 +20,10 @@ GAME_USAGE_TEXT = font("GAMES COMMANDS") + "\n━━━━━━━━━━━�
     "🎯 /dart - Throw a dart. Higher score means cleaner aim.",
     "🏀 /basketball - Take a basketball shot. Score out of 5.",
     "🎰 /slot - Spin the slot machine. Match symbols for luck.",
-]) + "\n\n" + font("EGO HUSTLE") + "\n" + "\n".join([
+]) + "\n\n" + font("EGO HUSTLE COMMANDS") + "\n" + "\n".join([
     "💰 /bal - Check your EC wallet or another member's balance.",
     "🧰 /work - Earn EC by working. Cooldown based reward.",
+    "⚔️ /raid - Attack an unprotected wallet for loot.",
     "🛡 /protect - Activate protection before raids.",
     "🍀 /luck - Try luck for EC, power, or shield.",
     "💣 /heist - High risk, high reward EC game.",
@@ -22,13 +31,28 @@ GAME_USAGE_TEXT = font("GAMES COMMANDS") + "\n━━━━━━━━━━━�
     "👤 /profile - Show your game profile.",
 ])
 
+BOY_NAMES = {"raj", "rahul", "aman", "rohit", "sahil", "arjun", "aryan", "vivek", "mohit", "mr", "ego"}
+GIRL_NAMES = {"aliza", "ayesha", "priya", "neha", "anjali", "rani", "muskan", "isha", "sana", "fatima", "zoya"}
+SOFT_WORDS = {"sad", "mood off", "tension", "akela", "overthinking", "broken"}
+POSITIVE_WORDS = {"thanks", "thank", "mast", "nice", "good", "op", "smart"}
+ROUGH_WORDS = {"gali", "rough", "bad", "bakwas", "faltu"}
+
+
+def safe_int(value):
+    try:
+        return int(value)
+    except Exception:
+        return 0
+
 
 def owner_ids():
-    try:
-        owner = int(OWNER_ID)
-        return {owner} if owner else set()
-    except Exception:
-        return set()
+    owner = safe_int(OWNER_ID)
+    return {owner} if owner else set()
+
+
+def bhabhi_ids():
+    ids = {safe_int(BHABHI_ID), safe_int(ALIZA_ID)}
+    return {x for x in ids if x}
 
 
 def command_from(text):
@@ -38,21 +62,106 @@ def command_from(text):
     return re.sub(r"[^a-z0-9_]+", "", raw)
 
 
-def short_ai_reply(text, user_id):
+def first_name(user):
+    name = getattr(user, "first_name", "") or ""
+    username = getattr(user, "username", "") or ""
+    clean = re.sub(r"[^a-zA-Z]+", " ", f"{name} {username}").lower().strip().split()
+    return clean[0] if clean else ""
+
+
+def guess_mode(user):
+    key = first_name(user)
+    if key in BOY_NAMES:
+        return "male"
+    if key in GIRL_NAMES:
+        return "female"
+    return "unknown"
+
+
+async def stored_mode(user_id):
+    row = await profile_db.find_one({"user_id": int(user_id)}) or {}
+    return row.get("mode")
+
+
+async def ask_profile_mode(event):
+    buttons = [[
+        Button.inline(font("Bhai Mode"), b"azai_profile_male"),
+        Button.inline(font("Ma'am Mode"), b"azai_profile_female"),
+    ], [
+        Button.inline(font("Neutral"), b"azai_profile_neutral"),
+        Button.inline(font("Skip"), b"azai_profile_skip"),
+    ]]
+    await event.reply(font("Naam clear nahi hai. Profile mode choose kar do, phir reply tone perfect rahega."), buttons=buttons)
+    raise events.StopPropagation
+
+
+async def save_profile_mode(event):
+    sender = await event.get_sender()
+    data = (event.data or b"").decode()
+    mode = data.replace("azai_profile_", "")
+    if mode == "skip":
+        mode = "neutral"
+    await profile_db.update_one({"user_id": int(sender.id)}, {"$set": {"user_id": int(sender.id), "mode": mode}}, upsert=True)
+    label = {"male": "Bhai Mode", "female": "Ma'am Mode", "neutral": "Neutral"}.get(mode, "Neutral")
+    await event.edit(font(f"Saved: {label}"))
+    raise events.StopPropagation
+
+
+def line_for_mode(text, user_id, mode):
     body = (text or "").strip()
     low = body.lower()
-    owner = int(user_id or 0) in owner_ids()
+    is_short = len(body) <= 3 or low in {"hi", "hu", "hello", "hey", "yo", "j"}
+    rough = any(x in low for x in ROUGH_WORDS) or len(body) > 0 and sum(ch in "!@#$%^&*" for ch in body) >= 3
 
-    if owner:
-        if len(body) <= 3 or low in {"hi", "hu", "hello", "hey", "j"}:
-            return font("MR EGO, bol. Kya kaam hai?")
-        if any(x in low for x in ["gali", "rough", "bad", "bakwas"]):
-            return font("Sir, tone rough hai. Point batao, main fix karta hoon.")
-        return font("Sir, samjha. Seedha kaam batao, main handle karta hoon.")
+    if int(user_id or 0) in owner_ids():
+        if rough:
+            return font("Control, Sir. Issue bolo, I will fix it.")
+        if is_short:
+            return font("Ready, Sir. Drop the task.")
+        return font("Got it, Sir. I am on it.")
 
-    if len(body) <= 3 or low in {"hi", "hu", "hello", "hey"}:
-        return font("Haan, bol. Kya chahiye?")
-    return font("Samjha. Short me batao, main help karta hoon.")
+    if int(user_id or 0) in bhabhi_ids():
+        if is_short:
+            return font("Bhabhi Ji, I am here. Bataiye.")
+        return font("Ma'am, noted. I will handle it cleanly.")
+
+    if mode == "male":
+        if rough:
+            return font("Bhai, issue bol. Drama kam, fix zyada.")
+        if is_short:
+            return font("Yo bro, kya scene hai?")
+        return font("Bhai, got it. Seedha point bhej.")
+
+    if mode == "female":
+        if rough:
+            return font("Aap point batao, main calmly help karta hoon.")
+        if is_short:
+            return font("Hey, tell me. What do you need?")
+        return font("Noted. I will keep it simple and clean.")
+
+    if rough:
+        return font("Point batao. Main help ke liye hoon, lecture ke liye nahi.")
+    if is_short:
+        return font("Yo, I am here. Kya scene hai?")
+    return font("Got it. Short me clear karo, I will handle it.")
+
+
+async def react_safe(event, emoji):
+    try:
+        await event.message.react(emoji)
+    except Exception:
+        pass
+
+
+def reaction_for(text):
+    low = (text or "").lower()
+    if any(x in low for x in SOFT_WORDS):
+        return "❤️"
+    if any(x in low for x in POSITIVE_WORDS):
+        return "🔥"
+    if any(x in low for x in ROUGH_WORDS):
+        return "😐"
+    return None
 
 
 def game_result(cmd):
@@ -109,7 +218,13 @@ async def premium_short_ai(event):
     text = (event.raw_text or "").strip()
     if not text or text[0] in prefix_cmds:
         return
-    if int(getattr(event, "chat_id", 0) or 0) < 0:
+
+    emoji = reaction_for(text)
+    if emoji:
+        await react_safe(event, emoji)
+
+    private_chat = int(getattr(event, "chat_id", 0) or 0) > 0
+    if not private_chat:
         username = str(BOT_USERNAME or "").lower().replace("@", "")
         mentioned = username and (f"@{username}" in text.lower())
         replied = False
@@ -120,7 +235,17 @@ async def premium_short_ai(event):
             replied = False
         if not mentioned and not replied and int(event.sender_id or 0) not in owner_ids():
             return
-    await event.reply(short_ai_reply(text, event.sender_id))
+
+    sender = await event.get_sender()
+    user_id = int(getattr(sender, "id", event.sender_id or 0) or 0)
+    mode = await stored_mode(user_id)
+    if not mode:
+        guessed = guess_mode(sender)
+        if guessed == "unknown" and user_id not in owner_ids() and user_id not in bhabhi_ids():
+            await ask_profile_mode(event)
+            return
+        mode = guessed
+    await event.reply(line_for_mode(text, user_id, mode))
     raise events.StopPropagation
 
 
@@ -130,5 +255,6 @@ if "zzzzzzzzzzzzzzzzzzzz_azai_premium_runtime_overrides" not in tbot.handlers_lo
     for command in GAME_COMMANDS:
         tbot.add_event_handler(premium_game_handler, events.NewMessage(pattern=f"^{prefix_cmds}{command}(?:@\\w+)?$", incoming=True))
     tbot.add_event_handler(premium_games_panel, events.CallbackQuery(pattern=b"^azai_help_games$"))
+    tbot.add_event_handler(save_profile_mode, events.CallbackQuery(pattern=b"^azai_profile_"))
     tbot.add_event_handler(premium_short_ai, events.NewMessage(incoming=True))
     tbot.handlers_loaded.add("zzzzzzzzzzzzzzzzzzzz_azai_premium_runtime_overrides")
