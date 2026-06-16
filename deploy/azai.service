@@ -1,0 +1,22 @@
+[Unit]
+Description=AZAI Telegram Bot - EGO Network
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/bots/AZAI
+EnvironmentFile=/home/bots/AZAI/.env
+ExecStart=/home/bots/AZAI/venv/bin/python3 -m AloneX
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+KillSignal=SIGINT
+
+# Keep logs in journalctl.
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
