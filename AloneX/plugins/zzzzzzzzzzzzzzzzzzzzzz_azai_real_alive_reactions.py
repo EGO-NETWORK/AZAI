@@ -1,6 +1,6 @@
-# AZAI Real Alive Reactions
-# EGO Network · MR EGO
-# No commands. Auto smart reactions + light natural group activity.
+# AZAI REAL ALIVE REACTIONS
+# EGO NETWORK · MR EGO
+# NO COMMANDS. AUTO SMART REACTIONS + LIGHT NATURAL GROUP ACTIVITY.
 
 import os
 import random
@@ -57,8 +57,8 @@ def _first_name(sender) -> str:
     name = getattr(sender, "first_name", None) or getattr(sender, "username", None) or ""
     name = str(name).strip()
     if not name:
-        return "bhai"
-    return name.split()[0][:18]
+        return "BHAI"
+    return name.split()[0][:18].upper()
 
 
 def _is_command(text: str) -> bool:
@@ -73,19 +73,14 @@ def _contains_any(text: str, words) -> bool:
 def _should_skip(event, sender, text: str) -> bool:
     if not tbot:
         return True
-
     if not text:
         return True
-
     if _is_command(text):
         return True
-
     if getattr(sender, "bot", False):
         return True
-
     if getattr(event, "out", False):
         return True
-
     return False
 
 
@@ -100,13 +95,13 @@ def _pick_reaction(text: str, is_owner: bool, is_bhabhi: bool) -> str:
     if is_bhabhi:
         return random.choice(["🤝", "❤️", "✨"])
 
-    if _contains_any(t, ["haha", "hahaha", "lol", "lmao", "😂", "🤣", "funny", "maja", "masti"]):
+    if _contains_any(t, ["haha", "hahaha", "lol", "😂", "🤣", "funny", "maja", "masti"]):
         return random.choice(["😂", "🤣"])
 
-    if _contains_any(t, ["sad", "mood off", "low", "alone", "lonely", "overthink", "tension", "depressed", "cry"]):
-        return random.choice(["❤️", "🫂", "😔"])
+    if _contains_any(t, ["sad", "mood off", "low", "alone", "lonely", "overthink", "tension", "cry"]):
+        return random.choice(["❤️", "😔"])
 
-    if _contains_any(t, ["nice", "mast", "op", "best", "sahi", "good", "great", "awesome", "fire"]):
+    if _contains_any(t, ["nice", "mast", "op", "best", "sahi", "good", "great", "fire"]):
         return random.choice(["🔥", "😎", "✨"])
 
     if _contains_any(t, ["kya", "kaise", "kyu", "why", "how", "?", "confuse", "samjha"]):
@@ -123,9 +118,7 @@ def _pick_reaction(text: str, is_owner: bool, is_bhabhi: bool) -> str:
 
 async def _react(event, emoji: str) -> None:
     try:
-        key = (event.chat_id, event.id)
         now = _now()
-
         last = LAST_REACTION.get(event.chat_id, 0)
         if now - last < REACTION_COOLDOWN:
             return
@@ -145,7 +138,6 @@ async def _react(event, emoji: str) -> None:
 
 async def _is_reply_to_me(event) -> bool:
     global BOT_ID
-
     try:
         if not event.is_reply:
             return False
@@ -163,8 +155,6 @@ async def _is_reply_to_me(event) -> bool:
 async def _is_mention_to_me(text: str) -> bool:
     try:
         username = os.getenv("BOT_USERNAME", "Urxazaibot")
-        if not username:
-            return False
         username = username.replace("@", "").lower()
         return f"@{username}" in _low(text)
     except Exception:
@@ -176,22 +166,16 @@ def _reply_chance(event, text: str, is_owner: bool, is_bhabhi: bool, direct_to_m
 
     if direct_to_me:
         return 100
-
     if event.is_private:
         return 45
-
     if is_owner:
         return 70
-
     if is_bhabhi:
         return 45
-
     if "?" in t or _contains_any(t, ["kya", "kaise", "kyu", "bata", "samjha"]):
         return 22
-
     if _contains_any(t, ["bore", "dead group", "koi hai", "silent", "soja", "hlo", "hello", "hi"]):
         return 18
-
     if _contains_any(t, ["azai", "ego hustle", "mr ego"]):
         return 35
 
@@ -203,63 +187,63 @@ def _make_reply(text: str, name: str, is_owner: bool, is_bhabhi: bool, is_privat
 
     if is_owner:
         if _contains_any(t, ["bore", "boring"]):
-            return "Boss, bore ho raha hai to kaam pakad. Duke 390 wallpaper se garage me nahi aayegi."
+            return "BORE HO RAHA HAI TO KAAM PAKAD. DUKE 390 WALLPAPER SE GARAGE ME NAHI AAYEGI."
         if _contains_any(t, ["mood off", "low", "sad"]):
-            return "Boss, thoda slow ho ja. Mood off me bade decision mat lena, pehle chai aur 10 minute ka silence."
+            return "THODA SLOW HO JA. MOOD OFF ME BADE DECISION MAT LENA, PEHLE CHAI AUR 10 MINUTE KA SILENCE."
         if _contains_any(t, ["kar", "fix", "repo", "azai"]):
-            return "MR EGO, scene simple hai. Pehle stable, phir stylish. Faltu drama nahi."
+            return "MR EGO, SCENE SIMPLE HAI. PEHLE STABLE, PHIR STYLISH. FALTU DRAMA NAHI."
         return random.choice([
-            "Boss, scene simple hai. Kaam batao.",
-            "MR EGO aa gaye, ab group thoda seedha behave kare.",
-            "Boss, idea strong hai. Bas execution me bakchodi nahi chahiye.",
+            "SCENE SIMPLE HAI. KAAM BATAO.",
+            "MR EGO AA GAYE, AB GROUP THODA SEEDHA BEHAVE KARE.",
+            "IDEA STRONG HAI. BAS EXECUTION ME BAKCHODI NAHI CHAHIYE.",
         ])
 
     if is_bhabhi:
         return random.choice([
-            "Bhabhi Ji, aap tension mat lijiye. Scene handle ho jayega.",
-            "Ma’am, aapka point sahi hai. Main calmly dekh raha hoon.",
+            "BHABHI JI, AAP TENSION MAT LIJIYE. SCENE HANDLE HO JAYEGA.",
+            "MA'AM, AAPKA POINT SAHI HAI. MAIN CALMLY DEKH RAHA HOON.",
         ])
 
     if _contains_any(t, ["hi", "hello", "hlo", "hey"]):
         return random.choice([
-            "Kya scene hai bhai?",
-            f"Kya haal {name}, sab theek?",
-            "Haan bhai, bol.",
+            "KYA SCENE HAI BHAI?",
+            f"KYA HAAL {name}, SAB THEEK?",
+            "HAAN BHAI, BOL.",
         ])
 
     if _contains_any(t, ["bore", "boring"]):
         return random.choice([
-            "Bore ho raha hai to ek kaam pakad bhai, warna din bhi pending aur mood bhi.",
-            "Chai bana, music laga, aur thoda kaam kar. Bore hone se EC nahi badhta.",
+            "BORE HO RAHA HAI TO EK KAAM PAKAD BHAI, WARNA DIN BHI PENDING AUR MOOD BHI.",
+            "CHAI BANA, MUSIC LAGA, AUR THODA KAAM KAR. BORE HONE SE EC NAHI BADHTA.",
         ])
 
     if _contains_any(t, ["mood off", "sad", "low", "overthink", "tension"]):
         return random.choice([
-            "Thoda slow jao. Har cheez ka answer aaj hi nikalna zaroori nahi hota.",
-            "Dimaag ko unpaid internship mat do. Pehle ek cheez handle karo.",
+            "THODA SLOW JAO. HAR CHEEZ KA ANSWER AAJ HI NIKALNA ZAROORI NAHI HOTA.",
+            "DIMAAG KO UNPAID INTERNSHIP MAT DO. PEHLE EK CHEEZ HANDLE KARO.",
         ])
 
     if _contains_any(t, ["group silent", "dead group", "koi hai"]):
         return random.choice([
-            "Itni khamoshi kyun hai bhai, sabka WiFi gaya hai ya social battery?",
-            "Group itna silent hai ki notification bhi so gaya.",
+            "ITNI KHAMOSHI KYU HAI BHAI, SABKA WIFI GAYA HAI YA SOCIAL BATTERY?",
+            "GROUP ITNA SILENT HAI KI NOTIFICATION BHI SO GAYA.",
         ])
 
     if _contains_any(t, ["spam", "baar baar"]):
-        return "Bhai thoda ruk. Itna spam karke server ko bhi anxiety de raha hai."
+        return "BHAI THODA RUK. ITNA SPAM KARKE SERVER KO BHI ANXIETY DE RAHA HAI."
 
     if "?" in t or _contains_any(t, ["kya", "kaise", "kyu", "bata"]):
         return random.choice([
-            "Seedha bol bhai, scene kya hai?",
-            "Thoda clear bata, guessing game me EC nahi milta.",
-            f"{name}, ye point thoda detail me bol.",
+            "SEEDHA BOL BHAI, SCENE KYA HAI?",
+            "THODA CLEAR BATA, GUESSING GAME ME EC NAHI MILTA.",
+            f"{name}, YE POINT THODA DETAIL ME BOL.",
         ])
 
     return random.choice([
-        "Hmm, scene samajh raha hoon.",
-        "Sahi hai bhai.",
-        "Aage bol.",
-        "Ye thoda interesting hai.",
+        "HMM, SCENE SAMAJH RAHA HOON.",
+        "SAHI HAI BHAI.",
+        "AAGE BOL.",
+        "YE THODA INTERESTING HAI.",
     ])
 
 
