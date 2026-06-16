@@ -99,11 +99,11 @@ async def raid_attack_result(event, mode="raid"):
 
 
 async def raid_cmd(event):
-    await core.send(event, "game", await raid_attack_result(event, "raid"), _back())
+    await core.send(event, "raid", await raid_attack_result(event, "raid"), _back())
 
 
 async def attack_cmd(event):
-    await core.send(event, "game", await raid_attack_result(event, "attack"), _back())
+    await core.send(event, "attack", await raid_attack_result(event, "attack"), _back())
 
 
 async def heist_result(user):
@@ -125,7 +125,7 @@ async def heist_result(user):
 
 
 async def heist_cmd(event):
-    await core.send(event, "game", await heist_result(await event.get_sender()), _back())
+    await core.send(event, "heist", await heist_result(await event.get_sender()), _back())
 
 
 async def help_cb(event):
