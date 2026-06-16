@@ -1,13 +1,19 @@
 # AZAI REAL ALIVE REACTIONS
 # EGO NETWORK · MR EGO
-# NO COMMANDS. AUTO SMART REACTIONS + LIGHT NATURAL GROUP ACTIVITY.
+# NO COMMANDS. AUTO SMART REACTIONS + IST TIME-AWARE GROUP ACTIVITY.
 
 import os
 import random
 import time
+from datetime import datetime, timezone, timedelta
 from typing import Optional
 
 from telethon import events, functions, types
+
+try:
+    from zoneinfo import ZoneInfo
+except Exception:
+    ZoneInfo = None
 
 try:
     from AloneX import tbot
@@ -15,6 +21,7 @@ except Exception:
     tbot = None
 
 
+IST = ZoneInfo("Asia/Kolkata") if ZoneInfo else timezone(timedelta(hours=5, minutes=30))
 BOT_ID = None
 
 OWNER_IDS = set()
@@ -35,14 +42,50 @@ for _key in ("ALIZA_ID", "BHABHI_ID"):
 LAST_REACTION = {}
 LAST_REPLY = {}
 
-REACTION_COOLDOWN = 3
-GROUP_REPLY_COOLDOWN = 140
-OWNER_REPLY_COOLDOWN = 45
-DM_REPLY_COOLDOWN = 35
+REACTION_COOLDOWN = 2
+GROUP_REPLY_COOLDOWN = 120
+OWNER_REPLY_COOLDOWN = 40
+DM_REPLY_COOLDOWN = 30
 
 
 def _now() -> float:
     return time.time()
+
+
+def _ist_now() -> datetime:
+    return datetime.now(IST)
+
+
+def _time_mood() -> str:
+    hour = _ist_now().hour
+
+    if 4 <= hour < 7:
+        return "EARLY"
+    if 7 <= hour < 11:
+        return "MORNING"
+    if 11 <= hour < 17:
+        return "DAY"
+    if 17 <= hour < 20:
+        return "EVENING"
+    if 20 <= hour < 23:
+        return "NIGHT"
+    return "LATE_NIGHT"
+
+
+def _festival_name() -> str:
+    fixed = {
+        "01-01": "NEW YEAR",
+        "01-26": "REPUBLIC DAY",
+        "08-15": "INDEPENDENCE DAY",
+        "10-02": "GANDHI JAYANTI",
+        "12-25": "CHRISTMAS",
+    }
+
+    env_festival = os.getenv("AZAI_TODAY_FESTIVAL", "").strip().upper()
+    if env_festival:
+        return env_festival
+
+    return fixed.get(_ist_now().strftime("%m-%d"), "")
 
 
 def _text(event) -> str:
@@ -86,6 +129,10 @@ def _should_skip(event, sender, text: str) -> bool:
 
 def _pick_reaction(text: str, is_owner: bool, is_bhabhi: bool) -> str:
     t = _low(text)
+    festival = _festival_name()
+
+    if festival and _contains_any(t, ["happy", "festival", "wish", "diwali", "eid", "holi", "christmas"]):
+        return random.choice(["✨", "❤️", "🔥"])
 
     if is_owner:
         if _contains_any(t, ["done", "kar", "fix", "repo", "azai", "ego", "hustle"]):
@@ -112,6 +159,10 @@ def _pick_reaction(text: str, is_owner: bool, is_bhabhi: bool) -> str:
 
     if _contains_any(t, ["spam", "bakchodi", "faltu", "chapri"]):
         return random.choice(["😐", "👀"])
+
+    mood = _time_mood()
+    if mood in ("NIGHT", "LATE_NIGHT"):
+        return random.choice(["👀", "❤️", "😎"])
 
     return random.choice(["👀", "👍", "😎"])
 
@@ -167,29 +218,78 @@ def _reply_chance(event, text: str, is_owner: bool, is_bhabhi: bool, direct_to_m
     if direct_to_me:
         return 100
     if event.is_private:
-        return 45
+        return 50
     if is_owner:
-        return 70
+        return 75
     if is_bhabhi:
-        return 45
+        return 50
     if "?" in t or _contains_any(t, ["kya", "kaise", "kyu", "bata", "samjha"]):
-        return 22
+        return 25
     if _contains_any(t, ["bore", "dead group", "koi hai", "silent", "soja", "hlo", "hello", "hi"]):
-        return 18
+        return 20
     if _contains_any(t, ["azai", "ego hustle", "mr ego"]):
-        return 35
+        return 38
+
+    mood = _time_mood()
+    if mood in ("EVENING", "NIGHT"):
+        return 10
+    if mood == "LATE_NIGHT":
+        return 13
 
     return 7
+
+
+def _festival_reply() -> Optional[str]:
+    festival = _festival_name()
+    if not festival:
+        return None
+
+    return random.choice([
+        f"HAPPY {festival}. SCENE SOFT RAKH, AAJ KA DIN DRAMA KE LIYE NAHI HAI.",
+        f"{festival} KA VIBE HAI. GROUP ME THODA LIGHT RAKHO, SPAM MAT KARNA.",
+        f"AAJ {festival} HAI, TOH THODA POSITIVE REHNA BANTA HAI.",
+    ])
+
+
+def _time_based_bore_reply() -> str:
+    mood = _time_mood()
+
+    if mood == "EARLY":
+        return "SUBAH-SUBAH BORE? BHAI DIN ABHI START HUA HAI, PEHLE CHAI AUR EK CHHOTA KAAM."
+    if mood == "MORNING":
+        return "MORNING ME BORE HO RAHA HAI TO KAAM PAKAD. DIN KO ABHI SE WASTE MAT KAR."
+    if mood == "DAY":
+        return "DAY WORK MODE HAI BHAI. BORE HONE SE EC NAHI BADHEGA, WORK KAR."
+    if mood == "EVENING":
+        return "EVENING HAI, MUSIC LAGA AUR GROUP KO THODA ZINDA KAR. SCENE SIMPLE HAI."
+    if mood == "NIGHT":
+        return "RAAT ME BORE HONA DANGEROUS HAI, DIMAAG EXTRA SOCHNA START KAR DETA HAI. MUSIC LAGA."
+    return "LATE NIGHT HAI. DIMAAG KO OVERTHINKING KA CONTRACT MAT DE, THODA SLOW HO JA."
+
+
+def _time_based_mood_reply() -> str:
+    mood = _time_mood()
+
+    if mood in ("NIGHT", "LATE_NIGHT"):
+        return "RAAT ME MOOD OFF HO TOH THODA SLOW REH. HAR ANSWER AAJ HI NIKALNA ZAROORI NAHI."
+    if mood == "DAY":
+        return "MOOD OFF HAI TOH EK SMALL TASK KAR. KABHI-KABHI MOTIVATION KAAM KE BAAD AATI HAI."
+    return "THODA PAUSE LE. DIMAAG KO UNPAID INTERNSHIP MAT DO."
 
 
 def _make_reply(text: str, name: str, is_owner: bool, is_bhabhi: bool, is_private: bool) -> Optional[str]:
     t = _low(text)
 
+    if _contains_any(t, ["diwali", "eid", "holi", "christmas", "festival", "happy"]):
+        festival_line = _festival_reply()
+        if festival_line:
+            return festival_line
+
     if is_owner:
         if _contains_any(t, ["bore", "boring"]):
-            return "BORE HO RAHA HAI TO KAAM PAKAD. DUKE 390 WALLPAPER SE GARAGE ME NAHI AAYEGI."
-        if _contains_any(t, ["mood off", "low", "sad"]):
-            return "THODA SLOW HO JA. MOOD OFF ME BADE DECISION MAT LENA, PEHLE CHAI AUR 10 MINUTE KA SILENCE."
+            return _time_based_bore_reply()
+        if _contains_any(t, ["mood off", "low", "sad", "overthink"]):
+            return _time_based_mood_reply()
         if _contains_any(t, ["kar", "fix", "repo", "azai"]):
             return "MR EGO, SCENE SIMPLE HAI. PEHLE STABLE, PHIR STYLISH. FALTU DRAMA NAHI."
         return random.choice([
@@ -205,6 +305,13 @@ def _make_reply(text: str, name: str, is_owner: bool, is_bhabhi: bool, is_privat
         ])
 
     if _contains_any(t, ["hi", "hello", "hlo", "hey"]):
+        mood = _time_mood()
+        if mood in ("NIGHT", "LATE_NIGHT"):
+            return random.choice([
+                "HAAN BHAI, RAAT KA SCENE KYA HAI?",
+                f"KYA HAAL {name}, RAAT ME ABHI TAK ACTIVE?",
+                "BOL BHAI, LATE NIGHT ME KYA CHAL RAHA HAI?",
+            ])
         return random.choice([
             "KYA SCENE HAI BHAI?",
             f"KYA HAAL {name}, SAB THEEK?",
@@ -212,21 +319,16 @@ def _make_reply(text: str, name: str, is_owner: bool, is_bhabhi: bool, is_privat
         ])
 
     if _contains_any(t, ["bore", "boring"]):
-        return random.choice([
-            "BORE HO RAHA HAI TO EK KAAM PAKAD BHAI, WARNA DIN BHI PENDING AUR MOOD BHI.",
-            "CHAI BANA, MUSIC LAGA, AUR THODA KAAM KAR. BORE HONE SE EC NAHI BADHTA.",
-        ])
+        return _time_based_bore_reply()
 
     if _contains_any(t, ["mood off", "sad", "low", "overthink", "tension"]):
-        return random.choice([
-            "THODA SLOW JAO. HAR CHEEZ KA ANSWER AAJ HI NIKALNA ZAROORI NAHI HOTA.",
-            "DIMAAG KO UNPAID INTERNSHIP MAT DO. PEHLE EK CHEEZ HANDLE KARO.",
-        ])
+        return _time_based_mood_reply()
 
     if _contains_any(t, ["group silent", "dead group", "koi hai"]):
         return random.choice([
             "ITNI KHAMOSHI KYU HAI BHAI, SABKA WIFI GAYA HAI YA SOCIAL BATTERY?",
             "GROUP ITNA SILENT HAI KI NOTIFICATION BHI SO GAYA.",
+            "KOI ZINDA HAI YA SAB BACKGROUND APP BAN GAYE?",
         ])
 
     if _contains_any(t, ["spam", "baar baar"]):
@@ -237,6 +339,14 @@ def _make_reply(text: str, name: str, is_owner: bool, is_bhabhi: bool, is_privat
             "SEEDHA BOL BHAI, SCENE KYA HAI?",
             "THODA CLEAR BATA, GUESSING GAME ME EC NAHI MILTA.",
             f"{name}, YE POINT THODA DETAIL ME BOL.",
+        ])
+
+    mood = _time_mood()
+    if mood == "LATE_NIGHT":
+        return random.choice([
+            "HMM, LATE NIGHT WALA SCENE LAG RAHA HAI.",
+            "RAAT ME BAATEIN THODI REAL HO JATI HAIN.",
+            "AAGE BOL, ABHI SUN RAHA HOON.",
         ])
 
     return random.choice([
