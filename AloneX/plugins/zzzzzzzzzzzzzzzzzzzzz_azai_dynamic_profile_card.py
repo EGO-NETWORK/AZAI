@@ -11,7 +11,25 @@ try:
 except Exception:
     Image = None
 
-CARD_W, CARD_H = 1280, 720
+BASE_W, BASE_H = 1536, 864
+
+# Coordinates tuned for the EGO HUSTLE Elite Player Profile template.
+PFP_CENTER = (365, 335)
+PFP_SIZE = 360
+NAMEPLATE_CENTER = (360, 665)
+VALUE_X = 930
+ROWS = {
+    "player": 208,
+    "username": 258,
+    "rank": 309,
+    "balance": 359,
+    "power": 411,
+    "level": 461,
+    "protection": 512,
+    "raid": 562,
+    "attack": 613,
+    "heist": 664,
+}
 
 
 def _font(size, bold=False):
@@ -27,10 +45,27 @@ def _font(size, bold=False):
     return ImageFont.load_default()
 
 
+def _scale_xy(x, y, w, h):
+    return int(x * w / BASE_W), int(y * h / BASE_H)
+
+
+def _scale_size(v, w):
+    return int(v * w / BASE_W)
+
+
 def _display_name(user, data):
-    username = getattr(user, "username", None) or data.get("username")
     name = getattr(user, "first_name", None) or data.get("name") or "EGO Player"
-    return f"{name} (@{username})" if username else name
+    return str(name)[:24]
+
+
+def _username(user, data):
+    username = getattr(user, "username", None) or data.get("username")
+    if not username:
+        return "-"
+    username = str(username)
+    if not username.startswith("@"):
+        username = "@" + username
+    return username[:22]
 
 
 def _circle_crop(img, size):
@@ -43,15 +78,6 @@ def _circle_crop(img, size):
     return out
 
 
-def _draw_meter(draw, x, y, w, h, value, max_value=250, label=""):
-    value = max(0, min(int(value), max_value))
-    fill_w = int(w * value / max_value)
-    draw.rounded_rectangle((x, y, x + w, y + h), radius=14, fill=(20, 28, 50), outline=(65, 90, 140), width=2)
-    draw.rounded_rectangle((x, y, x + fill_w, y + h), radius=14, fill=(236, 190, 74))
-    if label:
-        draw.text((x, y - 32), label, font=_font(24, True), fill=(205, 220, 255))
-
-
 async def _download_pfp(user_id):
     try:
         entity = await tbot.get_entity(int(user_id))
@@ -61,11 +87,65 @@ async def _download_pfp(user_id):
         return None
 
 
+async def _download_template():
+    try:
+        data = await core.media_db.find_one({"key": "profile"})
+        if not data:
+            return None
+        msg = await tbot.get_messages(int(data["chat_id"]), ids=int(data["msg_id"]))
+        if not msg or not msg.media:
+            return None
+        temp_dir = tempfile.mkdtemp()
+        return await tbot.download_media(msg, file=temp_dir)
+    except Exception:
+        return None
+
+
 async def _rank_for(balance):
     try:
         return await core.wallet_db.count_documents({"balance": {"$gt": int(balance)}}) + 1
     except Exception:
         return 0
+
+
+def _blank_template():
+    bg = Image.new("RGB", (BASE_W, BASE_H), (7, 9, 18))
+    draw = ImageDraw.Draw(bg)
+    for y in range(BASE_H):
+        ratio = y / BASE_H
+        draw.line((0, y, BASE_W, y), fill=(int(7 + ratio * 12), int(9 + ratio * 14), int(20 + ratio * 35)))
+    draw.rounded_rectangle((30, 30, 1505, 835), radius=32, outline=(245, 207, 90), width=3)
+    draw.text((690, 60), "EGO HUSTLE", font=_font(64, True), fill=(245, 207, 90))
+    draw.text((745, 135), "ELITE PLAYER PROFILE", font=_font(32, True), fill=(245, 207, 90))
+    draw.ellipse((185, 155, 545, 515), outline=(245, 207, 90), width=8)
+    draw.rounded_rectangle((120, 620, 620, 710), radius=24, outline=(245, 207, 90), width=3)
+    for label, y in ROWS.items():
+        draw.rounded_rectangle((900, y - 8, 1465, y + 28), radius=12, outline=(80, 105, 145), width=1)
+    return bg
+
+
+def _draw_placeholder_pfp(bg, x, y, size):
+    draw = ImageDraw.Draw(bg)
+    draw.ellipse((x, y, x + size, y + size), fill=(20, 24, 45), outline=(245, 207, 90), width=5)
+    draw.text((x + size * 0.36, y + size * 0.38), "EC", font=_font(max(30, size // 5), True), fill=(245, 207, 90))
+
+
+def _draw_value(draw, w, h, key, value, color=(235, 242, 255), bold=True):
+    x, y = _scale_xy(VALUE_X, ROWS[key], w, h)
+    size = max(16, int(26 * w / BASE_W))
+    draw.text((x, y), str(value)[:28], font=_font(size, bold), fill=color)
+
+
+def _draw_nameplate(draw, w, h, value):
+    size = max(16, int(30 * w / BASE_W))
+    fnt = _font(size, True)
+    cx, cy = _scale_xy(NAMEPLATE_CENTER[0], NAMEPLATE_CENTER[1], w, h)
+    try:
+        box = draw.textbbox((0, 0), value, font=fnt)
+        tw = box[2] - box[0]
+    except Exception:
+        tw = len(value) * size // 2
+    draw.text((cx - tw // 2, cy - size // 2), value[:24], font=fnt, fill=(245, 207, 90))
 
 
 async def _make_profile_card(user, data):
@@ -78,73 +158,49 @@ async def _make_profile_card(user, data):
     game = data.get("game", {}) or {}
     rank = await _rank_for(balance)
     protect_until = core.active_protect(data)
-    protection = "Active" if protect_until > core.ts() else "Inactive"
+    protection = "ACTIVE" if protect_until > core.ts() else "INACTIVE"
 
-    bg = Image.new("RGB", (CARD_W, CARD_H), (7, 9, 18))
+    template_path = await _download_template()
+    if template_path and os.path.exists(template_path):
+        try:
+            bg = Image.open(template_path).convert("RGB")
+        except Exception:
+            bg = _blank_template()
+    else:
+        bg = _blank_template()
+
+    w, h = bg.size
     draw = ImageDraw.Draw(bg)
 
-    for y in range(CARD_H):
-        ratio = y / CARD_H
-        draw.line((0, y, CARD_W, y), fill=(int(7 + ratio * 12), int(9 + ratio * 14), int(20 + ratio * 35)))
-
-    draw.rounded_rectangle((40, 40, 1240, 680), radius=34, outline=(236, 190, 74), width=3)
-    draw.rounded_rectangle((75, 95, 485, 635), radius=32, fill=(12, 15, 32), outline=(75, 115, 185), width=2)
-    draw.rounded_rectangle((525, 95, 1205, 635), radius=32, fill=(13, 16, 33), outline=(75, 115, 185), width=2)
-
-    title = _font(58, True)
-    sub = _font(27, False)
-    big = _font(52, True)
-    name_font = _font(36, True)
-    small = _font(25, False)
-    stat = _font(30, True)
-
-    draw.text((70, 42), "EGO HUSTLE PROFILE", font=title, fill=(245, 207, 90))
-    draw.text((75, 110), "Player Identity • Wallet • Power • Rank", font=sub, fill=(190, 220, 255))
-
-    # PFP frame
-    cx, cy, r = 280, 315, 130
-    for i in range(7, 0, -1):
-        draw.ellipse((cx - r - i * 5, cy - r - i * 5, cx + r + i * 5, cy + r + i * 5), outline=(90 + i * 18, 75 + i * 14, 20), width=2)
-    draw.ellipse((cx - r, cy - r, cx + r, cy + r), outline=(245, 207, 90), width=7)
+    # PFP inside the left premium circle.
+    cx, cy = _scale_xy(PFP_CENTER[0], PFP_CENTER[1], w, h)
+    pfp_size = max(170, _scale_size(PFP_SIZE, w))
+    pfp_x, pfp_y = cx - pfp_size // 2, cy - pfp_size // 2
 
     pfp_path = await _download_pfp(data.get("user_id"))
     if pfp_path and os.path.exists(pfp_path):
         try:
-            pfp = _circle_crop(Image.open(pfp_path), 246)
-            bg.paste(pfp, (157, 192), pfp)
+            pfp = _circle_crop(Image.open(pfp_path), pfp_size)
+            bg.paste(pfp, (pfp_x, pfp_y), pfp)
         except Exception:
-            draw.ellipse((157, 192, 403, 438), fill=(32, 38, 65))
-            draw.text((230, 284), "AZ", font=big, fill=(245, 207, 90))
+            _draw_placeholder_pfp(bg, pfp_x, pfp_y, pfp_size)
     else:
-        draw.ellipse((157, 192, 403, 438), fill=(32, 38, 65))
-        draw.text((230, 284), "AZ", font=big, fill=(245, 207, 90))
+        _draw_placeholder_pfp(bg, pfp_x, pfp_y, pfp_size)
 
-    draw.text((165, 470), _display_name(user, data)[:24], font=name_font, fill=(255, 255, 255))
-    draw.text((175, 520), f"Rank #{rank}" if rank else "Rank -", font=big, fill=(245, 207, 90))
-    draw.text((160, 590), "EGO Network · EST. 2026", font=small, fill=(160, 170, 190))
+    name = _display_name(user, data)
+    username = _username(user, data)
 
-    # Stats section
-    draw.text((565, 135), f"{balance} EC", font=big, fill=(245, 207, 90))
-    draw.text((570, 195), "Current Wallet Balance", font=small, fill=(190, 220, 255))
-
-    _draw_meter(draw, 570, 280, 560, 28, power, 250, "Power Meter")
-    draw.text((1145, 270), str(power), font=stat, fill=(245, 207, 90))
-
-    y = 350
-    rows = [
-        ("Level", level),
-        ("Protection", protection),
-        ("Raid Wins", int(game.get("raid_wins", 0) or 0)),
-        ("Attack Wins", int(game.get("attack_wins", 0) or 0)),
-        ("Heist Wins", int(game.get("heist_wins", 0) or 0)),
-    ]
-    for label, value in rows:
-        draw.rounded_rectangle((570, y, 1130, y + 45), radius=15, fill=(18, 24, 45), outline=(48, 70, 115), width=1)
-        draw.text((595, y + 8), str(label), font=stat, fill=(215, 225, 245))
-        draw.text((925, y + 8), str(value), font=stat, fill=(245, 207, 90))
-        y += 54
-
-    draw.text((570, 620), "AZAI • EGO HUSTLE • MR EGO", font=small, fill=(160, 170, 190))
+    _draw_nameplate(draw, w, h, name)
+    _draw_value(draw, w, h, "player", name)
+    _draw_value(draw, w, h, "username", username, color=(130, 220, 255))
+    _draw_value(draw, w, h, "rank", f"#{rank}" if rank else "-")
+    _draw_value(draw, w, h, "balance", f"{balance} EC", color=(245, 207, 90))
+    _draw_value(draw, w, h, "power", str(power), color=(245, 207, 90))
+    _draw_value(draw, w, h, "level", str(level))
+    _draw_value(draw, w, h, "protection", protection, color=(90, 225, 155) if protection == "ACTIVE" else (230, 150, 95))
+    _draw_value(draw, w, h, "raid", int(game.get("raid_wins", 0) or 0))
+    _draw_value(draw, w, h, "attack", int(game.get("attack_wins", 0) or 0))
+    _draw_value(draw, w, h, "heist", int(game.get("heist_wins", 0) or 0))
 
     out = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
     bg.save(out.name, "PNG")
