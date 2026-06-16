@@ -7,11 +7,21 @@ from AloneX import font, prefix_cmds, tbot
 import AloneX.plugins.zzzz_azai_ego_hustle_core as core
 
 try:
-    from PIL import Image, ImageDraw, ImageFont, ImageFilter
+    from PIL import Image, ImageDraw, ImageFont
 except Exception:
     Image = None
 
-CARD_W, CARD_H = 1280, 720
+BASE_W, BASE_H = 1536, 864
+
+# Coordinates are tuned for the EGO HUSTLE leaderboard template:
+# top-center empty circle + right-side top 10 table.
+PFP_CENTER = (1056, 190)
+PFP_SIZE = 226
+ROW_Y = 408
+ROW_STEP = 43
+NAME_X = 865
+USERNAME_X = 1128
+BALANCE_X = 1360
 
 
 def _font(size, bold=False):
@@ -27,8 +37,26 @@ def _font(size, bold=False):
     return ImageFont.load_default()
 
 
+def _scale_xy(x, y, w, h):
+    return int(x * w / BASE_W), int(y * h / BASE_H)
+
+
+def _scale(v, w):
+    return int(v * w / BASE_W)
+
+
 def _name(row):
-    return row.get("name") or row.get("username") or f"User {row.get('user_id')}"
+    return (row.get("name") or row.get("username") or f"User {row.get('user_id')}")[:20]
+
+
+def _username(row):
+    username = row.get("username")
+    if not username:
+        return "-"
+    username = str(username)
+    if not username.startswith("@"):
+        username = "@" + username
+    return username[:18]
 
 
 def _circle_crop(img, size):
@@ -41,98 +69,104 @@ def _circle_crop(img, size):
     return out
 
 
-def _draw_glow_circle(draw, x, y, r, color):
-    for i in range(7, 0, -1):
-        alpha = 30 + i * 8
-        c = tuple(min(255, v + i * 6) for v in color)
-        draw.ellipse((x - r - i * 5, y - r - i * 5, x + r + i * 5, y + r + i * 5), outline=c, width=2)
-    draw.ellipse((x - r, y - r, x + r, y + r), outline=color, width=6)
-
-
 async def _download_pfp(user_id):
     try:
         entity = await tbot.get_entity(int(user_id))
         temp_dir = tempfile.mkdtemp()
-        path = await tbot.download_profile_photo(entity, file=temp_dir)
-        return path
+        return await tbot.download_profile_photo(entity, file=temp_dir)
     except Exception:
         return None
+
+
+async def _download_template():
+    try:
+        data = await core.media_db.find_one({"key": "leaderboard"})
+        if not data:
+            return None
+        msg = await tbot.get_messages(int(data["chat_id"]), ids=int(data["msg_id"]))
+        if not msg or not msg.media:
+            return None
+        temp_dir = tempfile.mkdtemp()
+        return await tbot.download_media(msg, file=temp_dir)
+    except Exception:
+        return None
+
+
+def _blank_template():
+    bg = Image.new("RGB", (BASE_W, BASE_H), (7, 9, 18))
+    draw = ImageDraw.Draw(bg)
+    for y in range(BASE_H):
+        ratio = y / BASE_H
+        draw.line((0, y, BASE_W, y), fill=(int(7 + ratio * 12), int(9 + ratio * 14), int(20 + ratio * 35)))
+    title = _font(64, True)
+    sub = _font(34, True)
+    draw.text((70, 65), "EGO HUSTLE", font=title, fill=(245, 207, 90))
+    draw.text((130, 155), "LEADERBOARD", font=sub, fill=(80, 200, 255))
+    draw.ellipse((945, 77, 1167, 299), outline=(245, 207, 90), width=8)
+    draw.text((970, 40), "#1 TOP PLAYER", font=_font(28, True), fill=(245, 207, 90))
+    draw.rounded_rectangle((630, 330, 1505, 805), radius=22, outline=(245, 207, 90), width=3)
+    for i in range(10):
+        y = ROW_Y + i * ROW_STEP
+        draw.rounded_rectangle((740, y - 5, 1470, y + 30), radius=10, outline=(75, 85, 110), width=1)
+        draw.text((685, y), str(i + 1), font=_font(24, True), fill=(245, 207, 90))
+    return bg
+
+
+def _draw_placeholder_pfp(bg, x, y, size):
+    draw = ImageDraw.Draw(bg)
+    draw.ellipse((x, y, x + size, y + size), fill=(20, 24, 45), outline=(245, 207, 90), width=5)
+    draw.text((x + size * 0.36, y + size * 0.38), "EC", font=_font(max(28, size // 5), True), fill=(245, 207, 90))
 
 
 async def _make_card(rows):
     if Image is None:
         return None
 
-    bg = Image.new("RGB", (CARD_W, CARD_H), (7, 9, 18))
+    template_path = await _download_template()
+    if template_path and os.path.exists(template_path):
+        try:
+            bg = Image.open(template_path).convert("RGB")
+        except Exception:
+            bg = _blank_template()
+    else:
+        bg = _blank_template()
+
+    w, h = bg.size
     draw = ImageDraw.Draw(bg)
 
-    # premium dark gradient
-    for y in range(CARD_H):
-        ratio = y / CARD_H
-        r = int(8 + ratio * 10)
-        g = int(10 + ratio * 12)
-        b = int(22 + ratio * 28)
-        draw.line((0, y, CARD_W, y), fill=(r, g, b))
+    # Player PFP in the empty #1 circle.
+    cx, cy = _scale_xy(PFP_CENTER[0], PFP_CENTER[1], w, h)
+    pfp_size = max(120, int(PFP_SIZE * w / BASE_W))
+    pfp_x, pfp_y = cx - pfp_size // 2, cy - pfp_size // 2
 
-    # neon panels
-    draw.rounded_rectangle((40, 40, 1240, 680), radius=32, outline=(210, 170, 65), width=3)
-    draw.rounded_rectangle((70, 90, 560, 635), radius=30, fill=(12, 15, 32), outline=(70, 115, 190), width=2)
-    draw.rounded_rectangle((600, 105, 1210, 635), radius=28, fill=(13, 16, 33), outline=(70, 115, 190), width=2)
-
-    title_font = _font(64, True)
-    sub_font = _font(27, False)
-    rank_font = _font(42, True)
-    name_font = _font(36, True)
-    small_font = _font(25, False)
-    row_font = _font(26, True)
-
-    draw.text((75, 42), "EGO HUSTLE", font=title_font, fill=(245, 207, 90))
-    draw.text((80, 112), "LEADERBOARD • TOP PLAYERS", font=sub_font, fill=(190, 220, 255))
-    draw.text((80, 640), "EGO Network · EST. 2026   |   MR EGO", font=small_font, fill=(160, 170, 190))
-
-    if not rows:
-        draw.text((165, 330), "NO PLAYERS YET", font=name_font, fill=(235, 235, 235))
-    else:
+    if rows:
         top = rows[0]
-        top_name = _name(top)[:22]
-        top_balance = int(top.get("balance", 0) or 0)
-        top_power = int(top.get("power", 100) or 100)
-        top_level = int(top.get("level", 1) or 1)
-
-        # rank one crown and frame
-        draw.text((210, 165), "#1", font=rank_font, fill=(245, 207, 90))
-        draw.text((155, 215), "TOP PLAYER", font=small_font, fill=(190, 220, 255))
-        _draw_glow_circle(draw, 315, 360, 118, (245, 207, 90))
-
         pfp_path = await _download_pfp(top.get("user_id"))
         if pfp_path and os.path.exists(pfp_path):
             try:
-                pfp = Image.open(pfp_path)
-                pfp = _circle_crop(pfp, 218)
-                bg.paste(pfp, (206, 251), pfp)
+                pfp = _circle_crop(Image.open(pfp_path), pfp_size)
+                bg.paste(pfp, (pfp_x, pfp_y), pfp)
             except Exception:
-                draw.ellipse((206, 251, 424, 469), fill=(31, 38, 65))
-                draw.text((278, 330), "AZ", font=rank_font, fill=(245, 207, 90))
+                _draw_placeholder_pfp(bg, pfp_x, pfp_y, pfp_size)
         else:
-            draw.ellipse((206, 251, 424, 469), fill=(31, 38, 65))
-            draw.text((278, 330), "AZ", font=rank_font, fill=(245, 207, 90))
+            _draw_placeholder_pfp(bg, pfp_x, pfp_y, pfp_size)
 
-        draw.text((115, 500), top_name, font=name_font, fill=(255, 255, 255))
-        draw.text((115, 548), f"{top_balance} EC", font=rank_font, fill=(245, 207, 90))
-        draw.text((115, 600), f"Power {top_power}  •  Level {top_level}", font=small_font, fill=(190, 220, 255))
+    # Top 10 real data rows.
+    row_font = _font(max(16, int(24 * w / BASE_W)), True)
+    for idx, row in enumerate(rows[:10], 0):
+        y = int((ROW_Y + idx * ROW_STEP) * h / BASE_H)
+        name_x = int(NAME_X * w / BASE_W)
+        username_x = int(USERNAME_X * w / BASE_W)
+        balance_x = int(BALANCE_X * w / BASE_W)
+        name = _name(row)
+        username = _username(row)
+        balance = int(row.get("balance", 0) or 0)
+        draw.text((name_x, y), name, font=row_font, fill=(238, 244, 255))
+        draw.text((username_x, y), username, font=row_font, fill=(130, 220, 255))
+        draw.text((balance_x, y), f"{balance} EC", font=row_font, fill=(245, 207, 90))
 
-        y = 135
-        for idx, row in enumerate(rows[:10], 1):
-            name = _name(row)[:24]
-            balance = int(row.get("balance", 0) or 0)
-            power = int(row.get("power", 100) or 100)
-            color = (245, 207, 90) if idx == 1 else (210, 220, 240)
-            fill = (20, 26, 48) if idx % 2 else (16, 20, 38)
-            draw.rounded_rectangle((630, y, 1180, y + 45), radius=15, fill=fill, outline=(45, 65, 105), width=1)
-            draw.text((650, y + 8), f"#{idx}", font=row_font, fill=color)
-            draw.text((720, y + 8), name, font=row_font, fill=(235, 240, 255))
-            draw.text((1010, y + 8), f"{balance} EC", font=row_font, fill=(245, 207, 90))
-            y += 49
+    if not rows:
+        draw.text(_scale_xy(850, 430, w, h), "NO PLAYERS YET", font=_font(max(24, int(34 * w / BASE_W)), True), fill=(245, 207, 90))
 
     out = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
     bg.save(out.name, "PNG")
