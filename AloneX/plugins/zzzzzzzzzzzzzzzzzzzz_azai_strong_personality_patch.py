@@ -1,4 +1,4 @@
- import AloneX.plugins.azai_ai_chat as ai
+import AloneX.plugins.azai_ai_chat as ai
 
 
 def _profile_rule(role: str, mode: str | None) -> str:
