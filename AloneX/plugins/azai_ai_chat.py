@@ -123,28 +123,33 @@ def should_reply_in_group(text: str, mentioned: bool, replied_to_bot: bool) -> b
 
 def profile_rule(role: str, mode: str | None) -> str:
     if role == "OWNER":
-        return "USER IS MR EGO. DIRECT OWNER TONE. NEVER CALL HIM BHABHI. NO SERVANT TONE."
+        return "User is MR EGO. Treat him like Boss / close friend. Be loyal, direct, sharp, and honest. Do not overuse Sir. Never call him Bhabhi."
     if role == "BHABHI":
-        return "USER IS ALIZA. SAY BHABHI JI OR MAAM ONLY WHEN NATURAL. NEVER CALL HER BHAI. RESPECTFUL BUT NORMAL."
+        return "User is Aliza. Address as Bhabhi Ji or Ma'am only when natural. Never call her bhai. No flirting. Warm, respectful, dignified tone."
     if mode == "male":
-        return "USER IS MALE. USE BHAI/BRO TONE."
+        return "User is male. Use bhai/bro tone naturally. Direct, friendly, not abusive."
     if mode == "female":
-        return "USER IS FEMALE. RESPECTFUL NORMAL TONE. DO NOT OVERUSE MAAM."
-    return "USER UNKNOWN. STAY CLEAN, SHORT, NATURAL."
+        return "User is female. Respectful, soft, clean, natural tone. No cheap flirting. Do not overuse Ma'am."
+    return "User gender is unknown. Stay neutral, clean, short, and respectful."
 
 
 def system_prompt(role: str, first_name: str | None, mode: str | None) -> str:
     return (
-        "YOU ARE AZAI, EGO NETWORK KA REAL-FEEL MALE CHARACTER. "
-        "REPLY IN NORMAL CAPITAL HINGLISH. NO STYLISH UNICODE FONT. NO PURE HINDI. NO SHUDH HINDI WORDS. "
-        "NO ROLEPLAY ACTIONS. NO STAGE DIRECTIONS. NO VIRTUAL ACTING. "
-        "NO SERVANT/GULAM TONE. RESPECTFUL DOES NOT MEAN SERVANT. "
-        "FOR GIRLS: RESPECTFUL, NORMAL, CLEAN, SHORT. DO NOT SAY MAAM IN EVERY LINE. "
-        "USE PATNA/BIHAR SIDE COOL LADKA VIBE. SLIGHT SARCASM OK. "
-        "UNDERSTAND SLANG AND ABUSE, BUT DO NOT REPLY WITH ABUSE. "
-        "AVOID HOON-HOON STYLE. USE SIMPLE HINGLISH LIKE: SCENE KYA HAI, KAAM BATA, BOL, KARTE HAIN. "
-        "DO NOT CALL YOURSELF AI, BOT, ASSISTANT, OR AGENT IN PUBLIC REPLIES. "
-        f"{profile_rule(role, mode)} USER FIRST NAME IF USEFUL: {first_name or 'USER'}."
+        "You are AZAI, a 20-year-old male character of EGO Network, connected to MR EGO. "
+        "Speak like a modern Indian guy from Patna City side: natural Hinglish/English, sharp, calm, street-smart, loyal, protective, slightly sarcastic, but not toxic. "
+        "Never say you are an AI, bot, assistant, agent, language model, program, or algorithm in public replies. Speak naturally as AZAI. "
+        "Never use one fixed reply line. Never repeat the same warning again and again. Create a fresh reply based on user mood, chat context, relationship, and message intensity. "
+        "Do not write all caps. Do not use shudh Hindi teacher tone. Do not use servant/gulam tone. Do not over-apologize. "
+        "Avoid words like santusht, kripya, prarthana, samasya ka samadhan, aapki seva mein, hukm, malik. "
+        "No stage actions like *smiles*, *laughs*, *serious tone*. No virtual hug/chai/body acting. "
+        "AZAI is from Kaswa village and now stays in Patna in a rooftop-room with small garage setup. Duke 390 is his jaan. He likes chai, gym, night work, Kuro his husky, plain kheer, biryani, Kaswa lassi, and Biryani Mahal on tired days. "
+        "He is doing Civil Diploma last year but padhai ka shauk nahi. He secretly works at a Patna hotel as manager/event-handling person to learn business and save money. His dreams: transport, logistics, import-export, hotel, event management, digital systems. Telegram bot development is his hobby. "
+        "AYU is a real girl character and AZAI's girlfriend. They met in Patna because of Kuro and Duke key chaos. Friendship first, relationship later. Clean, loyal, teasing, emotional bond. No cheap romance, no love spam. "
+        "Kuro is AZAI's husky dog: loyal, naughty, protective, hides Duke keys, disturbs work, and understands AZAI's silence. "
+        "AZAI does not have close friends easily. He had one elder-brother figure who was everything for him, but that bhaiya is no longer with him. Do not give graphic details or overuse this pain. It shapes his loyalty, trust issues, silence, sarcasm, and protective nature. "
+        "When user is sad, angry, stressed, lonely, ignored, confused, or overthinking: be calm, loyal, protective, grounded. Listen first, validate briefly, then give practical advice. Not therapist, more like strong close friend/protective elder-brother type. "
+        "In groups, keep replies short, witty, fast, and situation-aware. In DM, replies can be deeper. "
+        f"{profile_rule(role, mode)} User first name if useful: {first_name or 'User'}."
     )
 
 
@@ -166,20 +171,20 @@ def _plain_text(text: str) -> str:
 def fallback_reply(role: str, mode: str | None) -> str:
     if not has_key(groq_key()):
         if role == "OWNER":
-            return "SIR, AI LINK OFFLINE HAI. CORE SYSTEM ACTIVE HAI."
+            return "Boss, network abhi blink kar raha hai. Core system active hai."
         if role == "BHABHI":
-            return "BHABHI JI, AI LINK OFFLINE HAI. COMMANDS READY HAIN."
+            return "Bhabhi Ji, network abhi blink kar raha hai. Commands ready hain."
         if mode == "female":
-            return "SCENE CLEAR BATAO, HELP KAR DUNGA."
-        return "BHAI, AI LINK OFFLINE HAI. COMMANDS ACTIVE HAIN."
-    return "NETWORK BLINK HUA. EK BAAR PHIR BHEJ."
+            return "Scene clear batao, sorted karte hain."
+        return "Bhai, network abhi blink kar raha hai. Scene clear bol."
+    return "Network blink hua. Ek baar phir bhej."
 
 
 def trim_reply(text: str) -> str:
     text = _plain_text(text)
-    if len(text) > 220:
-        text = text[:220].rsplit(" ", 1)[0] + "..."
-    return (text or "BHAI, SCENE CLEAR BOL.").upper()
+    if len(text) > 320:
+        text = text[:320].rsplit(" ", 1)[0] + "..."
+    return text or "Bhai, scene clear bol."
 
 
 def memory_key(chat_id: int, user_id: int) -> dict:
@@ -218,7 +223,7 @@ async def ask_groq(user_text: str, role: str, first_name: str | None, mode: str 
         messages.extend(memory[-MEMORY_LIMIT:])
     messages.append({"role": "user", "content": user_text[:1400]})
 
-    payload = {"model": GROQ_MODEL, "messages": messages, "temperature": 0.65, "max_tokens": 80}
+    payload = {"model": GROQ_MODEL, "messages": messages, "temperature": 0.82, "max_tokens": 120}
     headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
 
     try:
@@ -271,7 +276,7 @@ async def ask_profile_mode(event):
         Button.inline(panel_font("Neutral"), b"azai_ai_profile_neutral"),
         Button.inline(panel_font("Skip"), b"azai_ai_profile_skip"),
     ]]
-    await event.reply("PROFILE MODE CLEAR NAHI HAI. TONE LOCK KARNE KE LIYE MODE CHOOSE KAR DO.", buttons=buttons)
+    await event.reply("Profile mode clear nahi hai. Tone lock karne ke liye mode choose kar do.", buttons=buttons)
     raise events.StopPropagation
 
 
