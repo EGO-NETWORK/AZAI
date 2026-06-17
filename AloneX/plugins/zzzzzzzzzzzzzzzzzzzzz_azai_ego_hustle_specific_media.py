@@ -4,18 +4,6 @@ from AloneX import font, prefix_cmds, tbot
 import AloneX.plugins.zzzz_azai_ego_hustle_core as core
 
 
-async def bal_media(event):
-    reply = await event.get_reply_message()
-    user = await reply.get_sender() if reply else await event.get_sender()
-    data = await core.wallet(user.id, user)
-    await core.send(event, "wallet", await core.bal_text(user, data), core.back())
-
-
-async def daily_media(event):
-    user = await event.get_sender()
-    await core.send(event, "daily", await core.daily_result(user), core.back())
-
-
 async def protect_media(event):
     user = await event.get_sender()
     parts = (event.raw_text or "").split(maxsplit=1)
@@ -35,12 +23,8 @@ async def protect_media(event):
 
 if "zzzzzzzzzzzzzzzzzzzzz_azai_ego_hustle_specific_media" not in tbot.handlers_loaded:
     try:
-        tbot.remove_event_handler(core.bal)
-        tbot.remove_event_handler(core.daily)
         tbot.remove_event_handler(core.protect)
     except Exception:
         pass
-    tbot.add_event_handler(bal_media, events.NewMessage(pattern=f"^{prefix_cmds}(bal|wallet|balance)(?:@\\w+)?$", incoming=True))
-    tbot.add_event_handler(daily_media, events.NewMessage(pattern=f"^{prefix_cmds}daily(?:@\\w+)?$", incoming=True))
     tbot.add_event_handler(protect_media, events.NewMessage(pattern=f"^{prefix_cmds}protect(?:@\\w+)?(?: .*)?$", incoming=True))
     tbot.handlers_loaded.add("zzzzzzzzzzzzzzzzzzzzz_azai_ego_hustle_specific_media")
