@@ -1,3 +1,4 @@
+import asyncio
 import random
 import time
 from datetime import datetime
@@ -23,6 +24,8 @@ DAILY_LIMIT = 10
 STREAK_TARGET = 5
 STREAK_BONUS_EC = 200
 AUTO_INTERVAL_SECONDS = 1800
+AUTO_RECENT_LIMIT = 10
+AUTO_MAX_CHATS_PER_CYCLE = 500
 
 active_auto_task = None
 
@@ -97,26 +100,38 @@ async def add_anime_quiz(event):
         await event.reply(font("Use: /addanimeq answer | option1 | option2 | option3 | option4"))
         return
     answer, options = parsed
+    media_chat_id = int(reply.chat_id)
+    media_msg_id = int(reply.id)
+    existing = await quiz_db.find_one({"media_chat_id": media_chat_id, "media_msg_id": media_msg_id, "enabled": True})
+    if existing:
+        await event.reply(font("This anime quiz image is already saved:") + f" {existing.get('qid')}")
+        return
     qid = str(int(time.time() * 1000))
     await quiz_db.insert_one(
         {
             "qid": qid,
             "answer": answer,
             "options": options,
-            "media_chat_id": int(reply.chat_id),
-            "media_msg_id": int(reply.id),
+            "media_chat_id": media_chat_id,
+            "media_msg_id": media_msg_id,
             "created_by": int((await event.get_sender()).id),
             "enabled": True,
+            "times_used": 0,
+            "last_used_at": None,
             "created_at": now_ist(),
         }
     )
     await event.reply(font("Anime quiz saved:") + f" {qid}")
 
 
-async def random_quiz():
-    data = await quiz_db.find({"enabled": True}).to_list(length=100)
+async def random_quiz(exclude_qids: list[str] | None = None):
+    data = await quiz_db.find({"enabled": True}).to_list(length=250)
     if not data:
         return None
+    excluded = {str(x) for x in (exclude_qids or [])}
+    candidates = [q for q in data if str(q.get("qid")) not in excluded]
+    if candidates:
+        return random.choice(candidates)
     return random.choice(data)
 
 
@@ -152,6 +167,10 @@ async def send_quiz(chat_id: int, q: dict):
         await tbot.send_file(chat_id, msg.media, caption=quiz_caption(q), buttons=quiz_buttons(q))
     else:
         await tbot.send_message(chat_id, quiz_caption(q), buttons=quiz_buttons(q))
+    await quiz_db.update_one(
+        {"qid": q.get("qid")},
+        {"$inc": {"times_used": 1}, "$set": {"last_used_at": now_ist()}},
+    )
 
 
 async def animeguess_handler(event):
@@ -263,10 +282,13 @@ async def quiztop_handler(event):
 
 async def quiz_panel(event):
     total = await quiz_db.count_documents({"enabled": True})
+    settings = await settings_db.find_one({"chat_id": int(event.chat_id)}) or {}
+    auto_status = font("ON") if settings.get("auto") else font("OFF")
     text = (
         font("QUIZ PANEL") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Anime Quiz:") + f" {total} active questions\n"
+        + font("Auto Quiz:") + f" {auto_status}\n"
         + font("Reward:") + f" {CORRECT_EC} {CURRENCY} + {CORRECT_XP} XP\n"
         + font("Daily Limit:") + f" {DAILY_LIMIT} rewarded quiz\n"
         + font("Streak Bonus:") + f" {STREAK_TARGET} correct = +{STREAK_BONUS_EC} {CURRENCY}"
@@ -275,12 +297,70 @@ async def quiz_panel(event):
     await event.reply(text, buttons=buttons)
 
 
+async def send_auto_quiz(chat_id: int) -> bool:
+    chat_id = int(chat_id)
+    settings = await settings_db.find_one({"chat_id": chat_id}) or {}
+    if not settings.get("auto"):
+        return False
+    recent_qids = [str(x) for x in (settings.get("recent_qids", []) or [])]
+    q = await random_quiz(recent_qids)
+    if not q:
+        await settings_db.update_one({"chat_id": chat_id}, {"$set": {"last_error": "No active anime quiz questions", "updated_at": now_ist()}}, upsert=True)
+        return False
+    try:
+        await send_quiz(chat_id, q)
+    except Exception as exc:
+        await settings_db.update_one({"chat_id": chat_id}, {"$set": {"last_error": str(exc)[:200], "updated_at": now_ist()}}, upsert=True)
+        return False
+    qid = str(q.get("qid"))
+    recent_qids = [qid] + [x for x in recent_qids if x != qid]
+    recent_qids = recent_qids[:AUTO_RECENT_LIMIT]
+    await settings_db.update_one(
+        {"chat_id": chat_id},
+        {"$set": {"last_qid": qid, "recent_qids": recent_qids, "last_sent_at": now_ist(), "last_error": None, "updated_at": now_ist()}},
+        upsert=True,
+    )
+    return True
+
+
+async def auto_quiz_loop():
+    while True:
+        await asyncio.sleep(AUTO_INTERVAL_SECONDS)
+        rows = await settings_db.find({"auto": True}).to_list(length=AUTO_MAX_CHATS_PER_CYCLE)
+        for row in rows:
+            chat_id = row.get("chat_id")
+            if not chat_id:
+                continue
+            await send_auto_quiz(int(chat_id))
+            await asyncio.sleep(1)
+
+
+def ensure_auto_task() -> bool:
+    global active_auto_task
+    try:
+        if active_auto_task and not active_auto_task.done():
+            return True
+        loop = tbot.loop
+        active_auto_task = loop.create_task(auto_quiz_loop())
+        return True
+    except Exception:
+        return False
+
+
 async def quiz_toggle(event, enabled: bool):
     if not await is_owner(event):
         await event.reply(font("Owner only."))
         return
-    await settings_db.update_one({"chat_id": int(event.chat_id)}, {"$set": {"chat_id": int(event.chat_id), "auto": bool(enabled), "updated_at": now_ist()}}, upsert=True)
-    await event.reply(font("Auto quiz enabled." if enabled else "Auto quiz disabled."))
+    await settings_db.update_one(
+        {"chat_id": int(event.chat_id)},
+        {"$set": {"chat_id": int(event.chat_id), "auto": bool(enabled), "updated_at": now_ist()}},
+        upsert=True,
+    )
+    task_ok = ensure_auto_task() if enabled else True
+    status = "Auto quiz enabled." if enabled else "Auto quiz disabled."
+    if enabled and not task_ok:
+        status += " Restart ke baad auto task active hoga."
+    await event.reply(font(status))
 
 
 async def quizon_handler(event):
@@ -289,6 +369,23 @@ async def quizon_handler(event):
 
 async def quizoff_handler(event):
     await quiz_toggle(event, False)
+
+
+async def quizstatus_handler(event):
+    settings = await settings_db.find_one({"chat_id": int(event.chat_id)}) or {}
+    total = await quiz_db.count_documents({"enabled": True})
+    task_status = bool(active_auto_task and not active_auto_task.done())
+    text = (
+        font("ANIME QUIZ STATUS") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Auto:") + f" {'ON' if settings.get('auto') else 'OFF'}\n"
+        + font("Auto Task:") + f" {'RUNNING' if task_status else 'STOPPED'}\n"
+        + font("Interval:") + f" {AUTO_INTERVAL_SECONDS // 60} min\n"
+        + font("Active Questions:") + f" {total}\n"
+        + font("Last Sent:") + f" {settings.get('last_sent_at') or 'Never'}\n"
+        + font("Last Error:") + f" {settings.get('last_error') or 'None'}"
+    )
+    await event.reply(text)
 
 
 async def quiz_panel_callback(event):
@@ -309,6 +406,9 @@ if "azai_anime_quiz" not in tbot.handlers_loaded:
     tbot.add_event_handler(quiztop_handler, events.NewMessage(pattern=f"^{prefix_cmds}quiztop(?:@\\w+)?$", incoming=True))
     tbot.add_event_handler(quizon_handler, events.NewMessage(pattern=f"^{prefix_cmds}quizon(?:@\\w+)?$", incoming=True))
     tbot.add_event_handler(quizoff_handler, events.NewMessage(pattern=f"^{prefix_cmds}quizoff(?:@\\w+)?$", incoming=True))
+    tbot.add_event_handler(quizstatus_handler, events.NewMessage(pattern=f"^{prefix_cmds}quizstatus(?:@\\w+)?$", incoming=True))
     tbot.add_event_handler(quiz_callback, events.CallbackQuery(pattern=b"^azquiz\\|"))
     tbot.add_event_handler(quiz_panel_callback, events.CallbackQuery(pattern=b"^azqp_"))
     tbot.handlers_loaded.add("azai_anime_quiz")
+
+ensure_auto_task()
