@@ -114,6 +114,7 @@ def buttons():
     return [
         [Button.inline(font("Wallet"), b"egoh_bal"), Button.inline(font("Daily"), b"egoh_daily")],
         [Button.inline(font("Work"), b"egoh_work"), Button.inline(font("Luck"), b"egoh_luck")],
+        [Button.inline(font("Raid Help"), b"egoh_raid_help"), Button.inline(font("Heist"), b"egoh_heist")],
         [Button.inline(font("Profile"), b"egoh_profile"), Button.inline(font("Leaderboard"), b"egoh_top")],
         [Button.inline(font("Close"), b"egoh_close")],
     ]
@@ -124,7 +125,22 @@ def back():
 
 
 def home_text():
-    return font("EGO HUSTLE") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" + BRAND + "\n\n" + font("One Wallet. One Economy. One Rank.") + "\n\n" + font("Open wallet:") + " /bal\n" + font("Earn:") + " /daily /work /luck\n" + font("Open more:") + " /attack /raid /heist"
+    return (
+        "EGO HUSTLE COMMAND GUIDE\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+        "EGO Network - EST. 2026\n\n"
+        "OPEN PANEL: /hustle /game /egohustle\n\n"
+        "/bal - Check your EC wallet.\n"
+        "/daily - Claim daily EC reward.\n"
+        "/work - Earn EC by work mode.\n"
+        "/luck - Try luck rewards.\n"
+        "/protect - Activate wallet protection.\n"
+        "/raid - Raid another user's wallet. Reply to target.\n"
+        "/attack - Attack another user. Reply to target.\n"
+        "/heist - High risk EC heist.\n"
+        "/profile - Check your player profile.\n"
+        "/leaderboard - Top EC players.\n"
+    )
 
 
 async def media(key):
@@ -172,7 +188,8 @@ async def bal(event):
     reply = await event.get_reply_message()
     user = await reply.get_sender() if reply else await event.get_sender()
     data = await wallet(user.id, user)
-    await send(event, "profile", await bal_text(user, data), back())
+    await event.reply(await bal_text(user, data), buttons=back())
+    raise events.StopPropagation
 
 
 async def daily_result(user):
@@ -185,7 +202,8 @@ async def daily_result(user):
 
 
 async def daily(event):
-    await send(event, "game", await daily_result(await event.get_sender()), back())
+    await event.reply(await daily_result(await event.get_sender()), buttons=back())
+    raise events.StopPropagation
 
 
 async def work_result(user):
@@ -271,7 +289,8 @@ async def top_text():
 
 
 async def top(event):
-    await send(event, "leaderboard", await top_text(), back())
+    await event.reply(await top_text(), buttons=back())
+    raise events.StopPropagation
 
 
 async def profile_text(user, data):
@@ -283,7 +302,8 @@ async def profile(event):
     reply = await event.get_reply_message()
     user = await reply.get_sender() if reply else await event.get_sender()
     data = await wallet(user.id, user)
-    await send(event, "profile", await profile_text(user, data), back())
+    await event.reply(await profile_text(user, data), buttons=back())
+    raise events.StopPropagation
 
 
 async def cb(event):
@@ -316,14 +336,14 @@ async def media_cmd(event):
 
 
 if "zzzz_azai_ego_hustle_core" not in tbot.handlers_loaded:
-    tbot.add_event_handler(hustle, events.NewMessage(pattern=f"^{prefix_cmds}(hustle|game|egohustle)(?:@\\w+)?$", incoming=True))
-    tbot.add_event_handler(bal, events.NewMessage(pattern=f"^{prefix_cmds}(bal|wallet|balance)(?:@\\w+)?$", incoming=True))
-    tbot.add_event_handler(daily, events.NewMessage(pattern=f"^{prefix_cmds}daily(?:@\\w+)?$", incoming=True))
-    tbot.add_event_handler(work, events.NewMessage(pattern=f"^{prefix_cmds}work(?:@\\w+)?$", incoming=True))
-    tbot.add_event_handler(protect, events.NewMessage(pattern=f"^{prefix_cmds}protect(?:@\\w+)?(?: .*)?$", incoming=True))
-    tbot.add_event_handler(luck, events.NewMessage(pattern=f"^{prefix_cmds}luck(?:@\\w+)?$", incoming=True))
-    tbot.add_event_handler(top, events.NewMessage(pattern=f"^{prefix_cmds}(leaderboard|top)(?:@\\w+)?$", incoming=True))
-    tbot.add_event_handler(profile, events.NewMessage(pattern=f"^{prefix_cmds}profile(?:@\\w+)?$", incoming=True))
+    tbot.add_event_handler(hustle, events.NewMessage(pattern=f"^{prefix_cmds}(hustle|game|egohustle)(?:@\w+)?$", incoming=True))
+    tbot.add_event_handler(bal, events.NewMessage(pattern=f"^{prefix_cmds}(bal|wallet|balance)(?:@\w+)?$", incoming=True))
+    tbot.add_event_handler(daily, events.NewMessage(pattern=f"^{prefix_cmds}daily(?:@\w+)?$", incoming=True))
+    tbot.add_event_handler(work, events.NewMessage(pattern=f"^{prefix_cmds}work(?:@\w+)?$", incoming=True))
+    tbot.add_event_handler(protect, events.NewMessage(pattern=f"^{prefix_cmds}protect(?:@\w+)?(?: .*)?$", incoming=True))
+    tbot.add_event_handler(luck, events.NewMessage(pattern=f"^{prefix_cmds}luck(?:@\w+)?$", incoming=True))
+    tbot.add_event_handler(top, events.NewMessage(pattern=f"^{prefix_cmds}(leaderboard|top)(?:@\w+)?$", incoming=True))
+    tbot.add_event_handler(profile, events.NewMessage(pattern=f"^{prefix_cmds}profile(?:@\w+)?$", incoming=True))
     tbot.add_event_handler(media_cmd, events.NewMessage(pattern=f"^{prefix_cmds}(setgamepic|setworkpic|setluckpic|setleaderboardpic|setgameprofilepic)$", incoming=True))
     tbot.add_event_handler(cb, events.CallbackQuery(pattern=b"^egoh_"))
     tbot.handlers_loaded.add("zzzz_azai_ego_hustle_core")
