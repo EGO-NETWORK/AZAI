@@ -276,7 +276,7 @@ async def ask_profile_mode(event):
         Button.inline(panel_font("Neutral"), b"azai_ai_profile_neutral"),
         Button.inline(panel_font("Skip"), b"azai_ai_profile_skip"),
     ]]
-    await event.reply("Profile mode clear nahi hai. Tone lock karne ke liye mode choose kar do.", buttons=buttons)
+    await event.reply(panel_font("Profile mode clear nahi hai. Tone lock karne ke liye mode choose kar do."), buttons=buttons)
     raise events.StopPropagation
 
 
@@ -343,10 +343,11 @@ async def ai_chat_handler(event):
         plain_reply = trim_reply(reply)
         reply = plain_reply
 
+    visible_reply = panel_font(reply)
     try:
-        await event.reply(reply)
+        await event.reply(visible_reply)
     except Exception:
-        await event.respond(reply)
+        await event.respond(visible_reply)
 
     if plain_reply:
         await save_memory(event.chat_id, sender.id, text, plain_reply)
