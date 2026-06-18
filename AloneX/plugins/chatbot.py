@@ -23,7 +23,7 @@ Normal messages get situation-based reactions.
 Rough messages are deleted, muted, and reviewed before ban.
 """
 
-ACTION_TAG_RE = re.compile(r"\*[^*]{1,100}\*|[^)]{1,100}")
+ACTION_TAG_RE = re.compile(r"\*[^*]{1,100}\*|\([^)]{1,100}\)")
 
 MEMORY_LIMIT = 8
 AI_COOLDOWN_SECONDS = 2
@@ -370,7 +370,7 @@ async def send_markdown(chat_id: int, text: str, reply_markup=None):
             disable_web_page_preview=True,
         )
     except Exception:
-        plain = re.sub(r"([^]+)\]tg://user\?id=\d+", r"\1", text)
+        plain = re.sub(r"\[([^\]]+)\]\(tg://user\?id=\d+\)", r"\1", text)
         return await pbot.send_message(chat_id, plain, reply_markup=reply_markup)
 
 
@@ -619,4 +619,128 @@ async def azai_ban_review_callback(_, query: CallbackQuery):
     chat_id = int(query.message.chat.id)
 
     if not await is_user_admin(chat_id, int(query.from_user.id)):
-        return await query.answer("Admin only.", s
+        return await query.answer("Admin only.", show_alert=True)
+
+    if action == "ignore":
+        await abuse_db.update_one(
+            {"chat_id": chat_id, "user_id": target_id},
+            {"$set": {"count": 0, "updated_at": int(time.time())}},
+            upsert=True,
+        )
+        await pending_ban_db.delete_one({"chat_id": chat_id, "user_id": target_id})
+        await query.message.edit_text(font("Ban request ignored. User count reset."))
+        return await query.answer("Ignored.")
+
+    banned = await safe_ban(chat_id, target_id)
+
+    if banned:
+        await pending_ban_db.delete_one({"chat_id": chat_id, "user_id": target_id})
+        await query.message.edit_text(font("User banned. Scene closed."))
+        await send_logger(
+            f"AZAI Ban Confirmed\nChat: {chat_id}\nUser: {target_id}\nAction by: {query.from_user.id}"
+        )
+        return await query.answer("Banned.")
+
+    await query.answer("Ban failed. Check bot permission.", show_alert=True)
+
+
+async def ask_groq(text: str, role: str, name: str, chat_type: str, memory: list[dict]) -> str | None:
+    api_key = getattr(config, "GROQ_API_KEY", None)
+
+    if not api_key or str(api_key).lower() in {"0", "none", "null", "false"}:
+        return None
+
+    if AloneX.aiohttpsession is None:
+        await init_aiohttp_session()
+
+    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+    api_url = "https://api.groq.com/openai/v1/chat/completions"
+
+    messages = [{"role": "system", "content": chatbot_prompt(role, name, chat_type)}]
+
+    if memory:
+        messages.extend(memory[-MEMORY_LIMIT:])
+
+    messages.append({"role": "user", "content": str(text or "")[:1400]})
+
+    data = {
+        "model": getattr(config, "AZAI_GROQ_MODEL", None) or "llama-3.1-8b-instant",
+        "messages": messages,
+        "temperature": 0.84,
+        "max_tokens": 190 if chat_type == "private" else 130,
+    }
+
+    try:
+        async with AloneX.aiohttpsession.post(api_url, headers=headers, json=data, timeout=25) as response:
+            if response.status == 200:
+                res_json = await response.json()
+                return res_json.get("choices", [])[0].get("message", {}).get("content")
+    except Exception as e:
+        print(f"AZAI Chat Mode Error: {e}")
+
+    return None
+
+
+def fallback_reply(role: str, chat_type: str) -> str:
+    if role == "MR_EGO":
+        return "MR EGO, network blink hua. Core active hai, scene bol."
+    if role == "BHABHI":
+        return "Bhabhi Ji, network blink hua. Aap scene batao."
+    if chat_type == "private":
+        return "Network blink hua. Ek baar phir bol, main yahin hoon."
+    return "Bhai, network blink hua. Scene clear bol."
+
+
+@pbot.on_message(
+    (filters.text | filters.caption)
+    & ~filters.bot
+    & ~filters.command(["chatbot", "AloneX", "gpt", "groq", "google", "gemini"]),
+    group=10,
+)
+async def chatbot_handler(_, message: Message):
+    if not message.from_user:
+        return
+
+    input_text = message.text or message.caption
+    if not input_text:
+        return
+
+    if is_command_text(input_text):
+        return
+
+    chat_type = "private" if message.chat.type == enums.ChatType.PRIVATE else "group"
+
+    if chat_type == "group" and detect_abuse(input_text):
+        await handle_abuse(message, input_text)
+        return
+
+    await react_to_message(message, input_text)
+
+    if chat_type == "group" and not should_reply_in_group(message, input_text):
+        return
+
+    now = time.time()
+    cooldown_key = (message.chat.id, message.from_user.id)
+
+    if now - last_reply_at.get(cooldown_key, 0) < AI_COOLDOWN_SECONDS:
+        return
+
+    last_reply_at[cooldown_key] = now
+
+    if pbot.me and pbot.me.username:
+        input_text = input_text.replace(f"@{pbot.me.username}", "").strip()
+
+    user_id = int(message.from_user.id)
+    role = role_of(user_id)
+    name = first_name(message)
+
+    await pbot.send_chat_action(message.chat.id, enums.ChatAction.TYPING)
+
+    memory = await load_memory(message.chat.id, user_id)
+    raw_reply = await ask_groq(input_text, role, name, chat_type, memory)
+
+    reply_limit = 760 if chat_type == "private" else 520
+    reply = clean_reply(raw_reply, limit=reply_limit) if raw_reply else fallback_reply(role, chat_type)
+
+    await save_memory(message.chat.id, user_id, input_text, reply)
+    await message.reply_text(reply)
