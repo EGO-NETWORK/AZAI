@@ -234,7 +234,7 @@ if any(word in text_low for word in ["angry", "gussa", "fight", "drama", "warnin
     return "👀"
 
 if "?" in text_low or any(word in text_low for word in ["kaise", "kya", "kyu", "bata", "help", "samjha"]):
-    return "🧐"
+    return "🧐" "🤨"
 
 if any(word in text_low for word in ["hi", "hii", "hello", "hlo", "hey", "yo"]):
     return "👋"
