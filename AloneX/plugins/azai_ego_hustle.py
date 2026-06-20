@@ -17,6 +17,7 @@ cooldown_db = database["azai_hustle_cooldowns"]
 media_db = database["azai_media_assets"]
 
 WORK_COOLDOWN = 10 * 60
+ATTACK_COOLDOWN = 5 * 60
 LUCK_COOLDOWN = 4 * 60 * 60
 HEIST_COOLDOWN = 2 * 60 * 60
 HEIST_ENTRY = 300
@@ -28,6 +29,7 @@ MEDIA_KEYS = {
     "panel": "hustle_panel",
     "work": "hustle_work",
     "raid": "hustle_raid",
+    "attack": "hustle_attack",
     "protect": "hustle_protect",
     "luck": "hustle_luck",
     "heist": "hustle_heist",
@@ -149,16 +151,7 @@ async def get_wallet(user_id: int) -> dict:
     user_id = int(user_id)
     row = await wallet_db.find_one(wallet_key(user_id))
     if not row:
-        row = {
-            "user_id": user_id,
-            "balance": 0,
-            "xp": 0,
-            "level": 1,
-            "messages": 0,
-            "daily_at": None,
-            "power": DEFAULT_POWER,
-            "created_at": now_ist(),
-        }
+        row = {"user_id": user_id, "balance": 0, "xp": 0, "level": 1, "messages": 0, "daily_at": None, "power": DEFAULT_POWER, "created_at": now_ist()}
         await wallet_db.insert_one(row)
     if row.get("power") is None:
         row["power"] = DEFAULT_POWER
@@ -213,7 +206,7 @@ async def set_hustle_media_handler(event):
         return
     parts = (event.raw_text or "").split()
     if len(parts) < 2 or parts[1].lower() not in MEDIA_KEYS:
-        await event.reply(caption("🎬 Hustle Media", font("Use:") + " /sethustlemedia panel|work|raid|protect|luck|heist"))
+        await event.reply(caption("🎬 Hustle Media", font("Use:") + " /sethustlemedia panel|work|raid|attack|protect|luck|heist"))
         return
     reply = await event.get_reply_message()
     if not reply or not reply.media:
@@ -230,11 +223,12 @@ async def hustle_handler(event):
         "━━━━━━━━━━━━━━━━━━━━\n\n"
         + "/work - " + font("earn EC by completing tasks") + "\n"
         + "/raid - " + font("reply to target and try to loot EC") + "\n"
+        + "/attack - " + font("reply to target and fight for power") + "\n"
         + "/protect 1d - " + font("activate raid shield") + "\n"
         + "/luck - " + font("claim a random bonus") + "\n"
         + "/heist - " + font("high-risk mission for EC") + "\n"
         + "/bal - " + font("check wallet") + "\n\n"
-        + font("Owner Media:") + " /sethustlemedia panel|work|raid|protect|luck|heist\n"
+        + font("Owner Media:") + " /sethustlemedia panel|work|raid|attack|protect|luck|heist\n"
         + font("Currency:") + " EC"
     )
     await send_hustle(event, MEDIA_KEYS["panel"], text)
@@ -253,6 +247,45 @@ async def work_handler(event):
     await set_cooldown(sender.id, "work")
     body = font("Earned:") + f" {earned} {CURRENCY}\n" + font("Type:") + f" {'Rare Task' if rare else 'Task'}\n" + font("Cooldown:") + " 10m"
     await send_hustle(event, MEDIA_KEYS["work"], caption("💼 Work Mode", body))
+
+
+async def attack_handler(event):
+    reply = await event.get_reply_message()
+    if not reply:
+        await send_hustle(event, MEDIA_KEYS["attack"], caption("⚔️ Attack", font("Reply to a target user and use:") + " /attack"))
+        return
+    attacker = await event.get_sender()
+    target = await reply.get_sender()
+    await touch_user(attacker)
+    await touch_user(target)
+    if not target or getattr(target, "bot", False) or target.id == attacker.id:
+        await send_hustle(event, MEDIA_KEYS["attack"], caption("⚔️ Attack Failed", font("Invalid target.")))
+        return
+    left = await cooldown_left(attacker.id, "attack", ATTACK_COOLDOWN)
+    if left:
+        await send_hustle(event, MEDIA_KEYS["attack"], caption("⚔️ Attack Cooldown", font("Try again in:") + f" {wait_text(left)}"))
+        return
+    attacker_wallet = await get_wallet(attacker.id)
+    target_wallet = await get_wallet(target.id)
+    attacker_power = int(attacker_wallet.get("power", DEFAULT_POWER) or DEFAULT_POWER)
+    target_power = int(target_wallet.get("power", DEFAULT_POWER) or DEFAULT_POWER)
+    chance = 50
+    if attacker_power > target_power:
+        chance = 85
+    elif attacker_power < target_power:
+        chance = 20
+    success = random.randint(1, 100) <= chance
+    await set_cooldown(attacker.id, "attack")
+    if not success:
+        await send_hustle(event, MEDIA_KEYS["attack"], caption("⚔️ Attack Failed", font("Target defended the hit.") + "\n" + font("Chance:") + f" {chance}%"))
+        return
+    reward = random.randint(100, 400)
+    power_gain = random.randint(3, 8)
+    await add_balance(attacker.id, reward)
+    await add_power(attacker.id, power_gain)
+    await wallet_db.update_one(wallet_key(attacker.id), {"$inc": {"attack_wins": 1}, "$set": {"updated_at": now_ist()}}, upsert=True)
+    body = font("Target:") + f" {user_name(target)}\n" + font("Reward:") + f" {reward} {CURRENCY}\n" + font("Power Gain:") + f" +{power_gain}\n" + font("Chance:") + f" {chance}%"
+    await send_hustle(event, MEDIA_KEYS["attack"], caption("⚔️ Attack Success", body))
 
 
 async def protect_handler(event):
@@ -376,6 +409,7 @@ if "azai_ego_hustle" not in tbot.handlers_loaded:
     tbot.add_event_handler(hustle_handler, events.NewMessage(pattern=f"^{prefix_cmds}hustle(?:@\w+)?$", incoming=True))
     tbot.add_event_handler(work_handler, events.NewMessage(pattern=f"^{prefix_cmds}work(?:@\w+)?$", incoming=True))
     tbot.add_event_handler(raid_handler, events.NewMessage(pattern=f"^{prefix_cmds}raid(?:@\w+)?$", incoming=True))
+    tbot.add_event_handler(attack_handler, events.NewMessage(pattern=f"^{prefix_cmds}attack(?:@\w+)?$", incoming=True))
     tbot.add_event_handler(protect_handler, events.NewMessage(pattern=f"^{prefix_cmds}protect(?: .*)?$", incoming=True))
     tbot.add_event_handler(luck_handler, events.NewMessage(pattern=f"^{prefix_cmds}luck(?:@\w+)?$", incoming=True))
     tbot.add_event_handler(heist_handler, events.NewMessage(pattern=f"^{prefix_cmds}heist(?:@\w+)?$", incoming=True))
