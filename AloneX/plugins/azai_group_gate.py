@@ -10,8 +10,11 @@ from AloneX import database, font, prefix_cmds, tbot
 IST = pytz.timezone("Asia/Kolkata")
 AZAI_BOT_USERNAME = "Urxazaibot"
 gate_db = database["azai_group_gate"]
+wallet_db = database["azai_wallets"]
 active_gate = {}
 gate_notice_cd = {}
+
+START_EC = 100
 
 
 def now_ist() -> str:
@@ -19,7 +22,7 @@ def now_ist() -> str:
 
 
 def gate_key(chat_id: int, user_id: int) -> dict:
-    return {"chat_id": chat_id, "user_id": user_id}
+    return {"chat_id": int(chat_id), "user_id": int(user_id)}
 
 
 async def gate_done(chat_id: int, user_id: int) -> bool:
@@ -27,10 +30,30 @@ async def gate_done(chat_id: int, user_id: int) -> bool:
     return bool(data and data.get("done") is True)
 
 
+async def ensure_wallet(user_id: int):
+    await wallet_db.update_one(
+        {"user_id": int(user_id)},
+        {
+            "$setOnInsert": {
+                "user_id": int(user_id),
+                "balance": START_EC,
+                "xp": 0,
+                "rep": 0,
+                "level": 1,
+                "messages": 0,
+                "daily_at": None,
+                "created_at": now_ist(),
+            },
+            "$set": {"updated_at": now_ist()},
+        },
+        upsert=True,
+    )
+
+
 async def mark_gate_pending(chat_id: int, user_id: int):
     await gate_db.update_one(
         gate_key(chat_id, user_id),
-        {"$setOnInsert": {"chat_id": chat_id, "user_id": user_id, "done": False, "created_at": now_ist()}},
+        {"$setOnInsert": {"chat_id": int(chat_id), "user_id": int(user_id), "done": False, "created_at": now_ist()}},
         upsert=True,
     )
 
@@ -38,9 +61,10 @@ async def mark_gate_pending(chat_id: int, user_id: int):
 async def mark_gate_done(chat_id: int, user_id: int):
     await gate_db.update_one(
         gate_key(chat_id, user_id),
-        {"$set": {"done": True, "done_at": now_ist(), "updated_at": now_ist()}},
+        {"$set": {"chat_id": int(chat_id), "user_id": int(user_id), "done": True, "done_at": now_ist(), "updated_at": now_ist()}},
         upsert=True,
     )
+    await ensure_wallet(user_id)
 
 
 def setup_link() -> str:
@@ -63,6 +87,7 @@ def done_text() -> str:
         font("❂ VERIFICATION COMPLETE") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("You can now chat in this group.") + "\n"
+        + font("Starter wallet unlocked:") + f" {START_EC} EC\n"
         + font("Complete setup in DM for profile features.")
     )
 
@@ -85,8 +110,8 @@ def captcha_buttons(chat_id: int, user_id: int, answer: int):
 
 async def send_gate(event):
     user = await event.get_sender()
-    chat_id = event.chat_id
-    user_id = user.id
+    chat_id = int(event.chat_id)
+    user_id = int(user.id)
 
     if await gate_done(chat_id, user_id):
         await event.reply(font("Your verification is already completed for this group."), buttons=setup_button())
@@ -123,7 +148,7 @@ async def gate_answer(event):
         return
 
     sender = await event.get_sender()
-    if sender.id != target_user:
+    if int(sender.id) != target_user:
         await event.answer(font("This verification is not for you."), alert=True)
         return
 
@@ -131,7 +156,6 @@ async def gate_answer(event):
     if answer is None:
         await event.answer(font("Expired. Send /verify again."), alert=True)
         return
-
     if selected != answer:
         await event.answer(font("Wrong answer."), alert=True)
         return
@@ -173,7 +197,6 @@ async def require_admin(event) -> bool:
 async def verifyall_handler(event):
     if not await require_admin(event):
         return
-
     msg = await event.reply(font("Marking current group members as verified..."))
     total = 0
     skipped = 0
@@ -187,7 +210,6 @@ async def verifyall_handler(event):
     except Exception:
         await msg.edit(font("Failed to verify all members. Make sure AZAI has proper group access."))
         return
-
     await msg.edit(
         font("❂ VERIFY ALL COMPLETE") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
@@ -199,15 +221,10 @@ async def verifyall_handler(event):
 async def unverifyall_handler(event):
     if not await require_admin(event):
         return
-
-    result = await gate_db.update_many(
-        {"chat_id": event.chat_id},
-        {"$set": {"done": False, "updated_at": now_ist()}},
-    )
+    result = await gate_db.update_many({"chat_id": int(event.chat_id)}, {"$set": {"done": False, "updated_at": now_ist()}})
     active_to_remove = [key for key in active_gate if key[0] == event.chat_id]
     for key in active_to_remove:
         active_gate.pop(key, None)
-
     await event.reply(
         font("❂ UNVERIFY ALL COMPLETE") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
@@ -219,7 +236,7 @@ async def unverifyall_handler(event):
 async def verified_handler(event):
     if not await require_admin(event):
         return
-    count = await gate_db.count_documents({"chat_id": event.chat_id, "done": True})
+    count = await gate_db.count_documents({"chat_id": int(event.chat_id), "done": True})
     await event.reply(
         font("❂ VERIFIED USERS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
@@ -230,7 +247,7 @@ async def verified_handler(event):
 async def unverified_handler(event):
     if not await require_admin(event):
         return
-    count = await gate_db.count_documents({"chat_id": event.chat_id, "done": False})
+    count = await gate_db.count_documents({"chat_id": int(event.chat_id), "done": False})
     await event.reply(
         font("❂ UNVERIFIED USERS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
@@ -253,18 +270,15 @@ async def group_gate_guard(event):
     if allowed_gate_text(event.raw_text):
         await mark_gate_pending(event.chat_id, event.sender_id)
         return
-
     try:
         await event.delete()
     except Exception:
         pass
-
     cd_key = (event.chat_id, event.sender_id)
     now = time.time()
     if gate_notice_cd.get(cd_key, 0) > now:
         return
     gate_notice_cd[cd_key] = now + 25
-
     try:
         await event.respond(font("Verification required. Send /verify first."))
     except Exception:
@@ -278,5 +292,5 @@ if "azai_group_gate" not in tbot.handlers_loaded:
     tbot.add_event_handler(verified_handler, events.NewMessage(pattern=f"^{prefix_cmds}verified$", incoming=True))
     tbot.add_event_handler(unverified_handler, events.NewMessage(pattern=f"^{prefix_cmds}unverified$", incoming=True))
     tbot.add_event_handler(gate_answer, events.CallbackQuery(pattern=b"^azg\\|"))
-    tbot.add_event_handler(group_gate_guard, events.NewMessage(incoming=True))
+    tbot.add_event_handler(group_gate_guard, events.NewMessage(incoming=True), group=-90)
     tbot.handlers_loaded.add("azai_group_gate")
