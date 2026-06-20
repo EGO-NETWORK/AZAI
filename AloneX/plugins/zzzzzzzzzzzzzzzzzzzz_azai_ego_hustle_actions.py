@@ -25,7 +25,7 @@ def _action_buttons():
         [Button.inline(font("Work"), b"egoh_work"), Button.inline(font("Luck"), b"egoh_luck")],
         [Button.inline(font("Raid Help"), b"egoh2_raidhelp"), Button.inline(font("Heist"), b"egoh2_heist")],
         [Button.inline(font("Profile"), b"egoh_profile"), Button.inline(font("Leaderboard"), b"egoh_top")],
-        [Button.inline(font("Close"), b"egoh_close")],
+        [Button.url(font("Guide"), "https://t.me/EGOxHUSTEL"), Button.inline(font("Close"), b"egoh_close")],
     ]
 
 
@@ -139,8 +139,8 @@ async def help_cb(event):
 
 
 if "zzzzzzzzzzzzzzzzzzzz_azai_ego_hustle_actions" not in tbot.handlers_loaded:
-    tbot.add_event_handler(raid_cmd, events.NewMessage(pattern=f"^{prefix_cmds}raid(?:@\\w+)?$", incoming=True))
-    tbot.add_event_handler(attack_cmd, events.NewMessage(pattern=f"^{prefix_cmds}attack(?:@\\w+)?$", incoming=True))
-    tbot.add_event_handler(heist_cmd, events.NewMessage(pattern=f"^{prefix_cmds}heist(?:@\\w+)?$", incoming=True))
+    tbot.add_event_handler(raid_cmd, events.NewMessage(pattern=f"^{prefix_cmds}raid(?:@\w+)?$", incoming=True))
+    tbot.add_event_handler(attack_cmd, events.NewMessage(pattern=f"^{prefix_cmds}attack(?:@\w+)?$", incoming=True))
+    tbot.add_event_handler(heist_cmd, events.NewMessage(pattern=f"^{prefix_cmds}heist(?:@\w+)?$", incoming=True))
     tbot.add_event_handler(help_cb, events.CallbackQuery(pattern=b"^egoh2_"))
     tbot.handlers_loaded.add("zzzzzzzzzzzzzzzzzzzz_azai_ego_hustle_actions")
