@@ -112,11 +112,9 @@ async def send_gate(event):
     user = await event.get_sender()
     chat_id = int(event.chat_id)
     user_id = int(user.id)
-
     if await gate_done(chat_id, user_id):
         await event.reply(font("Your verification is already completed for this group."), buttons=setup_button())
         return
-
     await mark_gate_pending(chat_id, user_id)
     a = random.randint(2, 9)
     b = random.randint(2, 9)
@@ -146,12 +144,10 @@ async def gate_answer(event):
     except Exception:
         await event.answer(font("Invalid verification."), alert=True)
         return
-
     sender = await event.get_sender()
     if int(sender.id) != target_user:
         await event.answer(font("This verification is not for you."), alert=True)
         return
-
     answer = active_gate.get((chat_id, target_user))
     if answer is None:
         await event.answer(font("Expired. Send /verify again."), alert=True)
@@ -159,7 +155,6 @@ async def gate_answer(event):
     if selected != answer:
         await event.answer(font("Wrong answer."), alert=True)
         return
-
     active_gate.pop((chat_id, target_user), None)
     await mark_gate_done(chat_id, target_user)
     await event.edit(done_text(), buttons=setup_button())
@@ -210,12 +205,7 @@ async def verifyall_handler(event):
     except Exception:
         await msg.edit(font("Failed to verify all members. Make sure AZAI has proper group access."))
         return
-    await msg.edit(
-        font("❂ VERIFY ALL COMPLETE") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Verified Members:") + f" {total}\n"
-        + font("Skipped Bots:") + f" {skipped}"
-    )
+    await msg.edit(font("❂ VERIFY ALL COMPLETE") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Verified Members:") + f" {total}\n" + font("Skipped Bots:") + f" {skipped}")
 
 
 async def unverifyall_handler(event):
@@ -225,41 +215,25 @@ async def unverifyall_handler(event):
     active_to_remove = [key for key in active_gate if key[0] == event.chat_id]
     for key in active_to_remove:
         active_gate.pop(key, None)
-    await event.reply(
-        font("❂ UNVERIFY ALL COMPLETE") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Known members marked unverified:") + f" {result.modified_count}\n"
-        + font("Now users must send /verify before chatting.")
-    )
+    await event.reply(font("❂ UNVERIFY ALL COMPLETE") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Known members marked unverified:") + f" {result.modified_count}\n" + font("Now users must send /verify before chatting."))
 
 
 async def verified_handler(event):
     if not await require_admin(event):
         return
     count = await gate_db.count_documents({"chat_id": int(event.chat_id), "done": True})
-    await event.reply(
-        font("❂ VERIFIED USERS") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Verified count:") + f" {count}"
-    )
+    await event.reply(font("❂ VERIFIED USERS") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Verified count:") + f" {count}")
 
 
 async def unverified_handler(event):
     if not await require_admin(event):
         return
     count = await gate_db.count_documents({"chat_id": int(event.chat_id), "done": False})
-    await event.reply(
-        font("❂ UNVERIFIED USERS") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Known unverified count:") + f" {count}\n"
-        + font("Note: Users not seen by AZAI yet are also treated as unverified.")
-    )
+    await event.reply(font("❂ UNVERIFIED USERS") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Known unverified count:") + f" {count}\n" + font("Note: Users not seen by AZAI yet are also treated as unverified."))
 
 
 async def group_gate_guard(event):
-    if event.is_private:
-        return
-    if event.is_channel and not event.is_group:
+    if event.is_private or (event.is_channel and not event.is_group):
         return
     if not event.sender_id:
         return
@@ -292,5 +266,5 @@ if "azai_group_gate" not in tbot.handlers_loaded:
     tbot.add_event_handler(verified_handler, events.NewMessage(pattern=f"^{prefix_cmds}verified$", incoming=True))
     tbot.add_event_handler(unverified_handler, events.NewMessage(pattern=f"^{prefix_cmds}unverified$", incoming=True))
     tbot.add_event_handler(gate_answer, events.CallbackQuery(pattern=b"^azg\\|"))
-    tbot.add_event_handler(group_gate_guard, events.NewMessage(incoming=True), group=-90)
+    tbot.add_event_handler(group_gate_guard, events.NewMessage(incoming=True))
     tbot.handlers_loaded.add("azai_group_gate")
