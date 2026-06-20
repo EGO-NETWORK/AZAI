@@ -62,6 +62,13 @@ def owner_ids() -> set[int]:
     return ids
 
 
+def is_owner_wallet(user_id: int) -> bool:
+    try:
+        return int(user_id) in owner_ids()
+    except Exception:
+        return False
+
+
 async def is_owner(event) -> bool:
     sender = await event.get_sender()
     return bool(sender and int(sender.id) in owner_ids())
@@ -80,13 +87,7 @@ async def touch_user(user):
         return
     await wallet_db.update_one(
         wallet_key(user.id),
-        {
-            "$set": {
-                "name": getattr(user, "first_name", None) or getattr(user, "username", None) or "Unknown User",
-                "username": getattr(user, "username", None),
-                "updated_at": now_ist(),
-            }
-        },
+        {"$set": {"name": getattr(user, "first_name", None) or getattr(user, "username", None) or "Unknown User", "username": getattr(user, "username", None), "updated_at": now_ist()}},
         upsert=True,
     )
 
@@ -108,11 +109,7 @@ async def display_from_row(row: dict) -> str:
 
 
 async def save_media_asset(key: str, reply):
-    await media_db.update_one(
-        {"key": key},
-        {"$set": {"key": key, "chat_id": int(reply.chat_id), "msg_id": int(reply.id)}},
-        upsert=True,
-    )
+    await media_db.update_one({"key": key}, {"$set": {"key": key, "chat_id": int(reply.chat_id), "msg_id": int(reply.id)}}, upsert=True)
 
 
 async def get_media_asset(key: str):
@@ -152,11 +149,7 @@ async def get_wallet(user_id: int) -> dict:
 async def add_balance(user_id: int, amount: int, xp: int = 0):
     wallet = await get_wallet(user_id)
     new_xp = int(wallet.get("xp", 0)) + int(xp)
-    await wallet_db.update_one(
-        wallet_key(user_id),
-        {"$inc": {"balance": int(amount), "xp": int(xp)}, "$set": {"level": level_from_xp(new_xp), "updated_at": now_ist()}},
-        upsert=True,
-    )
+    await wallet_db.update_one(wallet_key(user_id), {"$inc": {"balance": int(amount), "xp": int(xp)}, "$set": {"level": level_from_xp(new_xp), "updated_at": now_ist()}}, upsert=True)
 
 
 async def set_balance(user_id: int, amount: int):
@@ -175,15 +168,17 @@ def wallet_text(user, wallet: dict) -> str:
     bal = int(wallet.get("balance", 0))
     xp = int(wallet.get("xp", 0))
     lvl = int(wallet.get("level", level_from_xp(xp)))
-    return (
+    text = (
         font("AZAI WALLET") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("User:") + f" {name}\n"
         + font("Balance:") + f" {bal} {CURRENCY}\n"
         + font("XP:") + f" {xp}\n"
-        + font("Level:") + f" {lvl}\n\n"
-        + font("Powered By:") + " " + BRAND
+        + font("Level:") + f" {lvl}\n"
     )
+    if is_owner_wallet(getattr(user, "id", 0)):
+        text += "\n" + font("Dev Wallet:") + " " + font("Not ranked on leaderboard") + "\n"
+    return text + "\n" + font("Powered By:") + " " + BRAND
 
 
 def wallet_buttons():
@@ -293,24 +288,25 @@ async def inventory_handler(event):
 
 async def leaderboard_text(kind: str = "balance") -> str:
     label = {"balance": "RICHEST USERS", "xp": "TOP XP", "rep": "TOP REP"}.get(kind, "LEADERBOARD")
-    rows = wallet_db.find({}).sort(kind, -1).limit(10)
+    rows = wallet_db.find({}).sort(kind, -1).limit(30)
     text = font(label) + "\n" + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
     rank = 1
     async for row in rows:
+        if is_owner_wallet(int(row.get("user_id", 0) or 0)):
+            continue
         value = int(row.get(kind, 0))
         display = await display_from_row(row)
         text += f"{rank}. {display} - {value}\n"
         rank += 1
+        if rank > 10:
+            break
     if rank == 1:
         text += font("No data yet.")
     return text
 
 
 def leaderboard_buttons():
-    return [
-        [Button.inline(font("Richest"), b"azeco_lb_balance"), Button.inline(font("XP"), b"azeco_lb_xp"), Button.inline(font("REP"), b"azeco_lb_rep")],
-        [Button.inline(font("Close"), b"azeco_close")],
-    ]
+    return [[Button.inline(font("Richest"), b"azeco_lb_balance"), Button.inline(font("XP"), b"azeco_lb_xp"), Button.inline(font("REP"), b"azeco_lb_rep")], [Button.inline(font("Close"), b"azeco_close")]]
 
 
 async def send_leaderboard(chat_id: int, text: str, buttons=None):
@@ -379,14 +375,14 @@ async def chat_reward_handler(event):
 
 
 if "azai_economy" not in tbot.handlers_loaded:
-    tbot.add_event_handler(set_leaderpic_handler, events.NewMessage(pattern=f"^{prefix_cmds}setleaderpic(?:@\\w+)?$", incoming=True))
-    tbot.add_event_handler(wallet_handler, events.NewMessage(pattern=f"^{prefix_cmds}(wallet|balance)(?:@\\w+)?$", incoming=True))
-    tbot.add_event_handler(daily_handler, events.NewMessage(pattern=f"^{prefix_cmds}daily(?:@\\w+)?$", incoming=True))
+    tbot.add_event_handler(set_leaderpic_handler, events.NewMessage(pattern=f"^{prefix_cmds}setleaderpic(?:@\w+)?$", incoming=True))
+    tbot.add_event_handler(wallet_handler, events.NewMessage(pattern=f"^{prefix_cmds}(wallet|balance|bal)(?:@\w+)?$", incoming=True))
+    tbot.add_event_handler(daily_handler, events.NewMessage(pattern=f"^{prefix_cmds}daily(?:@\w+)?$", incoming=True))
     tbot.add_event_handler(send_handler, events.NewMessage(pattern=f"^{prefix_cmds}send(?: .*)?$", incoming=True))
-    tbot.add_event_handler(rep_handler, events.NewMessage(pattern=f"^{prefix_cmds}rep(?:@\\w+)?$", incoming=True))
-    tbot.add_event_handler(myrep_handler, events.NewMessage(pattern=f"^{prefix_cmds}myrep(?:@\\w+)?$", incoming=True))
-    tbot.add_event_handler(inventory_handler, events.NewMessage(pattern=f"^{prefix_cmds}inventory(?:@\\w+)?$", incoming=True))
-    tbot.add_event_handler(leaderboard_handler, events.NewMessage(pattern=f"^{prefix_cmds}leaderboard(?:@\\w+)?$", incoming=True))
+    tbot.add_event_handler(rep_handler, events.NewMessage(pattern=f"^{prefix_cmds}rep(?:@\w+)?$", incoming=True))
+    tbot.add_event_handler(myrep_handler, events.NewMessage(pattern=f"^{prefix_cmds}myrep(?:@\w+)?$", incoming=True))
+    tbot.add_event_handler(inventory_handler, events.NewMessage(pattern=f"^{prefix_cmds}inventory(?:@\w+)?$", incoming=True))
+    tbot.add_event_handler(leaderboard_handler, events.NewMessage(pattern=f"^{prefix_cmds}leaderboard(?:@\w+)?$", incoming=True))
     tbot.add_event_handler(economy_callback, events.CallbackQuery(pattern=b"^azeco_"))
     tbot.add_event_handler(chat_reward_handler, events.NewMessage(incoming=True))
     tbot.handlers_loaded.add("azai_economy")
