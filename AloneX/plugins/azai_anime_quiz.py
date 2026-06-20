@@ -1,3 +1,4 @@
+import asyncio
 import random
 import time
 import uuid
@@ -15,10 +16,13 @@ CURRENCY = "EC"
 REWARD_EC = 150
 REWARD_XP = 15
 QUIZ_TIMEOUT_SECONDS = 180
+AUTO_INTERVAL_SECONDS = 30 * 60
+AUTO_CHECK_SECONDS = 60
 
 questions_db = database["azai_anime_quiz_questions_clean"]
 sessions_db = database["azai_anime_quiz_sessions_clean"]
 scores_db = database["azai_anime_quiz_scores_clean"]
+auto_db = database["azai_anime_quiz_auto_clean"]
 wallet_db = database["azai_wallets"]
 
 
@@ -168,7 +172,7 @@ async def pick_question():
     return None
 
 
-def quiz_caption(session: dict) -> str:
+def quiz_caption() -> str:
     return (
         font("ANIME QUIZ") + "\n"
         "━━━━━━━━━━━━━━━━━━━━\n\n"
@@ -185,14 +189,13 @@ def option_buttons(options: list[str]):
     return rows
 
 
-async def send_quiz(event, question: dict):
+async def create_session(chat_id: int, question: dict) -> dict:
     options = list(question.get("options", []))
     random.shuffle(options)
     correct_index = next((i for i, opt in enumerate(options) if opt.lower() == str(question.get("answer", "")).lower()), 0)
-    session_id = uuid.uuid4().hex[:10]
     session = {
-        "session_id": session_id,
-        "chat_id": int(event.chat_id),
+        "session_id": uuid.uuid4().hex[:10],
+        "chat_id": int(chat_id),
         "qid": question["qid"],
         "answer": question["answer"],
         "options": options,
@@ -202,20 +205,23 @@ async def send_quiz(event, question: dict):
         "created_at": now_ist(),
         "expires_at": int(time.time()) + QUIZ_TIMEOUT_SECONDS,
     }
-    await sessions_db.update_many({"chat_id": int(event.chat_id), "active": True}, {"$set": {"active": False}})
+    await sessions_db.update_many({"chat_id": int(chat_id), "active": True}, {"$set": {"active": False}})
     await sessions_db.insert_one(session)
+    return session
 
+
+async def send_quiz_to_chat(chat_id: int, question: dict):
+    session = await create_session(chat_id, question)
     media = None
     try:
         msg = await tbot.get_messages(int(question["media_chat_id"]), ids=int(question["media_msg_id"]))
         media = msg.media if msg else None
     except Exception:
         media = None
-
     if media:
-        await tbot.send_file(event.chat_id, media, caption=quiz_caption(session), buttons=option_buttons(options))
+        await tbot.send_file(chat_id, media, caption=quiz_caption(), buttons=option_buttons(session["options"]))
     else:
-        await event.reply(quiz_caption(session), buttons=option_buttons(options))
+        await tbot.send_message(chat_id, quiz_caption(), buttons=option_buttons(session["options"]))
 
 
 async def animeguess_handler(event):
@@ -227,7 +233,7 @@ async def animeguess_handler(event):
     if not question:
         await event.reply(font("No anime quiz questions added yet."))
         return
-    await send_quiz(event, question)
+    await send_quiz_to_chat(event.chat_id, question)
     raise events.StopPropagation
 
 
@@ -324,9 +330,90 @@ async def delanimeq_handler(event):
     raise events.StopPropagation
 
 
-async def quiz_auto_disabled(event):
-    await event.reply(font("Auto anime quiz is disabled in the clean rebuild. Use /animeguess to send one quiz at a time."))
+async def set_auto(chat_id: int, enabled: bool, user_id: int = 0):
+    now = int(time.time())
+    await auto_db.update_one(
+        {"chat_id": int(chat_id)},
+        {
+            "$set": {
+                "chat_id": int(chat_id),
+                "enabled": bool(enabled),
+                "interval": AUTO_INTERVAL_SECONDS,
+                "next_at": now + AUTO_INTERVAL_SECONDS if enabled else None,
+                "updated_by": int(user_id or 0),
+                "updated_at": now_ist(),
+            }
+        },
+        upsert=True,
+    )
+
+
+async def auto_status_text(chat_id: int) -> str:
+    row = await auto_db.find_one({"chat_id": int(chat_id)}) or {}
+    enabled = bool(row.get("enabled", False))
+    next_at = int(row.get("next_at") or 0)
+    wait = max(next_at - int(time.time()), 0) if enabled else 0
+    return (
+        font("ANIME QUIZ AUTO") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Status:") + f" {'ON' if enabled else 'OFF'}\n"
+        + font("Interval:") + " 30 minutes\n"
+        + font("Next Quiz In:") + f" {wait // 60} min {wait % 60} sec\n\n"
+        + font("Rule:") + " one saved quiz at a time, never all together."
+    )
+
+
+async def quizon_handler(event):
+    if not await is_owner(event):
+        await event.reply(font("Owner only."))
+        return
+    sender = await event.get_sender()
+    await set_auto(event.chat_id, True, sender.id if sender else 0)
+    await event.reply(await auto_status_text(event.chat_id))
     raise events.StopPropagation
+
+
+async def quizoff_handler(event):
+    if not await is_owner(event):
+        await event.reply(font("Owner only."))
+        return
+    sender = await event.get_sender()
+    await set_auto(event.chat_id, False, sender.id if sender else 0)
+    await event.reply(await auto_status_text(event.chat_id))
+    raise events.StopPropagation
+
+
+async def quizauto_handler(event):
+    await event.reply(await auto_status_text(event.chat_id))
+    raise events.StopPropagation
+
+
+async def quiz_auto_loop():
+    await asyncio.sleep(20)
+    while True:
+        try:
+            now = int(time.time())
+            async for row in auto_db.find({"enabled": True}):
+                chat_id = int(row.get("chat_id", 0) or 0)
+                if not chat_id:
+                    continue
+                next_at = int(row.get("next_at") or 0)
+                if next_at > now:
+                    continue
+                if await get_active_session(chat_id):
+                    await auto_db.update_one({"chat_id": chat_id}, {"$set": {"next_at": now + 60, "updated_at": now_ist()}}, upsert=True)
+                    continue
+                question = await pick_question()
+                if question:
+                    await send_quiz_to_chat(chat_id, question)
+                await auto_db.update_one(
+                    {"chat_id": chat_id},
+                    {"$set": {"next_at": now + AUTO_INTERVAL_SECONDS, "last_sent_at": now_ist(), "updated_at": now_ist()}},
+                    upsert=True,
+                )
+        except Exception as e:
+            print(f"AZAI Anime Quiz Auto Error: {e}")
+        await asyncio.sleep(AUTO_CHECK_SECONDS)
 
 
 if "azai_anime_quiz_clean" not in tbot.handlers_loaded:
@@ -336,6 +423,9 @@ if "azai_anime_quiz_clean" not in tbot.handlers_loaded:
     tbot.add_event_handler(quiztop_handler, events.NewMessage(pattern=f"^{prefix_cmds}quiztop(?:@\\w+)?$", incoming=True))
     tbot.add_event_handler(quizlist_handler, events.NewMessage(pattern=f"^{prefix_cmds}quizlist(?:@\\w+)?$", incoming=True))
     tbot.add_event_handler(delanimeq_handler, events.NewMessage(pattern=f"^{prefix_cmds}delanimeq(?: .*)?$", incoming=True))
-    tbot.add_event_handler(quiz_auto_disabled, events.NewMessage(pattern=f"^{prefix_cmds}(quizon|quizoff)(?:@\\w+)?$", incoming=True))
+    tbot.add_event_handler(quizon_handler, events.NewMessage(pattern=f"^{prefix_cmds}quizon(?:@\\w+)?$", incoming=True))
+    tbot.add_event_handler(quizoff_handler, events.NewMessage(pattern=f"^{prefix_cmds}quizoff(?:@\\w+)?$", incoming=True))
+    tbot.add_event_handler(quizauto_handler, events.NewMessage(pattern=f"^{prefix_cmds}quizauto(?:@\\w+)?$", incoming=True))
     tbot.add_event_handler(quiz_answer_callback, events.CallbackQuery(pattern=b"^azq_ans:"))
+    tbot.loop.create_task(quiz_auto_loop())
     tbot.handlers_loaded.add("azai_anime_quiz_clean")
