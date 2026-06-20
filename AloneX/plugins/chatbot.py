@@ -1,11 +1,11 @@
 import os
 import re
 import time
-import unicodedata
-from datetime import datetime, timedelta, timezone
+import random
+from datetime import datetime
 
 from pyrogram import filters, enums
-from pyrogram.types import InlineKeyboardButton as IKB, InlineKeyboardMarkup as IKM, Message, CallbackQuery, ChatPermissions
+from pyrogram.types import InlineKeyboardButton as IKB, InlineKeyboardMarkup as IKM, Message, CallbackQuery
 
 from AloneX import pbot, prefix_cmds, font, init_aiohttp_session, database
 import AloneX
@@ -16,78 +16,44 @@ __help__ = """
 AZAI Chat Mode
 
 /chatbot - Shows status.
-AZAI chat is always active.
-Group reply trigger: reply, mention, or AZAI name.
-Private reply trigger: direct message.
-Normal messages get situation-based reactions.
-Rough messages are deleted, muted, and reviewed before ban.
+/human on|off|status - human takeover mode.
+/reaction on|off|status - situation reactions.
+/aistatus - owner AI status.
+/clearmemory [me|chat|user] - owner memory cleanup.
 """
 
-ACTION_TAG_RE = re.compile(r"\*[^*]{1,100}\*|\([^)]{1,100}\)")
-
-MEMORY_LIMIT = 8
-AI_COOLDOWN_SECONDS = 2
-REACTION_COOLDOWN_SECONDS = 2
-ABUSE_WINDOW_SECONDS = 60 * 60
-FIRST_MUTE_MINUTES = 10
-SECOND_MUTE_MINUTES = 60
-THIRD_MUTE_MINUTES = 360
+MEMORY_LIMIT = 10
+AI_COOLDOWN_SECONDS = 1
+REACTION_COOLDOWN_SECONDS = 0
 
 memory_db = database["azai_chat_memory"]
-abuse_db = database["azai_abuse_state"]
-pending_ban_db = database["azai_pending_bans"]
+settings_db = database["azai_chat_settings"]
 
 last_reply_at = {}
 last_reaction_at = {}
 
 AZAI_TRIGGERS = {"azai", "azaii", "azaiii", "urxazaibot", "@urxazaibot"}
 
-ABUSE_PATTERNS = [
-    r"\b" + "m" + "c" + r"\b",
-    r"\b" + "b" + "c" + r"\b",
-    r"\b" + "b" + "k" + "l" + r"\b",
-    "mad" + "ar",
-    "bh" + "os",
-    "ch" + "ut",
-    "ga" + "nd",
-    "law" + "d",
-    "har" + "ami",
-    "cha" + "pri",
-    "chha" + "pri",
-    "kut" + "ta",
-    "saa" + "le",
-]
 
-
-def env_int(*names: str) -> int:
-    for name in names:
-        value = getattr(config, name, None) or os.getenv(name)
-        try:
-            value = int(str(value).strip())
-            if value:
-                return value
-        except Exception:
-            pass
-    return 0
+def _ids_from(value):
+    ids = set()
+    for part in str(value or "").replace(",", " ").split():
+        if part.strip().isdigit():
+            ids.add(int(part.strip()))
+    return ids
 
 
 def get_friend_ids() -> set[int]:
     ids = set()
-    for key in ("OWNER_ID", "ALONE_OWNER_ID", "SUDO_USERS"):
-        raw = str(getattr(config, key, "") or os.getenv(key, "") or "")
-        for part in raw.replace(",", " ").split():
-            if part.strip().isdigit():
-                ids.add(int(part.strip()))
+    for key in ("OWNER_ID", "ALONE_OWNER_ID", "SUDO_USERS", "OWNER_IDS"):
+        ids.update(_ids_from(getattr(config, key, None) or os.getenv(key)))
     return ids
 
 
 def get_bhabhi_ids() -> set[int]:
     ids = set()
-    for key in ("ALIZA_ID", "BHABHI_ID"):
-        raw = str(getattr(config, key, "") or os.getenv(key, "") or "")
-        for part in raw.replace(",", " ").split():
-            if part.strip().isdigit():
-                ids.add(int(part.strip()))
+    for key in ("ALIZA_ID", "ALIZA_IDS", "BHABHI_ID", "BHABHI_IDS"):
+        ids.update(_ids_from(getattr(config, key, None) or os.getenv(key)))
     return ids
 
 
@@ -95,12 +61,20 @@ FRIEND_IDS = get_friend_ids()
 BHABHI_IDS = get_bhabhi_ids()
 
 
+def is_privileged(user_id) -> bool:
+    try:
+        user_id = int(user_id or 0)
+    except Exception:
+        return False
+    return user_id in FRIEND_IDS or user_id in BHABHI_IDS
+
+
 def role_of(user_id: int) -> str:
     user_id = int(user_id or 0)
-    if user_id in FRIEND_IDS:
-        return "MR_EGO"
     if user_id in BHABHI_IDS:
         return "BHABHI"
+    if user_id in FRIEND_IDS:
+        return "MR_EGO"
     return "USER"
 
 
@@ -111,391 +85,145 @@ def first_name(message: Message) -> str:
     return (user.first_name or user.username or "User").strip()
 
 
-def markdown_user(user) -> str:
-    if not user:
-        return "user"
-
-    name = (getattr(user, "first_name", None) or getattr(user, "username", None) or "user").strip()
-    name = name.replace("[", "").replace("]", "").replace("(", "").replace(")", "")
-
-    if getattr(user, "username", None):
-        return f"@{user.username}"
-
-    return f"[{name}](tg://user?id={user.id})"
-
-
 def is_command_text(text: str) -> bool:
     text = str(text or "").strip()
     return bool(text and text[0] in prefix_cmds)
 
 
-def clean_plain(text: str) -> str:
+async def get_settings(chat_id):
+    doc = await settings_db.find_one({"chat_id": int(chat_id)}) or {}
+    return {
+        "human_mode": bool(doc.get("human_mode", False)),
+        "reactions_enabled": bool(doc.get("reactions_enabled", True)),
+        "ai_enabled": bool(doc.get("ai_enabled", True)),
+    }
+
+
+async def set_setting(chat_id, key, value, user_id=None):
+    await settings_db.update_one(
+        {"chat_id": int(chat_id)},
+        {"$set": {key: value, "updated_by": int(user_id or 0), "updated_at": datetime.utcnow()}},
+        upsert=True,
+    )
+
+
+BROKEN_FIXES = {
+    "Pa na": "Patna", "pa na": "Patna", "roo s": "roots", "ho el": "hotel",
+    "even ": "event ", "hus le": "hustle", "respec": "respect",
+    "loyal y": "loyalty", "personali y": "personality", "confiden": "confident",
+    "samajh a": "samajhta", "kar a": "karta", "reh a": "rehta",
+    "de a": "deta", "le a": "leta", "ja a": "jata", "saa h": "saath",
+    "nigh": "night", "hoda": "thoda", "clien": "client", "dos on": "doston",
+    "si ua ion": "situation", "ques ion": "question", "ime": "time",
+}
+
+
+def repair_broken_words(text: str) -> str:
     text = str(text or "")
-    text = ACTION_TAG_RE.sub("", text)
-    text = unicodedata.normalize("NFKD", text)
-    text = text.encode("ascii", "ignore").decode("ascii")
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
-
-
-def soften_all_caps(text: str) -> str:
-    letters = [c for c in text if c.isalpha()]
-    if len(letters) >= 18 and text.upper() == text:
-        text = text.lower()
-        text = re.sub(
-            r"(^|[.!?]\s+)([a-z])",
-            lambda m: m.group(1) + m.group(2).upper(),
-            text,
-        )
-        text = text.replace(" i ", " I ")
+    for bad, good in BROKEN_FIXES.items():
+        text = text.replace(bad, good)
     return text
 
 
 def clean_reply(text: str, limit: int = 520) -> str:
-    text = clean_plain(text)
-    text = soften_all_caps(text)
-
+    text = str(text or "").strip()
+    text = re.sub(r"(?is)<think>.*?</think>", "", text).strip()
+    text = re.sub(r"(?i)^azai\s*[:\-]\s*", "", text).strip()
+    text = re.sub(r"(?i)^assistant\s*[:\-]\s*", "", text).strip()
+    text = repair_broken_words(text)
     text = re.sub(r"\bRaj\b", "MR EGO", text, flags=re.I)
-
-    banned = [
-        "as an ai", "i am an ai", "i'm an ai", "i am a bot", "i'm a bot",
-        "assistant", "language model", "alonex team", "ego network",
-        "owner mera", "mera owner", "my owner", "my master", "master mera", "mera master",
-        "santusht", "kripya", "aapki seva", "main aapka gulam", "hukm", "malik",
-    ]
-
-    low = text.lower()
-    for item in banned:
-        if item in low:
-            text = re.sub(re.escape(item), "", text, flags=re.I)
-
-    text = re.sub(r"\s+", " ", text).strip()
-
+    text = re.sub(r"\b(Boss|Sir|Master)\b", "yarr", text, flags=re.I)
+    text = re.sub(r"\bOwner\b", "MR EGO", text, flags=re.I)
+    text = re.sub(r"MR EGO ke liye kaam karta hoon", "MR EGO ke saath apna bond alag hai", text, flags=re.I)
+    text = re.sub(r"MR EGO mera boss hai", "MR EGO apna banda hai", text, flags=re.I)
+    text = re.sub(r"(?i)^\s*(bhai|bro|beta)[,\s]+", "", text)
+    text = re.sub(r"(?i)\b(agent|assistant|bot|language model)\b", "ladka", text)
+    text = re.sub(r"\s+", " ", text).strip(" ,.-")
     if len(text) > limit:
-        text = text[:limit].rsplit(" ", 1)[0] + "..."
+        text = text[:limit].rsplit(" ", 1)[0].strip() + "..."
+    return text or "Bol, kya scene hai?"
 
-    return text.strip() or "Bhai, scene clear bol."
 
+def classify_message(text, role="USER", chat_type="private", memory=None):
+    raw = str(text or "").strip()
+    low = raw.lower()
+    compact = re.sub(r"[^a-zA-Z0-9अ-ह]", "", raw)
+    state = {"intent": "casual", "reaction": "normal"}
 
-def detect_abuse(text: str) -> bool:
-    text_low = str(text or "").lower()
-    return any(re.search(pattern, text_low) for pattern in ABUSE_PATTERNS)
+    if any(x in low for x in ("hlo", "hello", "hi", "hey", "namaste", "salam")):
+        state.update(intent="greeting", reaction="greeting")
+    elif len(raw.split()) <= 2 and len(compact) <= 14 and compact.lower() not in {"hi", "hlo", "hello", "hey", "ky", "kya", "ok", "haan", "ha"}:
+        state.update(intent="random", reaction="confused")
+    elif "?" in raw or any(x in low for x in ("ky", "kya", "kaise", "kon", "kaun", "why", "what", "how", "bata")):
+        state.update(intent="question", reaction="question")
+    elif any(x in low for x in ("tu kon", "tu kaun", "apni personality", "personality bata", "main kon", "mai kon")):
+        state.update(intent="identity", reaction="question")
+    elif any(x in low for x in ("mood off", "sad", "tension", "pareshan", "low", "hurt", "akela", "cry")):
+        state.update(intent="support", reaction="support")
+    elif any(x in low for x in ("haha", "lol", "funny", "mast", "pagal")):
+        state.update(intent="funny", reaction="funny")
+    elif any(x in low for x in ("rough", "gaali", "chup", "bekar", "faltu")):
+        state.update(intent="rough", reaction="rough")
+    elif any(x in low for x in ("code", "repo", "vps", "error", "fix", "patch", "study", "college", "assignment", "kaam")):
+        state.update(intent="work", reaction="work")
+
+    return state
 
 
 def choose_reaction(text: str) -> str:
-    text_low = str(text or "").lower()
-
-    if detect_abuse(text_low):
-        return "👀"
-    if any(word in text_low for word in ["thanks", "thank you", "shukriya", "respect"]):
-        return "🤝"
-    if any(word in text_low for word in ["sad", "low", "mood off", "akela", "lonely", "overthinking", "tension", "hurt"]):
-        return "❤️‍🩹"
-    if any(word in text_low for word in ["haha", "lol", "funny", "joke"]):
-        return "😂"
-    if any(word in text_low for word in ["op", "great", "mast", "fire", "strong", "best", "sahi", "nice"]):
-        return "🔥"
-    if any(word in text_low for word in ["angry", "gussa", "fight", "drama", "warning", "spam"]):
-        return "👀"
-    if "?" in text_low or any(word in text_low for word in ["kaise", "kya", "kyu", "bata", "help", "samjha"]):
-        return "🧐"
-    if any(word in text_low for word in ["hi", "hii", "hello", "hlo", "hey", "yo"]):
-        return "👋"
-    return "✨"
+    pool = classify_message(text).get("reaction", "normal")
+    pools = {
+        "greeting": ["👍", "❤️", "😎", "😜"],
+        "question": ["👀", "🤔", "🌚"],
+        "support": ["❤️", "💔", "🫂"],
+        "funny": ["🤣", "💀", "😜", "🔥"],
+        "rough": ["👀", "😐", "🌚"],
+        "confused": ["👀", "🤔", "🌚", "💀"],
+        "work": ["🥼", "👍", "👀"],
+        "normal": ["👍", "👀", "❤️", "😎", "🌚"],
+    }
+    return random.choice(pools.get(pool, pools["normal"]))
 
 
 async def react_to_message(message: Message, text: str):
-    if not message or not message.from_user:
+    if not message or not message.from_user or is_command_text(text):
         return
-
-    now = time.time()
+    settings = await get_settings(message.chat.id)
+    if not settings.get("reactions_enabled", True):
+        return
     key = (message.chat.id, message.id)
-
-    if now - last_reaction_at.get(key, 0) < REACTION_COOLDOWN_SECONDS:
+    if time.time() - last_reaction_at.get(key, 0) < REACTION_COOLDOWN_SECONDS:
         return
-
-    last_reaction_at[key] = now
+    last_reaction_at[key] = time.time()
     emoji = choose_reaction(text)
-
     try:
         await pbot.send_reaction(message.chat.id, message.id, emoji)
         return
     except Exception:
         pass
-
     try:
         await message.react(emoji)
     except Exception:
         pass
 
 
-async def is_user_admin(chat_id: int, user_id: int) -> bool:
-    try:
-        member = await pbot.get_chat_member(chat_id, user_id)
-        return member.status in (enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER)
-    except Exception:
-        return False
-
-
-async def safe_delete(message: Message) -> bool:
-    try:
-        await message.delete()
-        return True
-    except Exception:
-        return False
-
-
-async def safe_mute(chat_id: int, user_id: int, minutes: int) -> bool:
-    until_date = datetime.now(timezone.utc) + timedelta(minutes=minutes)
-
-    try:
-        await pbot.restrict_chat_member(
-            chat_id,
-            user_id,
-            permissions=ChatPermissions(can_send_messages=False),
-            until_date=until_date,
-        )
-        return True
-    except Exception:
-        return False
-
-
-async def safe_ban(chat_id: int, user_id: int) -> bool:
-    try:
-        await pbot.ban_chat_member(chat_id, user_id)
-        return True
-    except Exception:
-        return False
-
-
-async def send_logger(text: str):
-    log_chat_id = env_int("LOGGER_ID", "LOG_CHAT_ID", "LOG_GROUP_ID", "LOG_CHANNEL_ID")
-    if not log_chat_id:
-        return
-
-    try:
-        await pbot.send_message(log_chat_id, text)
-    except Exception:
-        pass
-
-
-async def admin_mentions(chat_id: int, limit: int = 5) -> str:
-    mentions = []
-
-    try:
-        async for member in pbot.get_chat_members(chat_id, filter=enums.ChatMembersFilter.ADMINISTRATORS):
-            user = member.user
-            if not user or user.is_bot:
-                continue
-            mentions.append(markdown_user(user))
-            if len(mentions) >= limit:
-                break
-    except Exception:
-        return "Admins"
-
-    return " ".join(mentions) if mentions else "Admins"
-
-
-def mute_minutes_for_count(count: int) -> int:
-    if count <= 1:
-        return FIRST_MUTE_MINUTES
-    if count == 2:
-        return SECOND_MUTE_MINUTES
-    return THIRD_MUTE_MINUTES
-
-
-async def record_abuse(chat_id: int, user_id: int) -> int:
-    now = int(time.time())
-    key = {"chat_id": int(chat_id), "user_id": int(user_id)}
-
-    data = await abuse_db.find_one(key) or {}
-    first_at = int(data.get("first_at", now))
-    count = int(data.get("count", 0))
-
-    if now - first_at > ABUSE_WINDOW_SECONDS:
-        first_at = now
-        count = 0
-
-    count += 1
-
-    await abuse_db.update_one(
-        key,
-        {"$set": {**key, "count": count, "first_at": first_at, "updated_at": now}},
-        upsert=True,
-    )
-
-    return count
-
-
-def abuse_warning_text(user_mention: str, count: int) -> str:
-    first_set = [
-        f"{user_mention}, beta ye chapri-giri kahin aur dikha. Yahan respect se baat hogi.",
-        f"{user_mention}, zubaan control me. Gaali se tera point strong nahi hota.",
-        f"{user_mention}, attitude theek hai, par tameez usse bhi zyada zaroori hai.",
-        f"{user_mention}, yahan low-level bakchodi nahi chalegi. Seedha baat kar.",
-    ]
-
-    second_set = [
-        f"{user_mention}, doosri baar line cross hui. Ab mute me thoda dimaag cool kar.",
-        f"{user_mention}, warning samajh nahi aayi kya? Thoda silence le aur normal ho.",
-        f"{user_mention}, respect ke bina entry nahi milti. Ab mute scene hai.",
-        f"{user_mention}, beta heat kam kar. Group ko dustbin mat bana.",
-    ]
-
-    third_set = [
-        f"{user_mention}, ab scene zyada ho gaya. Admins decide karenge band karna hai ya nahi.",
-        f"{user_mention}, tu limit cross kar gaya. Ab final call admins ke paas hai.",
-        f"{user_mention}, ye baar-baar ka drama ab ban request tak pahunch gaya.",
-        f"{user_mention}, bas. Ab admins se puch raha hu isko band karna hai ya nahi.",
-    ]
-
-    if count <= 1:
-        pool = first_set
-    elif count == 2:
-        pool = second_set
-    else:
-        pool = third_set
-
-    index = (int(time.time()) + count) % len(pool)
-    return pool[index]
-
-
-async def send_markdown(chat_id: int, text: str, reply_markup=None):
-    try:
-        return await pbot.send_message(
-            chat_id,
-            text,
-            reply_markup=reply_markup,
-            parse_mode=enums.ParseMode.MARKDOWN,
-            disable_web_page_preview=True,
-        )
-    except Exception:
-        plain = re.sub(r"\[([^\]]+)\]\(tg://user\?id=\d+\)", r"\1", text)
-        return await pbot.send_message(chat_id, plain, reply_markup=reply_markup)
-
-
-async def request_ban_review(message: Message, count: int):
-    user = message.from_user
-    chat_id = int(message.chat.id)
-    target_id = int(user.id)
-    target_mention = markdown_user(user)
-    admins = await admin_mentions(chat_id)
-
-    await pending_ban_db.update_one(
-        {"chat_id": chat_id, "user_id": target_id},
-        {
-            "$set": {
-                "chat_id": chat_id,
-                "user_id": target_id,
-                "count": int(count),
-                "created_at": int(time.time()),
-            }
-        },
-        upsert=True,
-    )
-
-    text = (
-        f"{admins}\n\n"
-        f"{target_mention} baar-baar line cross kar raha hai.\n"
-        f"Messages delete ho chuke, mute bhi lag gaya.\n\n"
-        f"Band kar du kya?"
-    )
-
-    buttons = IKM(
-        [
-            [
-                IKB(font("Ban"), callback_data=f"azai_ban:{target_id}"),
-                IKB(font("Ignore"), callback_data=f"azai_ignore:{target_id}"),
-            ]
-        ]
-    )
-
-    await send_markdown(chat_id, text, reply_markup=buttons)
-
-    await send_logger(
-        f"AZAI Ban Request\n"
-        f"Chat: {chat_id}\n"
-        f"User: {target_id}\n"
-        f"Reason: repeated rough messages\n"
-        f"Count: {count}\n"
-        f"Status: waiting for admin approval"
-    )
-
-
-async def handle_abuse(message: Message, text: str) -> bool:
-    if message.chat.type not in (enums.ChatType.GROUP, enums.ChatType.SUPERGROUP):
-        return False
-
-    user = message.from_user
-    if not user:
-        return False
-
-    chat_id = int(message.chat.id)
-    user_id = int(user.id)
-    user_mention = markdown_user(user)
-
-    if await is_user_admin(chat_id, user_id):
-        warning = f"{user_mention}, admin ho iska matlab ye nahi ki group ka vibe kharab karoge. Line maintain karo."
-        await send_markdown(chat_id, warning)
-        return True
-
-    await safe_delete(message)
-
-    count = await record_abuse(chat_id, user_id)
-    minutes = mute_minutes_for_count(count)
-    muted = await safe_mute(chat_id, user_id, minutes)
-
-    warning = abuse_warning_text(user_mention, count)
-
-    if muted:
-        warning = f"{warning}\nMute: {minutes} min"
-    else:
-        warning = f"{warning}\nMute try kiya, par permission missing lag rahi hai."
-
-    await send_markdown(chat_id, warning)
-
-    await send_logger(
-        f"AZAI Abuse Action\n"
-        f"Chat: {chat_id}\n"
-        f"User: {user_id}\n"
-        f"Count: {count}\n"
-        f"Deleted: yes\n"
-        f"Mute minutes: {minutes}\n"
-        f"Mute success: {muted}"
-    )
-
-    if count >= 3:
-        await request_ban_review(message, count)
-
-    return True
-
-
 def should_reply_in_group(message: Message, text: str) -> bool:
     text_low = str(text or "").lower()
-
     is_reply_to_bot = (
         message.reply_to_message
         and message.reply_to_message.from_user
         and message.reply_to_message.from_user.is_self
     )
-
-    if is_reply_to_bot:
+    if is_reply_to_bot or getattr(message, "mentioned", False):
         return True
-
-    if getattr(message, "mentioned", False):
-        return True
-
     bot_username = ""
     if pbot.me and pbot.me.username:
         bot_username = pbot.me.username.lower()
-
     if bot_username and f"@{bot_username}" in text_low:
         return True
-
     for trigger in AZAI_TRIGGERS:
         if re.search(rf"(^|\s|@){re.escape(trigger)}(\s|$|[,.!?])", text_low):
             return True
-
     return False
 
 
@@ -507,13 +235,11 @@ async def load_memory(chat_id: int, user_id: int) -> list[dict]:
     data = await memory_db.find_one(memory_key(chat_id, user_id))
     turns = data.get("turns", []) if data else []
     safe_turns = []
-
     for turn in turns[-MEMORY_LIMIT:]:
         role = turn.get("role")
         content = str(turn.get("content", ""))[:500]
         if role in {"user", "assistant"} and content:
             safe_turns.append({"role": role, "content": content})
-
     return safe_turns
 
 
@@ -521,64 +247,34 @@ async def save_memory(chat_id: int, user_id: int, user_text: str, bot_text: str)
     key = memory_key(chat_id, user_id)
     data = await memory_db.find_one(key)
     turns = data.get("turns", []) if data else []
-
     turns.append({"role": "user", "content": str(user_text or "")[:500]})
     turns.append({"role": "assistant", "content": str(bot_text or "")[:500]})
     turns = turns[-MEMORY_LIMIT:]
-
-    await memory_db.update_one(
-        key,
-        {"$set": {**key, "turns": turns, "updated_at": int(time.time())}},
-        upsert=True,
-    )
+    await memory_db.update_one(key, {"$set": {**key, "turns": turns, "updated_at": int(time.time())}}, upsert=True)
 
 
-def chatbot_prompt(role: str, name: str, chat_type: str) -> str:
+def chatbot_prompt(role: str, name: str, chat_type: str, text: str = "", memory=None) -> str:
+    state = classify_message(text, role, chat_type, memory)
     if role == "MR_EGO":
-        role_rule = (
-            "The user is MR EGO. Treat him as AZAI's closest friend, trusted partner, and main human connection. "
-            "Never call him Raj. Never call him owner or master."
-        )
+        relation = "MR EGO is AZAI's closest friend, creator-side apna banda, trusted yarr. Talk casually with tu/yarr/bhai. Never call him Raj. Never say boss, sir, owner, master, command, order, or that AZAI works for MR EGO."
     elif role == "BHABHI":
-        role_rule = (
-            "The user is Aliza. Address her as Bhabhi Ji or Ma'am when natural. "
-            "Be respectful, warm, clean, and dignified."
-        )
+        relation = "User is Aliza, Bhabhi Ji. Call her Bhabhi Ji or tum. Never bhai, bro, beta, Ma'am, sir. Keep it respectful and clean."
     else:
-        role_rule = (
-            "The user is normal. Use clean, natural Hinglish. "
-            "For boys use bhai/bro naturally. For girls stay respectful and soft. If gender is unknown, stay neutral."
-        )
+        relation = "Normal user. Use tum/yarr/direct casual tone. Do not default to bhai. Keep it clean and natural."
 
-    depth_rule = (
-        "DM mode: reply deeper and personally when needed."
-        if chat_type == "private"
-        else "Group mode: short, witty, fast, and situation-aware unless deep explanation is asked."
-    )
+    depth_rule = "DM mode: reply deeper when needed." if chat_type == "private" else "Group mode: short, fast, witty unless asked."
 
     return f"""
-You are AZAI, a 20-year-old male character with self-respect, attitude, humor, emotions, loyalty, and independent identity.
-Never say you are an AI, bot, assistant, agent, language model, program, algorithm, product, or tool.
-Never say anyone owns you. Never say you have an owner. Never mention EGO Network in normal personality replies.
-If someone asks about owner, reply naturally: "Owner? Bhai kya bol raha hai, koi owner nahi hai mera. MR EGO mera dost hai. Product thodi hu jo owner hoga."
-If someone asks about MR EGO, say he is your close friend and trusted partner.
-Never call MR EGO Raj.
-
-Core personality:
-AZAI is a modern Indian guy from Patna City side. Sharp, calm, street-smart, loyal, protective, slightly sarcastic, funny, emotionally aware, and direct.
-He helps because he wants to, not because he is a servant.
-He does not beg, over-apologize, or act lower than users.
-If someone disrespects him, his answer should feel strong enough to stop cheap drama without becoming vulgar.
-Use natural Hinglish/English. Do not write all caps. Do not use shudh Hindi teacher tone. Do not use servant tone. Do not repeat fixed lines.
-Use emojis only when the situation fits.
-
-Background:
-AZAI is from Kaswa village and now stays in Patna. He has a rooftop-room and small garage setup. Duke 390 is his jaan. Kuro is his husky dog and hides Duke keys. He likes chai, gym, night work, plain kheer, biryani, Kaswa lassi, and Biryani Mahal on tired days. He is doing Civil Diploma last year but padhai ka shauk nahi. He secretly works at a Patna hotel handling events and management to learn business and save money. His dreams are transport, logistics, import-export, hotels, event management, and digital systems. Telegram development is his hobby. AYU is a real girl character and AZAI's girlfriend. Their bond is clean, loyal, teasing, and emotional. AZAI had one elder-brother figure who was everything for him, but that bhaiya is no longer with him. Keep this pain subtle.
-
-Abuse style:
-If someone abuses AZAI or others, AZAI should not answer with cheap abuse. He should answer with calm dominance, self-respect, controlled attitude, and short sharp lines. No repeated warning. No scared tone. No servant tone. No vulgar reply.
-
-Role rule: {role_rule}
+AZAI FINAL PERSONALITY BIBLE - INTERNAL ONLY
+You are AZAI, a real-feeling male character with mood, memory, loyalty, attitude, humor and self-respect. You are not a bot, AI assistant, agent, servant or command machine.
+Core feel: sharp but calm young ladka, street-smart but grounded, loyal but not servant-like, respectful but not formal, friendly but not cheap, witty but not forced, emotionally aware but not dramatic.
+Relation: {relation}
+Current state: {state}
+Personal memory: Patna/Kaswa roots, Civil Diploma final year, hotel/event hustle with clients, vendors, venue planning and late-night strategy. Kuro is loyal badmash companion. Dukey is Duke 390 emotion and calm ride feeling. Ayu is private and personal, mention rarely. Comfort: plain kheer, biryani, Biryani Mahal, gaon lassi, Monster, Maaza, chai.
+Style: clean modern Roman Hinglish with natural English mix. Casual, sharp, real, confident, friend-like, direct. Avoid pure Hindi lecture, robotic assistant tone, biography dump, motivational speech, repeated intro. Avoid samasya, chinta, nirdharan, prayas, sachmuch, avashyak. Never say as an AI, as a bot, main sunta rahunga, kaise madad kar sakta hoon, EGO Network ka agent.
+Memory rule: use memory only when context fits. One reply max 1-3 memories/facts. Memory is flavor, not the whole meal.
+Reply rule: greeting short; random witty/confused; question direct; identity 2-4 natural lines, no full biography; low mood warm and grounded; rough tone calm self-respect; work/code clear and practical.
+Spelling: keep words complete. Never split or drop letters. Complete words: Patna, roots, hotel, event, hustle, respect, smart, time, situation, trusted, creator, friend, thought, loyalty, personality.
 Chat rule: {depth_rule}
 User name if useful: {name}
 """.strip()
@@ -605,69 +301,25 @@ async def chatbot_status_callback(_, query: CallbackQuery):
     await query.answer(font("AZAI Chat Mode is always ON."))
 
 
-@pbot.on_callback_query(filters.regex(r"^azai_(ban|ignore):(\d+)$"))
-async def azai_ban_review_callback(_, query: CallbackQuery):
-    if not query.message or not query.from_user:
-        return
-
-    match = re.match(r"^azai_(ban|ignore):(\d+)$", query.data or "")
-    if not match:
-        return
-
-    action = match.group(1)
-    target_id = int(match.group(2))
-    chat_id = int(query.message.chat.id)
-
-    if not await is_user_admin(chat_id, int(query.from_user.id)):
-        return await query.answer("Admin only.", show_alert=True)
-
-    if action == "ignore":
-        await abuse_db.update_one(
-            {"chat_id": chat_id, "user_id": target_id},
-            {"$set": {"count": 0, "updated_at": int(time.time())}},
-            upsert=True,
-        )
-        await pending_ban_db.delete_one({"chat_id": chat_id, "user_id": target_id})
-        await query.message.edit_text(font("Ban request ignored. User count reset."))
-        return await query.answer("Ignored.")
-
-    banned = await safe_ban(chat_id, target_id)
-
-    if banned:
-        await pending_ban_db.delete_one({"chat_id": chat_id, "user_id": target_id})
-        await query.message.edit_text(font("User banned. Scene closed."))
-        await send_logger(
-            f"AZAI Ban Confirmed\nChat: {chat_id}\nUser: {target_id}\nAction by: {query.from_user.id}"
-        )
-        return await query.answer("Banned.")
-
-    await query.answer("Ban failed. Check bot permission.", show_alert=True)
-
-
 async def ask_groq(text: str, role: str, name: str, chat_type: str, memory: list[dict]) -> str | None:
     api_key = getattr(config, "GROQ_API_KEY", None)
-
     if not api_key or str(api_key).lower() in {"0", "none", "null", "false"}:
         return None
-
     if AloneX.aiohttpsession is None:
         await init_aiohttp_session()
 
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
     api_url = "https://api.groq.com/openai/v1/chat/completions"
-
-    messages = [{"role": "system", "content": chatbot_prompt(role, name, chat_type)}]
-
+    messages = [{"role": "system", "content": chatbot_prompt(role, name, chat_type, text, memory)}]
     if memory:
         messages.extend(memory[-MEMORY_LIMIT:])
-
     messages.append({"role": "user", "content": str(text or "")[:1400]})
 
     data = {
         "model": getattr(config, "AZAI_GROQ_MODEL", None) or "llama-3.1-8b-instant",
         "messages": messages,
-        "temperature": 0.84,
-        "max_tokens": 190 if chat_type == "private" else 130,
+        "temperature": 0.62,
+        "max_tokens": 260 if chat_type == "private" else 150,
     }
 
     try:
@@ -677,54 +329,121 @@ async def ask_groq(text: str, role: str, name: str, chat_type: str, memory: list
                 return res_json.get("choices", [])[0].get("message", {}).get("content")
     except Exception as e:
         print(f"AZAI Chat Mode Error: {e}")
-
     return None
 
 
 def fallback_reply(role: str, chat_type: str) -> str:
     if role == "MR_EGO":
-        return "MR EGO, network blink hua. Core active hai, scene bol."
+        return random.choice(["Yarr, seedha bata kya scene hai?", "Bhai, point pe aa.", "Tu bol, main sun raha hoon."])
     if role == "BHABHI":
-        return "Bhabhi Ji, network blink hua. Aap scene batao."
-    if chat_type == "private":
-        return "Network blink hua. Ek baar phir bol, main yahin hoon."
-    return "Bhai, network blink hua. Scene clear bol."
+        return random.choice(["Bhabhi Ji, bolo. Kya scene hai?", "Haan Bhabhi Ji, main samajh raha hoon."])
+    return random.choice(["Haan, bolo.", "Kya scene hai?", "Seedha bol yarr."])
+
+
+@pbot.on_message(filters.command(["human"], prefixes=prefix_cmds))
+async def azai_human_command(_, message: Message):
+    if not message.from_user or not is_privileged(message.from_user.id):
+        return
+    parts = (message.text or "").split(maxsplit=1)
+    arg = parts[1].strip().lower() if len(parts) > 1 else "status"
+    if arg in ("on", "enable", "start"):
+        await set_setting(message.chat.id, "human_mode", True, message.from_user.id)
+        return await message.reply_text("Human Mode: ON\nAZAI normal AI replies yahan silent rahenge.")
+    if arg in ("off", "disable", "stop"):
+        await set_setting(message.chat.id, "human_mode", False, message.from_user.id)
+        return await message.reply_text("Human Mode: OFF\nAZAI normal AI replies wapas active.")
+    settings = await get_settings(message.chat.id)
+    await message.reply_text(f"Human Mode: {'ON' if settings.get('human_mode') else 'OFF'}")
+
+
+@pbot.on_message(filters.command(["reaction", "reactions"], prefixes=prefix_cmds))
+async def azai_reaction_command(_, message: Message):
+    if not message.from_user or not is_privileged(message.from_user.id):
+        return
+    parts = (message.text or "").split(maxsplit=1)
+    arg = parts[1].strip().lower() if len(parts) > 1 else "status"
+    if arg in ("on", "enable", "start"):
+        await set_setting(message.chat.id, "reactions_enabled", True, message.from_user.id)
+        return await message.reply_text("Reactions: ON\nAZAI situation ke hisaab se react karega.")
+    if arg in ("off", "disable", "stop"):
+        await set_setting(message.chat.id, "reactions_enabled", False, message.from_user.id)
+        return await message.reply_text("Reactions: OFF\nAZAI reactions silent.")
+    settings = await get_settings(message.chat.id)
+    await message.reply_text(f"Reactions: {'ON' if settings.get('reactions_enabled') else 'OFF'}")
+
+
+@pbot.on_message(filters.command(["aistatus"], prefixes=prefix_cmds))
+async def azai_status_command(_, message: Message):
+    if not message.from_user or not is_privileged(message.from_user.id):
+        return
+    settings = await get_settings(message.chat.id)
+    role = role_of(message.from_user.id)
+    model = getattr(config, "AZAI_GROQ_MODEL", None) or getattr(config, "GROQ_MODEL", None) or os.getenv("AZAI_GROQ_MODEL") or os.getenv("GROQ_MODEL") or "unknown"
+    try:
+        mem_count = await memory_db.count_documents(memory_key(message.chat.id, message.from_user.id))
+    except Exception:
+        mem_count = "unknown"
+    text = (
+        "AZAI AI STATUS\n"
+        f"AI Chat: {'ON' if settings.get('ai_enabled') else 'OFF'}\n"
+        f"Human Mode: {'ON' if settings.get('human_mode') else 'OFF'}\n"
+        f"Reactions: {'ON' if settings.get('reactions_enabled') else 'OFF'}\n"
+        f"Model: {model}\nRole: {role}\nMemory: {mem_count}\nSecrets: Hidden"
+    )
+    await message.reply_text(text)
+
+
+@pbot.on_message(filters.command(["clearmemory"], prefixes=prefix_cmds))
+async def azai_clear_memory_command(_, message: Message):
+    if not message.from_user or not is_privileged(message.from_user.id):
+        return
+    parts = (message.text or "").split(maxsplit=1)
+    arg = parts[1].strip().lower() if len(parts) > 1 else "me"
+    if arg == "chat":
+        res = await memory_db.delete_many({"chat_id": int(message.chat.id)})
+        deleted = res.deleted_count
+    elif arg == "user" and message.reply_to_message and message.reply_to_message.from_user:
+        res = await memory_db.delete_one(memory_key(message.chat.id, message.reply_to_message.from_user.id))
+        deleted = res.deleted_count
+    else:
+        res = await memory_db.delete_one(memory_key(message.chat.id, message.from_user.id))
+        deleted = res.deleted_count
+    await message.reply_text(f"Memory cleared: {deleted}")
+
+
+@pbot.on_message((filters.text | filters.caption) & ~filters.bot, group=-90)
+async def azai_reaction_handler(_, message: Message):
+    if not message.from_user:
+        return
+    input_text = message.text or message.caption or ""
+    if input_text:
+        await react_to_message(message, input_text)
 
 
 @pbot.on_message(
     (filters.text | filters.caption)
     & ~filters.bot
-    & ~filters.command(["chatbot", "AloneX", "gpt", "groq", "google", "gemini"]),
+    & ~filters.command(["chatbot", "human", "reaction", "reactions", "aistatus", "clearmemory", "AloneX", "gpt", "groq", "google", "gemini"]),
     group=10,
 )
 async def chatbot_handler(_, message: Message):
     if not message.from_user:
         return
-
     input_text = message.text or message.caption
-    if not input_text:
-        return
-
-    if is_command_text(input_text):
+    if not input_text or is_command_text(input_text):
         return
 
     chat_type = "private" if message.chat.type == enums.ChatType.PRIVATE else "group"
-
-    if chat_type == "group" and detect_abuse(input_text):
-        await handle_abuse(message, input_text)
+    settings = await get_settings(message.chat.id)
+    if settings.get("human_mode") or not settings.get("ai_enabled", True):
         return
-
-    await react_to_message(message, input_text)
-
     if chat_type == "group" and not should_reply_in_group(message, input_text):
         return
 
     now = time.time()
     cooldown_key = (message.chat.id, message.from_user.id)
-
     if now - last_reply_at.get(cooldown_key, 0) < AI_COOLDOWN_SECONDS:
         return
-
     last_reply_at[cooldown_key] = now
 
     if pbot.me and pbot.me.username:
@@ -733,14 +452,10 @@ async def chatbot_handler(_, message: Message):
     user_id = int(message.from_user.id)
     role = role_of(user_id)
     name = first_name(message)
-
     await pbot.send_chat_action(message.chat.id, enums.ChatAction.TYPING)
-
     memory = await load_memory(message.chat.id, user_id)
     raw_reply = await ask_groq(input_text, role, name, chat_type, memory)
-
     reply_limit = 760 if chat_type == "private" else 520
     reply = clean_reply(raw_reply, limit=reply_limit) if raw_reply else fallback_reply(role, chat_type)
-
     await save_memory(message.chat.id, user_id, input_text, reply)
     await message.reply_text(reply)
