@@ -285,7 +285,21 @@ async def set_quiz_auto(chat_id: int, enabled: bool, user_id: int = 0):
 
 
 def market_text() -> str:
-    return font("MARKET MEDIA CONTROL") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Set start panel image:") + "\n" + font("Send image/video, reply, then use:") + " /setstartpic\n\n" + font("Set item image:") + "\n" + font("Send item image, reply, then use:") + " /setitempic item_id"
+    return (
+        font("MARKET MEDIA CONTROL") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Set start panel image:") + "\n"
+        + font("Send image/video, reply, then use:") + " /setstartpic\n\n"
+        + font("Set item image:") + "\n"
+        + font("Send item image, reply, then use:") + " /setitempic item_id\n\n"
+        + font("EGO HUSTLE MEDIA:") + "\n"
+        + "/sethustlemedia panel\n"
+        + "/sethustlemedia work\n"
+        + "/sethustlemedia raid\n"
+        + "/sethustlemedia protect\n"
+        + "/sethustlemedia luck\n"
+        + "/sethustlemedia heist"
+    )
 
 
 def events_text() -> str:
@@ -293,7 +307,7 @@ def events_text() -> str:
 
 
 def games_text() -> str:
-    return font("GAME CONTROL") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Panel:") + " /games\n" + font("Commands:") + " /dice /dart /basketball"
+    return font("GAME CONTROL") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Panel:") + " /games\n" + font("Commands:") + " /dice /dart /basketball\n" + font("EGO HUSTLE:") + " /hustle /work /raid /protect /luck /heist"
 
 
 def guide_text() -> str:
@@ -302,13 +316,14 @@ def guide_text() -> str:
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("OWNER MOD:") + "\n/ownermod on\n/ownermod off\n/ownermod status\n"
         + font("Phrases:") + " azai nikal / azai chup\n\n"
+        + font("EGO HUSTLE MEDIA:") + "\n/sethustlemedia panel\n/sethustlemedia work\n/sethustlemedia raid\n/sethustlemedia protect\n/sethustlemedia luck\n/sethustlemedia heist\n\n"
         + font("ANIME QUIZ:") + "\n/addanimeq answer | option1 | option2 | option3 | option4\n/animeguess\n\n"
         + font("EVENTS:") + "\n/events\n/addevent DD/MM | title | text\n"
     )
 
 
 def launch_text() -> str:
-    return font("LAUNCH CHECKLIST") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n1. " + font("Restart bot after latest repo update") + "\n2. " + font("Test") + " /start /commands\n3. " + font("Test") + " /owner /events /wallet /ownermod status\n4. " + font("Run live group test")
+    return font("LAUNCH CHECKLIST") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n1. " + font("Restart bot after latest repo update") + "\n2. " + font("Test") + " /start /commands\n3. " + font("Test") + " /owner /events /wallet /ownermod status\n4. " + font("Test") + " /hustle /work /luck /heist\n5. " + font("Set media") + " /sethustlemedia panel|work|raid|protect|luck|heist\n6. " + font("Run live group test")
 
 
 def maintenance_text() -> str:
