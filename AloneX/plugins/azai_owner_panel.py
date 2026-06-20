@@ -6,11 +6,15 @@ import psutil
 import pytz
 from telethon import Button, events
 
-from AloneX import START_TIME, font, prefix_cmds, tbot
+from AloneX import START_TIME, database, font, prefix_cmds, tbot
 from config import ALONE_OWNER_ID, GROQ_API_KEY, OWNER_ID
 
 IST = pytz.timezone("Asia/Kolkata")
 BRAND = font("EGO Network - EST. 2026")
+
+wallet_db = database["azai_wallets"]
+rep_db = database["azai_reputation"]
+ref_db = database["azai_referrals"]
 
 
 def owner_ids() -> set[int]:
@@ -28,6 +32,10 @@ def owner_ids() -> set[int]:
 async def is_owner(event) -> bool:
     sender = await event.get_sender()
     return bool(sender and sender.id in owner_ids())
+
+
+def now_ist() -> str:
+    return datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S")
 
 
 def readable_time(seconds: int) -> str:
@@ -49,7 +57,7 @@ def owner_home_text() -> str:
         font("AZAI OWNER PANEL") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Access:") + " " + font("Owner Only") + "\n"
-        + font("Control Center:") + " " + font("Core status, modules, launch checklist, and setup guide") + "\n\n"
+        + font("Control Center:") + " " + font("Core status, modules, launch checklist, setup guide, and reset controls") + "\n\n"
         + font("Private data is hidden. Secrets are never shown here.") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
@@ -132,23 +140,122 @@ def economy_text() -> str:
         + font("Market:") + " /shop /setcar /setbike /gift\n"
         + font("Referral:") + " /refer /redeemref\n"
         + font("Vault Items:") + " /addvaultitem /vaultitems /buyvault /myvault\n\n"
+        + font("Owner Reset:") + " " + font("Use Reset Economy button from owner panel") + "\n"
+        + font("Reset Scope:") + " balance, XP, level, REP, message count, daily claim date\n"
+        + font("Safe:") + " inventory, garage, vault, and items are not deleted\n\n"
         + font("Currency:") + " EGO CREDIT (EC)"
     )
+
+
+def reset_economy_warning_text() -> str:
+    return (
+        font("RESET ECONOMY") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("This will reset for all users:") + "\n"
+        + "• Balance / EC\n"
+        + "• XP / Level / rank values\n"
+        + "• REP and REP daily records\n"
+        + "• Message reward count\n"
+        + "• Daily claim date\n\n"
+        + font("This will NOT delete:") + "\n"
+        + "• Inventory\n"
+        + "• Garage / selected vehicles\n"
+        + "• Vault / limited items\n"
+        + "• Market items\n\n"
+        + font("Press Confirm only if you really want a clean launch economy.")
+    )
+
+
+async def reset_economy_data() -> dict:
+    now = now_ist()
+    wallet_result = await wallet_db.update_many(
+        {},
+        {
+            "$set": {
+                "balance": 0,
+                "xp": 0,
+                "level": 1,
+                "rep": 0,
+                "messages": 0,
+                "daily_at": None,
+                "updated_at": now,
+            },
+            "$unset": {
+                "rank": "",
+                "rank_points": "",
+                "power": "",
+                "protection": "",
+                "protection_until": "",
+                "protect_until": "",
+                "raid_wins": "",
+                "attack_wins": "",
+                "fight_wins": "",
+                "heist_wins": "",
+                "last_work": "",
+                "last_luck": "",
+                "last_heist": "",
+                "work_at": "",
+                "luck_at": "",
+                "heist_at": "",
+            },
+        },
+    )
+    rep_result = await rep_db.delete_many({})
+
+    extra_counts = {}
+    for col_name in (
+        "azai_hustle_stats",
+        "azai_hustle_cooldowns",
+        "azai_economy_cooldowns",
+        "azai_work_cooldowns",
+        "azai_luck_cooldowns",
+        "azai_heist_cooldowns",
+        "azai_protection",
+    ):
+        try:
+            res = await database[col_name].delete_many({})
+            if res.deleted_count:
+                extra_counts[col_name] = res.deleted_count
+        except Exception:
+            pass
+
+    return {
+        "wallets": int(wallet_result.modified_count),
+        "matched_wallets": int(wallet_result.matched_count),
+        "rep_logs": int(rep_result.deleted_count),
+        "extra": extra_counts,
+    }
+
+
+def reset_done_text(stats: dict) -> str:
+    extra = stats.get("extra") or {}
+    extra_text = ""
+    if extra:
+        extra_text = "\n" + "\n".join(f"• {k}: {v}" for k, v in extra.items())
+    return (
+        font("ECONOMY RESET DONE") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Wallets matched:") + f" {stats.get('matched_wallets', 0)}\n"
+        + font("Wallets updated:") + f" {stats.get('wallets', 0)}\n"
+        + font("REP logs deleted:") + f" {stats.get('rep_logs', 0)}"
+        + extra_text + "\n\n"
+        + font("Inventory, garage, vault, and market items were kept safe.")
+    )
+
+
+def reset_buttons():
+    return [
+        [Button.inline(font("Confirm Reset"), b"azown_reseteco_confirm")],
+        [Button.inline(font("Cancel"), b"azown_home")],
+    ]
 
 
 def quiz_text() -> str:
     return (
         font("QUIZ CONTROL") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Easy add steps:") + "\n"
-        + font("1. Send anime or character image") + "\n"
-        + font("2. Reply to that image") + "\n"
-        + font("3. Use this command:") + "\n"
-        + "/addanimeq Naruto | Naruto | Luffy | Gojo | Eren\n\n"
-        + font("Play:") + " /animeguess /quiz\n"
-        + font("Stats:") + " /quizstats /quiztop\n"
-        + font("Auto:") + " /quizon /quizoff\n\n"
-        + font("Reward:") + " +100 EC +15 XP, 5 streak = +200 EC"
+        + font("Anime quiz is disabled for rebuild.") + "\n"
+        + font("MR EGO will add the new quiz system later.")
     )
 
 
@@ -207,10 +314,6 @@ def guide_text() -> str:
         + font("ITEM PICS:") + "\n"
         + font("Send item image, reply to it, then use:") + " /setitempic item_id\n"
         + font("Example:") + " /setitempic bike_splendor\n\n"
-        + font("ANIME QUIZ:") + "\n"
-        + font("Send quiz image, reply to it, then use:") + "\n"
-        + "/addanimeq answer | option1 | option2 | option3 | option4\n"
-        + font("Example:") + " /addanimeq Naruto | Naruto | Luffy | Gojo | Eren\n\n"
         + font("EVENTS:") + "\n"
         + "/events\n"
         + "/addevent DD/MM | title | text\n"
@@ -226,10 +329,10 @@ def launch_text() -> str:
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + "1. " + font("Restart bot after latest repo update") + "\n"
         + "2. " + font("Test") + " /start /commands\n"
-        + "3. " + font("Test") + " /owner /events /quiz\n"
+        + "3. " + font("Test") + " /owner /events /wallet\n"
         + "4. " + font("Test verification and group admin permissions") + "\n"
         + "5. " + font("Set start and item images") + "\n"
-        + "6. " + font("Add 3-5 anime quiz questions") + "\n"
+        + "6. " + font("Reset economy before public launch if needed") + "\n"
         + "7. " + font("Test") + " /wallet /daily /shop /garage /broadcast\n"
         + "8. " + font("Test") + " /eventauto status /todayevents\n"
         + "9. " + font("Fix errors for 1-2 days, then publish")
@@ -254,11 +357,11 @@ def owner_buttons():
         [Button.inline(font("Guide"), b"azown_guide"), Button.inline(font("Bot Status"), b"azown_bot")],
         [Button.inline(font("AI Status"), b"azown_ai"), Button.inline(font("Database"), b"azown_db")],
         [Button.inline(font("Logs"), b"azown_logs"), Button.inline(font("Security"), b"azown_security")],
-        [Button.inline(font("Economy"), b"azown_economy"), Button.inline(font("Quiz"), b"azown_quiz")],
-        [Button.inline(font("Events"), b"azown_events"), Button.inline(font("Games"), b"azown_games")],
-        [Button.inline(font("Market Media"), b"azown_market"), Button.inline(font("Launch Check"), b"azown_launch")],
-        [Button.inline(font("Commands"), b"azown_commands"), Button.inline(font("Maintenance"), b"azown_maintenance")],
-        [Button.inline(font("Close"), b"azown_close")],
+        [Button.inline(font("Economy"), b"azown_economy"), Button.inline(font("Reset Economy"), b"azown_reseteco")],
+        [Button.inline(font("Quiz"), b"azown_quiz"), Button.inline(font("Events"), b"azown_events")],
+        [Button.inline(font("Games"), b"azown_games"), Button.inline(font("Market Media"), b"azown_market")],
+        [Button.inline(font("Launch Check"), b"azown_launch"), Button.inline(font("Commands"), b"azown_commands")],
+        [Button.inline(font("Maintenance"), b"azown_maintenance"), Button.inline(font("Close"), b"azown_close")],
     ]
 
 
@@ -294,6 +397,12 @@ async def owner_callback(event):
         await event.edit(security_text(), buttons=back_buttons())
     elif data == "azown_economy":
         await event.edit(economy_text(), buttons=back_buttons())
+    elif data == "azown_reseteco":
+        await event.edit(reset_economy_warning_text(), buttons=reset_buttons())
+    elif data == "azown_reseteco_confirm":
+        await event.edit(font("Resetting economy... please wait."))
+        stats = await reset_economy_data()
+        await event.edit(reset_done_text(stats), buttons=back_buttons())
     elif data == "azown_quiz":
         await event.edit(quiz_text(), buttons=back_buttons())
     elif data == "azown_events":
@@ -313,6 +422,6 @@ async def owner_callback(event):
 
 
 if "azai_owner_panel" not in tbot.handlers_loaded:
-    tbot.add_event_handler(owner_panel_handler, events.NewMessage(pattern=f"^{prefix_cmds}owner(?:@\\w+)?$", incoming=True))
+    tbot.add_event_handler(owner_panel_handler, events.NewMessage(pattern=f"^{prefix_cmds}owner(?:@\w+)?$", incoming=True))
     tbot.add_event_handler(owner_callback, events.CallbackQuery(pattern=b"^azown_"))
     tbot.handlers_loaded.add("azai_owner_panel")
