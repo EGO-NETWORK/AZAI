@@ -125,11 +125,7 @@ async def owner_mod_status_line(chat_id: int) -> str:
 
 
 async def set_owner_mod(chat_id: int, enabled: bool, user_id: int = 0):
-    await owner_override_db.update_one(
-        {"chat_id": int(chat_id)},
-        {"$set": {"chat_id": int(chat_id), "enabled": bool(enabled), "updated_by": int(user_id or 0), "updated_at": now_ist()}},
-        upsert=True,
-    )
+    await owner_override_db.update_one({"chat_id": int(chat_id)}, {"$set": {"chat_id": int(chat_id), "enabled": bool(enabled), "updated_by": int(user_id or 0), "updated_at": now_ist()}}, upsert=True)
 
 
 async def owner_mod_text(chat_id: int) -> str:
@@ -139,25 +135,33 @@ async def owner_mod_text(chat_id: int) -> str:
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Status:") + f" {status}\n"
         + font("Only:") + " MR EGO / owner ID\n\n"
-        + font("Commands:") + "\n"
-        + "/ownermod on\n"
-        + "/ownermod off\n"
-        + "/ownermod status\n\n"
-        + font("Phrases:") + "\n"
-        + "azai nikal = ban target\n"
-        + "azai chup = mute target\n\n"
+        + font("Commands:") + "\n/ownermod on\n/ownermod off\n/ownermod status\n\n"
+        + font("Phrases:") + "\nazai nikal = ban target\nazai chup = mute target\n\n"
         + font("Target:") + " reply or @username\n"
         + font("Bot Requirement:") + " AZAI must be admin with ban/mute permission"
     )
 
 
 def owner_mod_buttons():
-    return [[Button.inline(font("Owner Mod ON"), b"azown_ownermod_on"), Button.inline(font("Owner Mod OFF"), b"azown_ownermod_off")], [Button.inline(font("Owner Mod Status"), b"azown_ownermod_status")], [Button.inline(font("Back"), b"azown_home"), Button.inline(font("Close"), b"azown_close")]]
+    return [
+        [Button.inline(font("Owner Mod ON"), b"azown_ownermod_on"), Button.inline(font("Owner Mod OFF"), b"azown_ownermod_off")],
+        [Button.inline(font("Owner Mod Status"), b"azown_ownermod_status")],
+        [Button.inline(font("Back"), b"azown_home"), Button.inline(font("Close"), b"azown_close")],
+    ]
 
 
 async def security_text(chat_id: int) -> str:
     owner_mod = await owner_mod_status_line(chat_id)
-    return font("SECURITY CONTROL") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Verification:") + " /verify /verifyall /unverifyall\n" + font("Moderation:") + " /mod /warn /mute /ban /kick /purge\n" + font("Anti-link:") + " /antilink on | off\n" + font("Owner Override:") + f" {owner_mod}\n" + font("Owner Mod:") + " /ownermod on /ownermod off /ownermod status\n\n" + font("Use these in group where AZAI is admin.")
+    return (
+        font("SECURITY CONTROL") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Verification:") + " /verify /verifyall /unverifyall\n"
+        + font("Moderation:") + " /mod /warn /mute /ban /kick /purge\n"
+        + font("Anti-link:") + " /antilink on | off\n"
+        + font("Owner Override:") + f" {owner_mod}\n"
+        + font("Owner Mod:") + " /ownermod on /ownermod off /ownermod status\n\n"
+        + font("Use these in group where AZAI is admin.")
+    )
 
 
 def security_buttons():
@@ -165,11 +169,27 @@ def security_buttons():
 
 
 def economy_text() -> str:
-    return font("ECONOMY CONTROL") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Wallet:") + " /wallet /daily /send\n" + font("Inventory:") + " /inventory /garage /vault\n" + font("Market:") + " /shop /setcar /setbike /gift\n" + font("Referral:") + " /refer /redeemref\n" + font("Vault Items:") + " /addvaultitem /vaultitems /buyvault /myvault\n\n" + font("Owner Reset:") + " " + font("Use Reset Economy button from owner panel") + "\n" + font("Currency:") + " EGO CREDIT (EC)"
+    return (
+        font("ECONOMY CONTROL") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Wallet:") + " /wallet /daily /send\n"
+        + font("Inventory:") + " /inventory /garage /vault\n"
+        + font("Market:") + " /shop /setcar /setbike /gift\n"
+        + font("Referral:") + " /refer /redeemref\n"
+        + font("Vault Items:") + " /addvaultitem /vaultitems /buyvault /myvault\n\n"
+        + font("Owner Reset:") + " " + font("Use Reset Economy button from owner panel") + "\n"
+        + font("Currency:") + " EGO CREDIT (EC)"
+    )
 
 
 def reset_economy_warning_text() -> str:
-    return font("RESET ECONOMY") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("This will reset for all users:") + "\n• Balance / EC\n• XP / Level / rank values\n• REP and REP daily records\n• Message reward count\n• Daily claim date\n\n" + font("This will NOT delete:") + "\n• Inventory\n• Garage / selected vehicles\n• Vault / limited items\n• Market items\n\n" + font("Press Confirm only if you really want a clean launch economy.")
+    return (
+        font("RESET ECONOMY") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("This will reset for all users:") + "\n• Balance / EC\n• XP / Level / rank values\n• REP and REP daily records\n• Message reward count\n• Daily claim date\n\n"
+        + font("This will NOT delete:") + "\n• Inventory\n• Garage / selected vehicles\n• Vault / limited items\n• Market items\n\n"
+        + font("Press Confirm only if you really want a clean launch economy.")
+    )
 
 
 async def reset_economy_data() -> dict:
@@ -222,7 +242,7 @@ async def set_quiz_auto(chat_id: int, enabled: bool, user_id: int = 0):
 
 
 def market_text() -> str:
-    return font("MARKET MEDIA CONTROL") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Set start panel image:") + "\n" + font("Send image/video, reply, then use:") + " /setstartpic\n\n" + font("Set item image:") + "\n" + font("Send item image, reply, then use:") + " /setitempic item_id\n\n" + font("EGO HUSTLE MEDIA:") + "\n/sethustlemedia panel\n/sethustlemedia work\n/sethustlemedia raid\n/sethustlemedia attack\n/sethustlemedia protect\n/sethustlemedia luck\n/sethustlemedia heist"
+    return font("MARKET MEDIA CONTROL") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Set start panel image:") + "\n" + font("Send image/video, reply, then use:") + " /setstartpic\n\n" + font("Set item image:") + "\n" + font("Send item image, reply, then use:") + " /setitempic item_id"
 
 
 def events_text() -> str:
@@ -230,15 +250,15 @@ def events_text() -> str:
 
 
 def games_text() -> str:
-    return font("GAME CONTROL") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Panel:") + " /games\n" + font("Commands:") + " /dice /dart /basketball\n" + font("EGO HUSTLE:") + " /hustle /work /raid /attack /protect /luck /heist"
+    return font("GAME CONTROL") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Panel:") + " /games\n" + font("Commands:") + " /dice /dart /basketball"
 
 
 def guide_text() -> str:
-    return font("AZAI SETUP GUIDE") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("OWNER MOD:") + "\n/ownermod on\n/ownermod off\n/ownermod status\n" + font("Phrases:") + " azai nikal / azai chup\n\n" + font("EGO HUSTLE MEDIA:") + "\n/sethustlemedia panel\n/sethustlemedia work\n/sethustlemedia raid\n/sethustlemedia attack\n/sethustlemedia protect\n/sethustlemedia luck\n/sethustlemedia heist\n\n" + font("ANIME QUIZ:") + "\n/addanimeq answer | option1 | option2 | option3 | option4\n/animeguess\n\n" + font("EVENTS:") + "\n/events\n/addevent DD/MM | title | text\n"
+    return font("AZAI SETUP GUIDE") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("OWNER MOD:") + "\n/ownermod on\n/ownermod off\n/ownermod status\n" + font("Phrases:") + " azai nikal / azai chup\n\n" + font("ANIME QUIZ:") + "\n/addanimeq answer | option1 | option2 | option3 | option4\n/animeguess\n\n" + font("EVENTS:") + "\n/events\n/addevent DD/MM | title | text\n"
 
 
 def launch_text() -> str:
-    return font("LAUNCH CHECKLIST") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n1. " + font("Restart bot after latest repo update") + "\n2. " + font("Test") + " /start /commands\n3. " + font("Test") + " /owner /events /wallet /ownermod status\n4. " + font("Test") + " /hustle /work /attack /luck /heist\n5. " + font("Set media") + " /sethustlemedia panel|work|raid|attack|protect|luck|heist\n6. " + font("Run live group test")
+    return font("LAUNCH CHECKLIST") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n1. " + font("Restart bot after latest repo update") + "\n2. " + font("Test") + " /start /commands\n3. " + font("Test") + " /owner /events /wallet /ownermod status\n4. " + font("Run live group test")
 
 
 def maintenance_text() -> str:
