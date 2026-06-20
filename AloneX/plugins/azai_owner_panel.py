@@ -14,8 +14,8 @@ BRAND = font("EGO Network - EST. 2026")
 
 wallet_db = database["azai_wallets"]
 rep_db = database["azai_reputation"]
-ref_db = database["azai_referrals"]
 anime_auto_db = database["azai_anime_quiz_auto_clean"]
+owner_override_db = database["azai_owner_override_mod"]
 
 
 def owner_ids() -> set[int]:
@@ -58,7 +58,7 @@ def owner_home_text() -> str:
         font("AZAI OWNER PANEL") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Access:") + " " + font("Owner Only") + "\n"
-        + font("Control Center:") + " " + font("Core status, modules, launch checklist, setup guide, and reset controls") + "\n\n"
+        + font("Control Center:") + " " + font("Core status, security, quiz, economy, launch, and owner override controls") + "\n\n"
         + font("Private data is hidden. Secrets are never shown here.") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
@@ -92,7 +92,6 @@ def ai_status_text() -> str:
         + font("Provider:") + " " + font("Groq") + "\n"
         + font("Memory:") + " " + font("Short context enabled") + "\n"
         + font("Key Status:") + f" {status}\n"
-        + font("Accepted env:") + " GROQ_API_KEY / GRQI_API_KEY / GQRI_API_KEY\n"
         + font("Secret Safety:") + " " + font("Hidden") + "\n\n"
         + font("Powered By:") + " " + BRAND
     )
@@ -120,16 +119,65 @@ def database_status_text() -> str:
     )
 
 
-def security_text() -> str:
+async def owner_mod_status_line(chat_id: int) -> str:
+    row = await owner_override_db.find_one({"chat_id": int(chat_id)}) or {}
+    return "ON" if row.get("enabled") else "OFF"
+
+
+async def set_owner_mod(chat_id: int, enabled: bool, user_id: int = 0):
+    await owner_override_db.update_one(
+        {"chat_id": int(chat_id)},
+        {"$set": {"chat_id": int(chat_id), "enabled": bool(enabled), "updated_by": int(user_id or 0), "updated_at": now_ist()}},
+        upsert=True,
+    )
+
+
+async def owner_mod_text(chat_id: int) -> str:
+    status = await owner_mod_status_line(chat_id)
+    return (
+        font("OWNER OVERRIDE MOD") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Status:") + f" {status}\n"
+        + font("Only:") + " MR EGO / owner ID\n\n"
+        + font("Commands:") + "\n"
+        + "/ownermod on\n"
+        + "/ownermod off\n"
+        + "/ownermod status\n\n"
+        + font("Phrases:") + "\n"
+        + "azai nikal = ban target\n"
+        + "azai chup = mute target\n\n"
+        + font("Target:") + " reply or @username\n"
+        + font("Bot Requirement:") + " AZAI must be admin with ban/mute permission"
+    )
+
+
+def owner_mod_buttons():
+    return [
+        [Button.inline(font("Owner Mod ON"), b"azown_ownermod_on"), Button.inline(font("Owner Mod OFF"), b"azown_ownermod_off")],
+        [Button.inline(font("Owner Mod Status"), b"azown_ownermod_status")],
+        [Button.inline(font("Back"), b"azown_home"), Button.inline(font("Close"), b"azown_close")],
+    ]
+
+
+async def security_text(chat_id: int) -> str:
+    owner_mod = await owner_mod_status_line(chat_id)
     return (
         font("SECURITY CONTROL") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Verification:") + " /verify /verifyall /unverifyall\n"
-        + font("Moderation:") + " /mod /warn /mute /ban\n"
+        + font("Moderation:") + " /mod /warn /mute /ban /kick /purge\n"
         + font("Anti-link:") + " /antilink on | off\n"
-        + font("Removed shortcuts:") + " /prop /weds /ageverify guarded\n\n"
+        + font("Owner Override:") + f" {owner_mod}\n"
+        + font("Owner Mod:") + " /ownermod on /ownermod off /ownermod status\n\n"
         + font("Use these in group where AZAI is admin.")
     )
+
+
+def security_buttons():
+    return [
+        [Button.inline(font("Owner Mod"), b"azown_owner_mod")],
+        [Button.inline(font("Back"), b"azown_home"), Button.inline(font("Close"), b"azown_close")],
+    ]
 
 
 def economy_text() -> str:
@@ -142,8 +190,6 @@ def economy_text() -> str:
         + font("Referral:") + " /refer /redeemref\n"
         + font("Vault Items:") + " /addvaultitem /vaultitems /buyvault /myvault\n\n"
         + font("Owner Reset:") + " " + font("Use Reset Economy button from owner panel") + "\n"
-        + font("Reset Scope:") + " balance, XP, level, REP, message count, daily claim date\n"
-        + font("Safe:") + " inventory, garage, vault, and items are not deleted\n\n"
         + font("Currency:") + " EGO CREDIT (EC)"
     )
 
@@ -171,59 +217,18 @@ async def reset_economy_data() -> dict:
     now = now_ist()
     wallet_result = await wallet_db.update_many(
         {},
-        {
-            "$set": {
-                "balance": 0,
-                "xp": 0,
-                "level": 1,
-                "rep": 0,
-                "messages": 0,
-                "daily_at": None,
-                "updated_at": now,
-            },
-            "$unset": {
-                "rank": "",
-                "rank_points": "",
-                "power": "",
-                "protection": "",
-                "protection_until": "",
-                "protect_until": "",
-                "raid_wins": "",
-                "attack_wins": "",
-                "fight_wins": "",
-                "heist_wins": "",
-                "last_work": "",
-                "last_luck": "",
-                "last_heist": "",
-                "work_at": "",
-                "luck_at": "",
-                "heist_at": "",
-            },
-        },
+        {"$set": {"balance": 0, "xp": 0, "level": 1, "rep": 0, "messages": 0, "daily_at": None, "updated_at": now}, "$unset": {"rank": "", "rank_points": "", "power": "", "protection": "", "protection_until": "", "protect_until": "", "raid_wins": "", "attack_wins": "", "fight_wins": "", "heist_wins": "", "last_work": "", "last_luck": "", "last_heist": "", "work_at": "", "luck_at": "", "heist_at": ""}},
     )
     rep_result = await rep_db.delete_many({})
     extra_counts = {}
-    for col_name in (
-        "azai_hustle_stats",
-        "azai_hustle_cooldowns",
-        "azai_economy_cooldowns",
-        "azai_work_cooldowns",
-        "azai_luck_cooldowns",
-        "azai_heist_cooldowns",
-        "azai_protection",
-    ):
+    for col_name in ("azai_hustle_stats", "azai_hustle_cooldowns", "azai_economy_cooldowns", "azai_work_cooldowns", "azai_luck_cooldowns", "azai_heist_cooldowns", "azai_protection"):
         try:
             res = await database[col_name].delete_many({})
             if res.deleted_count:
                 extra_counts[col_name] = res.deleted_count
         except Exception:
             pass
-    return {
-        "wallets": int(wallet_result.modified_count),
-        "matched_wallets": int(wallet_result.matched_count),
-        "rep_logs": int(rep_result.deleted_count),
-        "extra": extra_counts,
-    }
+    return {"wallets": int(wallet_result.modified_count), "matched_wallets": int(wallet_result.matched_count), "rep_logs": int(rep_result.deleted_count), "extra": extra_counts}
 
 
 def reset_done_text(stats: dict) -> str:
@@ -243,10 +248,7 @@ def reset_done_text(stats: dict) -> str:
 
 
 def reset_buttons():
-    return [
-        [Button.inline(font("Confirm Reset"), b"azown_reseteco_confirm")],
-        [Button.inline(font("Cancel"), b"azown_home")],
-    ]
+    return [[Button.inline(font("Confirm Reset"), b"azown_reseteco_confirm")], [Button.inline(font("Cancel"), b"azown_home")]]
 
 
 async def quiz_auto_status_line(chat_id: int) -> str:
@@ -274,139 +276,55 @@ async def quiz_text(chat_id: int) -> str:
 
 
 def quiz_buttons():
-    return [
-        [Button.inline(font("Auto ON"), b"azown_quizauto_on"), Button.inline(font("Auto OFF"), b"azown_quizauto_off")],
-        [Button.inline(font("Auto Status"), b"azown_quizauto_status")],
-        [Button.inline(font("Back"), b"azown_home"), Button.inline(font("Close"), b"azown_close")],
-    ]
+    return [[Button.inline(font("Auto ON"), b"azown_quizauto_on"), Button.inline(font("Auto OFF"), b"azown_quizauto_off")], [Button.inline(font("Auto Status"), b"azown_quizauto_status")], [Button.inline(font("Back"), b"azown_home"), Button.inline(font("Close"), b"azown_close")]]
 
 
 async def set_quiz_auto(chat_id: int, enabled: bool, user_id: int = 0):
     now = int(time.time())
-    await anime_auto_db.update_one(
-        {"chat_id": int(chat_id)},
-        {
-            "$set": {
-                "chat_id": int(chat_id),
-                "enabled": bool(enabled),
-                "interval": 1800,
-                "next_at": now + 1800 if enabled else None,
-                "updated_by": int(user_id or 0),
-                "updated_at": now_ist(),
-            }
-        },
-        upsert=True,
-    )
+    await anime_auto_db.update_one({"chat_id": int(chat_id)}, {"$set": {"chat_id": int(chat_id), "enabled": bool(enabled), "interval": 1800, "next_at": now + 1800 if enabled else None, "updated_by": int(user_id or 0), "updated_at": now_ist()}}, upsert=True)
 
 
 def market_text() -> str:
-    return (
-        font("MARKET MEDIA CONTROL") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Set start panel image:") + "\n"
-        + font("1. Send image or video") + "\n"
-        + font("2. Reply to it") + "\n"
-        + font("3. Use command:") + " /setstartpic\n\n"
-        + font("Set item image:") + "\n"
-        + font("1. Send item image") + "\n"
-        + font("2. Reply to it") + "\n"
-        + font("3. Use command:") + " /setitempic item_id\n\n"
-        + font("Examples:") + "\n"
-        + "/setitempic bike_splendor\n"
-        + "/setitempic car_scorpio_s11_black\n"
-        + "/setitempic rose\n\n"
-        + font("Set vehicles after buy:") + "\n"
-        + "/garage\n/setbike bike_splendor\n/setcar car_scorpio_s11_black"
-    )
+    return font("MARKET MEDIA CONTROL") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Set start panel image:") + "\n" + font("Send image/video, reply, then use:") + " /setstartpic\n\n" + font("Set item image:") + "\n" + font("Send item image, reply, then use:") + " /setitempic item_id"
 
 
 def events_text() -> str:
-    return (
-        font("EVENT CONTROL") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Panel:") + " /events\n"
-        + font("Birthday:") + " /birthday DD/MM /birthdays\n"
-        + font("Today:") + " /todayevents\n"
-        + font("Owner Add:") + " /addevent DD/MM | title | text\n"
-        + font("Owner Delete:") + " /delevent title\n"
-        + font("Auto Wish:") + " /eventauto on | off | status\n\n"
-        + font("Status:") + " " + font("Event, saved-date, and auto-wish modules active.")
-    )
+    return font("EVENT CONTROL") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Panel:") + " /events\n" + font("Birthday:") + " /birthday DD/MM /birthdays\n" + font("Owner Add:") + " /addevent DD/MM | title | text\n" + font("Auto Wish:") + " /eventauto on | off | status"
 
 
 def games_text() -> str:
-    return (
-        font("GAME CONTROL") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Panel:") + " /games\n"
-        + font("Commands:") + " /dice /dart /basketball\n"
-        + font("Rule:") + " " + font("Free clean mini-games only.") + "\n\n"
-        + font("Status:") + " " + font("Game panel and basic handlers active.")
-    )
+    return font("GAME CONTROL") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Panel:") + " /games\n" + font("Commands:") + " /dice /dart /basketball"
 
 
 def guide_text() -> str:
     return (
         font("AZAI SETUP GUIDE") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("START PIC:") + "\n"
-        + font("Send image or video, reply to it, then use:") + " /setstartpic\n\n"
-        + font("ITEM PICS:") + "\n"
-        + font("Send item image, reply to it, then use:") + " /setitempic item_id\n"
-        + font("Example:") + " /setitempic bike_splendor\n\n"
-        + font("ANIME QUIZ:") + "\n"
-        + font("Send quiz image, reply to it, then use:") + "\n"
-        + "/addanimeq answer | option1 | option2 | option3 | option4\n"
-        + font("Play:") + " /animeguess\n"
-        + font("Auto:") + " /owner > Quiz > Auto ON\n\n"
-        + font("EVENTS:") + "\n"
-        + "/events\n"
-        + "/addevent DD/MM | title | text\n"
-        + "/eventauto status\n\n"
-        + font("AI KEY:") + "\n"
-        + font("Replit Secrets me") + " GROQ_API_KEY / GRQI_API_KEY " + font("add karo.")
+        + font("OWNER MOD:") + "\n/ownermod on\n/ownermod off\n/ownermod status\n"
+        + font("Phrases:") + " azai nikal / azai chup\n\n"
+        + font("ANIME QUIZ:") + "\n/addanimeq answer | option1 | option2 | option3 | option4\n/animeguess\n\n"
+        + font("EVENTS:") + "\n/events\n/addevent DD/MM | title | text\n"
     )
 
 
 def launch_text() -> str:
-    return (
-        font("LAUNCH CHECKLIST") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + "1. " + font("Restart bot after latest repo update") + "\n"
-        + "2. " + font("Test") + " /start /commands\n"
-        + "3. " + font("Test") + " /owner /events /wallet\n"
-        + "4. " + font("Test verification and group admin permissions") + "\n"
-        + "5. " + font("Set start and item images") + "\n"
-        + "6. " + font("Add 3-5 anime quiz questions") + "\n"
-        + "7. " + font("Reset economy before public launch if needed") + "\n"
-        + "8. " + font("Test") + " /wallet /daily /shop /garage /broadcast\n"
-        + "9. " + font("Fix errors for 1-2 days, then publish")
-    )
+    return font("LAUNCH CHECKLIST") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n1. " + font("Restart bot after latest repo update") + "\n2. " + font("Test") + " /start /commands\n3. " + font("Test") + " /owner /events /wallet /ownermod status\n4. " + font("Run live group test")
 
 
 def maintenance_text() -> str:
-    return (
-        font("MAINTENANCE") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Runtime restart must be done from hosting panel for now.") + "\n"
-        + font("Recommended before launch:") + "\n"
-        + "• " + font("Restart") + "\n"
-        + "• " + font("Check logs") + "\n"
-        + "• " + font("Run live group test") + "\n\n"
-        + font("Powered By:") + " " + BRAND
-    )
+    return font("MAINTENANCE") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Runtime restart must be done from hosting panel for now.")
 
 
 def owner_buttons():
     return [
         [Button.inline(font("Guide"), b"azown_guide"), Button.inline(font("Bot Status"), b"azown_bot")],
         [Button.inline(font("AI Status"), b"azown_ai"), Button.inline(font("Database"), b"azown_db")],
-        [Button.inline(font("Logs"), b"azown_logs"), Button.inline(font("Security"), b"azown_security")],
+        [Button.inline(font("Security"), b"azown_security"), Button.inline(font("Owner Mod"), b"azown_owner_mod")],
         [Button.inline(font("Economy"), b"azown_economy"), Button.inline(font("Reset Economy"), b"azown_reseteco")],
         [Button.inline(font("Quiz"), b"azown_quiz"), Button.inline(font("Events"), b"azown_events")],
         [Button.inline(font("Games"), b"azown_games"), Button.inline(font("Market Media"), b"azown_market")],
-        [Button.inline(font("Launch Check"), b"azown_launch"), Button.inline(font("Commands"), b"azown_commands")],
-        [Button.inline(font("Maintenance"), b"azown_maintenance"), Button.inline(font("Close"), b"azown_close")],
+        [Button.inline(font("Launch Check"), b"azown_launch"), Button.inline(font("Maintenance"), b"azown_maintenance")],
+        [Button.inline(font("Logs"), b"azown_logs"), Button.inline(font("Close"), b"azown_close")],
     ]
 
 
@@ -439,7 +357,19 @@ async def owner_callback(event):
     elif data == "azown_db":
         await event.edit(database_status_text(), buttons=back_buttons())
     elif data == "azown_security":
-        await event.edit(security_text(), buttons=back_buttons())
+        await event.edit(await security_text(event.chat_id), buttons=security_buttons())
+    elif data == "azown_owner_mod":
+        await event.edit(await owner_mod_text(event.chat_id), buttons=owner_mod_buttons())
+    elif data == "azown_ownermod_on":
+        sender = await event.get_sender()
+        await set_owner_mod(event.chat_id, True, sender.id if sender else 0)
+        await event.edit(await owner_mod_text(event.chat_id), buttons=owner_mod_buttons())
+    elif data == "azown_ownermod_off":
+        sender = await event.get_sender()
+        await set_owner_mod(event.chat_id, False, sender.id if sender else 0)
+        await event.edit(await owner_mod_text(event.chat_id), buttons=owner_mod_buttons())
+    elif data == "azown_ownermod_status":
+        await event.answer(await owner_mod_status_line(event.chat_id), alert=True)
     elif data == "azown_economy":
         await event.edit(economy_text(), buttons=back_buttons())
     elif data == "azown_reseteco":
@@ -468,8 +398,6 @@ async def owner_callback(event):
         await event.edit(market_text(), buttons=back_buttons())
     elif data == "azown_launch":
         await event.edit(launch_text(), buttons=back_buttons())
-    elif data == "azown_commands":
-        await event.edit(font("Use /commands to open the public command center."), buttons=back_buttons())
     elif data == "azown_maintenance":
         await event.edit(maintenance_text(), buttons=back_buttons())
     elif data == "azown_close":
