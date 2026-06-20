@@ -15,6 +15,7 @@ BRAND = font("EGO Network - EST. 2026")
 wallet_db = database["azai_wallets"]
 rep_db = database["azai_reputation"]
 ref_db = database["azai_referrals"]
+anime_auto_db = database["azai_anime_quiz_auto_clean"]
 
 
 def owner_ids() -> set[int]:
@@ -248,7 +249,16 @@ def reset_buttons():
     ]
 
 
-def quiz_text() -> str:
+async def quiz_auto_status_line(chat_id: int) -> str:
+    row = await anime_auto_db.find_one({"chat_id": int(chat_id)}) or {}
+    enabled = bool(row.get("enabled", False))
+    next_at = int(row.get("next_at") or 0)
+    wait = max(next_at - int(time.time()), 0) if enabled else 0
+    return f"Auto: {'ON' if enabled else 'OFF'} | Next: {wait // 60}m {wait % 60}s"
+
+
+async def quiz_text(chat_id: int) -> str:
+    status = await quiz_auto_status_line(chat_id)
     return (
         font("ANIME QUIZ CONTROL") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
@@ -256,9 +266,36 @@ def quiz_text() -> str:
         + font("Play One Quiz:") + " /animeguess /quiz\n"
         + font("Stats:") + " /quizstats /quiztop\n"
         + font("Owner:") + " /quizlist /delanimeq question_id\n"
-        + font("Auto:") + " disabled; /quizon /quizoff only explains this\n\n"
-        + font("Rule:") + " one active quiz per chat, one attempt per user\n"
+        + font("Auto:") + " every 30 minutes\n"
+        + font("Status:") + f" {status}\n\n"
+        + font("Rule:") + " one saved quiz at a time, never all together\n"
         + font("Reward:") + " 150 EC + 15 XP"
+    )
+
+
+def quiz_buttons():
+    return [
+        [Button.inline(font("Auto ON"), b"azown_quizauto_on"), Button.inline(font("Auto OFF"), b"azown_quizauto_off")],
+        [Button.inline(font("Auto Status"), b"azown_quizauto_status")],
+        [Button.inline(font("Back"), b"azown_home"), Button.inline(font("Close"), b"azown_close")],
+    ]
+
+
+async def set_quiz_auto(chat_id: int, enabled: bool, user_id: int = 0):
+    now = int(time.time())
+    await anime_auto_db.update_one(
+        {"chat_id": int(chat_id)},
+        {
+            "$set": {
+                "chat_id": int(chat_id),
+                "enabled": bool(enabled),
+                "interval": 1800,
+                "next_at": now + 1800 if enabled else None,
+                "updated_by": int(user_id or 0),
+                "updated_at": now_ist(),
+            }
+        },
+        upsert=True,
     )
 
 
@@ -320,7 +357,8 @@ def guide_text() -> str:
         + font("ANIME QUIZ:") + "\n"
         + font("Send quiz image, reply to it, then use:") + "\n"
         + "/addanimeq answer | option1 | option2 | option3 | option4\n"
-        + font("Play:") + " /animeguess\n\n"
+        + font("Play:") + " /animeguess\n"
+        + font("Auto:") + " /owner > Quiz > Auto ON\n\n"
         + font("EVENTS:") + "\n"
         + "/events\n"
         + "/addevent DD/MM | title | text\n"
@@ -411,7 +449,17 @@ async def owner_callback(event):
         stats = await reset_economy_data()
         await event.edit(reset_done_text(stats), buttons=back_buttons())
     elif data == "azown_quiz":
-        await event.edit(quiz_text(), buttons=back_buttons())
+        await event.edit(await quiz_text(event.chat_id), buttons=quiz_buttons())
+    elif data == "azown_quizauto_on":
+        sender = await event.get_sender()
+        await set_quiz_auto(event.chat_id, True, sender.id if sender else 0)
+        await event.edit(await quiz_text(event.chat_id), buttons=quiz_buttons())
+    elif data == "azown_quizauto_off":
+        sender = await event.get_sender()
+        await set_quiz_auto(event.chat_id, False, sender.id if sender else 0)
+        await event.edit(await quiz_text(event.chat_id), buttons=quiz_buttons())
+    elif data == "azown_quizauto_status":
+        await event.answer(await quiz_auto_status_line(event.chat_id), alert=True)
     elif data == "azown_events":
         await event.edit(events_text(), buttons=back_buttons())
     elif data == "azown_games":
