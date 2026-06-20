@@ -53,6 +53,34 @@ def readable_duration(seconds: int) -> str:
     return f"{seconds}s"
 
 
+def user_name(user) -> str:
+    return getattr(user, "first_name", None) or getattr(user, "username", None) or "User"
+
+
+def mute_caption(user, duration: str, reason: str = "Admin action") -> str:
+    return (
+        font("💀 Chat Locked") + "\n\n"
+        + f"{user_name(user)} " + font("muted for") + f" {duration}\n"
+        + font("Reason:") + f" {reason}"
+    )
+
+
+def ban_caption(user, reason: str = "Admin action") -> str:
+    return (
+        font("💀 Access Denied") + "\n\n"
+        + f"{user_name(user)} " + font("banned from the group") + "\n"
+        + font("Reason:") + f" {reason}"
+    )
+
+
+def kick_caption(user, reason: str = "Admin action") -> str:
+    return (
+        font("💀 Access Removed") + "\n\n"
+        + f"{user_name(user)} " + font("kicked from the group") + "\n"
+        + font("Reason:") + f" {reason}"
+    )
+
+
 async def send_mod_log(chat_id: int, text: str):
     targets = []
     for key in ("LOGGER_ID", "LOG_GROUP_ID", "LOG_CHAT_ID", "LOG_CHANNEL_ID"):
@@ -93,16 +121,12 @@ async def target_from_reply(event):
     reply = await event.get_reply_message()
     if not reply:
         return None
-    sender = await reply.get_sender()
-    return sender
+    return await reply.get_sender()
 
 
 async def settings(chat_id: int) -> dict:
     data = await mod_db.find_one({"chat_id": chat_id}) or {}
-    return {
-        "antilink": bool(data.get("antilink", False)),
-        "max_warns": int(data.get("max_warns", DEFAULT_MAX_WARNS)),
-    }
+    return {"antilink": bool(data.get("antilink", False)), "max_warns": int(data.get("max_warns", DEFAULT_MAX_WARNS))}
 
 
 async def set_setting(chat_id: int, key: str, value):
@@ -117,11 +141,7 @@ async def warn_count(chat_id: int, user_id: int) -> int:
 async def add_warn(chat_id: int, user_id: int, reason: str) -> int:
     await warn_db.update_one(
         {"chat_id": chat_id, "user_id": user_id},
-        {
-            "$inc": {"count": 1},
-            "$set": {"last_reason": reason, "updated_at": now_text()},
-            "$setOnInsert": {"chat_id": chat_id, "user_id": user_id, "created_at": now_text()},
-        },
+        {"$inc": {"count": 1}, "$set": {"last_reason": reason, "updated_at": now_text()}, "$setOnInsert": {"chat_id": chat_id, "user_id": user_id, "created_at": now_text()}},
         upsert=True,
     )
     return await warn_count(chat_id, user_id)
@@ -139,7 +159,7 @@ def mod_home_text(current: dict) -> str:
         + font("Anti-Link:") + f" {antilink}\n"
         + font("Max Warnings:") + f" {current.get('max_warns', DEFAULT_MAX_WARNS)}\n\n"
         + font("Commands:") + " /warn /mute /ban /kick /purge /antilink\n"
-        + font("Abuse Guard:") + " separate auto guard active when deployed\n\n"
+        + font("Caption Style:") + " 💀 compact\n\n"
         + font("Powered By:") + " " + BRAND
     )
 
@@ -166,11 +186,7 @@ def mod_help_text() -> str:
 
 def mod_buttons(current: dict):
     antilink_label = font("Anti-Link ON") if current.get("antilink") else font("Anti-Link OFF")
-    return [
-        [Button.inline(antilink_label, b"azmod_toggle_antilink")],
-        [Button.inline(font("Commands"), b"azmod_help"), Button.inline(font("Refresh"), b"azmod_home")],
-        [Button.inline(font("Close"), b"azmod_close")],
-    ]
+    return [[Button.inline(antilink_label, b"azmod_toggle_antilink")], [Button.inline(font("Commands"), b"azmod_help"), Button.inline(font("Refresh"), b"azmod_home")], [Button.inline(font("Close"), b"azmod_close")]]
 
 
 async def mod_panel(event):
@@ -205,20 +221,15 @@ async def warn_handler(event):
     reason = " ".join((event.raw_text or "").split()[1:]) or "No reason added"
     current = await settings(event.chat_id)
     count = await add_warn(event.chat_id, target.id, reason)
-    text = (
-        font("WARNING ADDED") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("User:") + f" {getattr(target, 'first_name', 'User')}\n"
-        + font("Warnings:") + f" {count}/{current['max_warns']}\n"
-        + font("Reason:") + f" {reason}"
-    )
+    text = font("💀 AZAI Saw That") + "\n\n" + font("Strike:") + f" {count}/{current['max_warns']}\n" + font("Warning")
     await event.reply(text)
     await send_mod_log(event.chat_id, font("MOD LOG") + f"\nWarned: {target.id}\nReason: {reason}")
     if count >= current["max_warns"]:
         try:
-            until = datetime.utcnow() + timedelta(minutes=10)
+            duration = DEFAULT_MUTE_SECONDS
+            until = datetime.utcnow() + timedelta(seconds=duration)
             await event.client.edit_permissions(event.chat_id, target.id, until_date=until, send_messages=False)
-            await event.reply(font("Warning limit reached. User muted for 10 minutes."))
+            await event.reply(mute_caption(target, readable_duration(duration), "warning limit"))
         except Exception:
             await event.reply(font("Warning limit reached, but mute failed. Check bot admin permissions."))
 
@@ -261,10 +272,11 @@ async def mute_handler(event):
         return
     parts = (event.raw_text or "").split()
     duration = parse_duration(parts[1] if len(parts) > 1 else "10m")
+    reason = " ".join(parts[2:]) if len(parts) > 2 else "Admin action"
     try:
         until = datetime.utcnow() + timedelta(seconds=duration)
         await event.client.edit_permissions(event.chat_id, target.id, until_date=until, send_messages=False)
-        await event.reply(font("User muted for:") + f" {readable_duration(duration)}")
+        await event.reply(mute_caption(target, readable_duration(duration), reason))
         await send_mod_log(event.chat_id, font("MOD LOG") + f"\nMuted: {target.id}\nDuration: {readable_duration(duration)}")
     except Exception:
         await event.reply(font("Mute failed. Check bot admin permissions."))
@@ -291,9 +303,11 @@ async def ban_handler(event):
     if not target:
         await event.reply(font("Reply to a user and use /ban."))
         return
+    parts = (event.raw_text or "").split()
+    reason = " ".join(parts[1:]) if len(parts) > 1 else "Admin action"
     try:
         await event.client.edit_permissions(event.chat_id, target.id, view_messages=False)
-        await event.reply(font("User banned from this group."))
+        await event.reply(ban_caption(target, reason))
         await send_mod_log(event.chat_id, font("MOD LOG") + f"\nBanned: {target.id}")
     except Exception:
         await event.reply(font("Ban failed. Check bot admin permissions."))
@@ -323,7 +337,7 @@ async def kick_handler(event):
     try:
         await event.client.edit_permissions(event.chat_id, target.id, view_messages=False)
         await event.client.edit_permissions(event.chat_id, target.id, view_messages=True)
-        await event.reply(font("User kicked from this group."))
+        await event.reply(kick_caption(target, "Admin action"))
         await send_mod_log(event.chat_id, font("MOD LOG") + f"\nKicked: {target.id}")
     except Exception:
         await event.reply(font("Kick failed. Check bot admin permissions."))
@@ -344,7 +358,7 @@ async def purge_handler(event):
     ids = list(range(start_id, end_id + 1))[:MAX_PURGE_LIMIT]
     try:
         await event.client.delete_messages(event.chat_id, ids)
-        msg = await event.client.send_message(event.chat_id, font("Purge complete. Deleted messages:") + f" {len(ids)}")
+        await event.client.send_message(event.chat_id, font("💀 Cleaned") + "\n\n" + font("Purged messages:") + f" {len(ids)}")
         await send_mod_log(event.chat_id, font("MOD LOG") + f"\nPurged: {len(ids)} messages")
     except Exception:
         await event.reply(font("Purge failed. Check bot admin permissions."))
@@ -390,7 +404,7 @@ async def antilink_guard(event):
     except Exception:
         pass
     try:
-        await event.respond(font("Link removed. Group protection is active."))
+        await event.respond(font("💀 Link Removed") + "\n\n" + font("Group protection is active."))
         await send_mod_log(event.chat_id, font("MOD LOG") + f"\nLink removed from user: {event.sender_id}")
     except Exception:
         pass
@@ -405,7 +419,7 @@ if "azai_moderation" not in tbot.handlers_loaded:
     tbot.add_event_handler(resetwarns_handler, events.NewMessage(pattern=f"^{prefix_cmds}resetwarns$", incoming=True))
     tbot.add_event_handler(mute_handler, events.NewMessage(pattern=f"^{prefix_cmds}mute(?: .*)?$", incoming=True))
     tbot.add_event_handler(unmute_handler, events.NewMessage(pattern=f"^{prefix_cmds}unmute$", incoming=True))
-    tbot.add_event_handler(ban_handler, events.NewMessage(pattern=f"^{prefix_cmds}ban$", incoming=True))
+    tbot.add_event_handler(ban_handler, events.NewMessage(pattern=f"^{prefix_cmds}ban(?: .*)?$", incoming=True))
     tbot.add_event_handler(unban_handler, events.NewMessage(pattern=f"^{prefix_cmds}unban$", incoming=True))
     tbot.add_event_handler(kick_handler, events.NewMessage(pattern=f"^{prefix_cmds}kick$", incoming=True))
     tbot.add_event_handler(purge_handler, events.NewMessage(pattern=f"^{prefix_cmds}purge$", incoming=True))
