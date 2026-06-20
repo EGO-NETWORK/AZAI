@@ -201,7 +201,6 @@ async def reset_economy_data() -> dict:
         },
     )
     rep_result = await rep_db.delete_many({})
-
     extra_counts = {}
     for col_name in (
         "azai_hustle_stats",
@@ -218,7 +217,6 @@ async def reset_economy_data() -> dict:
                 extra_counts[col_name] = res.deleted_count
         except Exception:
             pass
-
     return {
         "wallets": int(wallet_result.modified_count),
         "matched_wallets": int(wallet_result.matched_count),
@@ -252,10 +250,15 @@ def reset_buttons():
 
 def quiz_text() -> str:
     return (
-        font("QUIZ CONTROL") + "\n"
+        font("ANIME QUIZ CONTROL") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Anime quiz is disabled for rebuild.") + "\n"
-        + font("MR EGO will add the new quiz system later.")
+        + font("Add Image Quiz:") + " /addanimeq answer | option1 | option2 | option3 | option4\n"
+        + font("Play One Quiz:") + " /animeguess /quiz\n"
+        + font("Stats:") + " /quizstats /quiztop\n"
+        + font("Owner:") + " /quizlist /delanimeq question_id\n"
+        + font("Auto:") + " disabled; /quizon /quizoff only explains this\n\n"
+        + font("Rule:") + " one active quiz per chat, one attempt per user\n"
+        + font("Reward:") + " 150 EC + 15 XP"
     )
 
 
@@ -314,6 +317,10 @@ def guide_text() -> str:
         + font("ITEM PICS:") + "\n"
         + font("Send item image, reply to it, then use:") + " /setitempic item_id\n"
         + font("Example:") + " /setitempic bike_splendor\n\n"
+        + font("ANIME QUIZ:") + "\n"
+        + font("Send quiz image, reply to it, then use:") + "\n"
+        + "/addanimeq answer | option1 | option2 | option3 | option4\n"
+        + font("Play:") + " /animeguess\n\n"
         + font("EVENTS:") + "\n"
         + "/events\n"
         + "/addevent DD/MM | title | text\n"
@@ -332,9 +339,9 @@ def launch_text() -> str:
         + "3. " + font("Test") + " /owner /events /wallet\n"
         + "4. " + font("Test verification and group admin permissions") + "\n"
         + "5. " + font("Set start and item images") + "\n"
-        + "6. " + font("Reset economy before public launch if needed") + "\n"
-        + "7. " + font("Test") + " /wallet /daily /shop /garage /broadcast\n"
-        + "8. " + font("Test") + " /eventauto status /todayevents\n"
+        + "6. " + font("Add 3-5 anime quiz questions") + "\n"
+        + "7. " + font("Reset economy before public launch if needed") + "\n"
+        + "8. " + font("Test") + " /wallet /daily /shop /garage /broadcast\n"
         + "9. " + font("Fix errors for 1-2 days, then publish")
     )
 
