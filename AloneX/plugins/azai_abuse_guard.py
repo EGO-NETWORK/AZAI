@@ -219,6 +219,6 @@ async def abuse_review_callback(event):
 
 
 if "azai_abuse_guard" not in tbot.handlers_loaded:
-    tbot.add_event_handler(abuse_guard, events.NewMessage(incoming=True), group=-80)
+    tbot.add_event_handler(abuse_guard, events.NewMessage(incoming=True))
     tbot.add_event_handler(abuse_review_callback, events.CallbackQuery(pattern=b"^azab_"))
     tbot.handlers_loaded.add("azai_abuse_guard")
