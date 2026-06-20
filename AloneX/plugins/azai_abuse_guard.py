@@ -103,11 +103,9 @@ async def add_strike(chat_id: int, user_id: int, reason: str) -> int:
 
 def strike_text(count: int, action: str) -> str:
     return (
-        font("AZAI MODERATION") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Message removed:") + " " + font("Group rule violation") + "\n"
+        font("💀 AZAI Saw That") + "\n\n"
         + font("Strike:") + f" {count}/3\n"
-        + font("Action:") + f" {action}"
+        + font(action)
     )
 
 
@@ -151,7 +149,7 @@ async def handle_flood(event):
         return False
     await mute_user(event, 10)
     await safe_delete(event)
-    await event.respond(font("Flood detected. User muted for 10 minutes."))
+    await event.respond(font("💀 Chat Locked") + "\n\n" + font("Flood detected. Muted for 10 minutes."))
     await send_log(font("MOD LOG") + f"\nFlood mute: {event.sender_id}\nChat: {event.chat_id}")
     msg_cache[key].clear()
     return True
@@ -168,7 +166,7 @@ async def handle_sticker_spam(event):
         return False
     await mute_user(event, 10)
     await safe_delete(event)
-    await event.respond(font("Sticker spam detected. User muted for 10 minutes."))
+    await event.respond(font("💀 Chat Locked") + "\n\n" + font("Sticker spam detected. Muted for 10 minutes."))
     await send_log(font("MOD LOG") + f"\nSticker spam mute: {event.sender_id}\nChat: {event.chat_id}")
     sticker_cache[key].clear()
     return True
@@ -206,7 +204,7 @@ async def abuse_review_callback(event):
         try:
             await event.client.edit_permissions(chat_id, user_id, view_messages=False)
             await pending_db.update_one({"chat_id": chat_id, "user_id": user_id}, {"$set": {"status": "banned", "reviewed_at": now_ist()}}, upsert=True)
-            await event.edit(font("User banned by admin review."))
+            await event.edit(font("💀 Access Denied") + "\n\n" + font("User banned by admin review."))
             await send_log(font("MOD LOG") + f"\nReview ban: {user_id}\nChat: {chat_id}")
         except Exception:
             await event.answer(font("Ban failed. Check permissions."), alert=True)
