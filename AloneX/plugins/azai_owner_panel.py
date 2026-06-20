@@ -152,73 +152,29 @@ async def owner_mod_text(chat_id: int) -> str:
 
 
 def owner_mod_buttons():
-    return [
-        [Button.inline(font("Owner Mod ON"), b"azown_ownermod_on"), Button.inline(font("Owner Mod OFF"), b"azown_ownermod_off")],
-        [Button.inline(font("Owner Mod Status"), b"azown_ownermod_status")],
-        [Button.inline(font("Back"), b"azown_home"), Button.inline(font("Close"), b"azown_close")],
-    ]
+    return [[Button.inline(font("Owner Mod ON"), b"azown_ownermod_on"), Button.inline(font("Owner Mod OFF"), b"azown_ownermod_off")], [Button.inline(font("Owner Mod Status"), b"azown_ownermod_status")], [Button.inline(font("Back"), b"azown_home"), Button.inline(font("Close"), b"azown_close")]]
 
 
 async def security_text(chat_id: int) -> str:
     owner_mod = await owner_mod_status_line(chat_id)
-    return (
-        font("SECURITY CONTROL") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Verification:") + " /verify /verifyall /unverifyall\n"
-        + font("Moderation:") + " /mod /warn /mute /ban /kick /purge\n"
-        + font("Anti-link:") + " /antilink on | off\n"
-        + font("Owner Override:") + f" {owner_mod}\n"
-        + font("Owner Mod:") + " /ownermod on /ownermod off /ownermod status\n\n"
-        + font("Use these in group where AZAI is admin.")
-    )
+    return font("SECURITY CONTROL") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Verification:") + " /verify /verifyall /unverifyall\n" + font("Moderation:") + " /mod /warn /mute /ban /kick /purge\n" + font("Anti-link:") + " /antilink on | off\n" + font("Owner Override:") + f" {owner_mod}\n" + font("Owner Mod:") + " /ownermod on /ownermod off /ownermod status\n\n" + font("Use these in group where AZAI is admin.")
 
 
 def security_buttons():
-    return [
-        [Button.inline(font("Owner Mod"), b"azown_owner_mod")],
-        [Button.inline(font("Back"), b"azown_home"), Button.inline(font("Close"), b"azown_close")],
-    ]
+    return [[Button.inline(font("Owner Mod"), b"azown_owner_mod")], [Button.inline(font("Back"), b"azown_home"), Button.inline(font("Close"), b"azown_close")]]
 
 
 def economy_text() -> str:
-    return (
-        font("ECONOMY CONTROL") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Wallet:") + " /wallet /daily /send\n"
-        + font("Inventory:") + " /inventory /garage /vault\n"
-        + font("Market:") + " /shop /setcar /setbike /gift\n"
-        + font("Referral:") + " /refer /redeemref\n"
-        + font("Vault Items:") + " /addvaultitem /vaultitems /buyvault /myvault\n\n"
-        + font("Owner Reset:") + " " + font("Use Reset Economy button from owner panel") + "\n"
-        + font("Currency:") + " EGO CREDIT (EC)"
-    )
+    return font("ECONOMY CONTROL") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Wallet:") + " /wallet /daily /send\n" + font("Inventory:") + " /inventory /garage /vault\n" + font("Market:") + " /shop /setcar /setbike /gift\n" + font("Referral:") + " /refer /redeemref\n" + font("Vault Items:") + " /addvaultitem /vaultitems /buyvault /myvault\n\n" + font("Owner Reset:") + " " + font("Use Reset Economy button from owner panel") + "\n" + font("Currency:") + " EGO CREDIT (EC)"
 
 
 def reset_economy_warning_text() -> str:
-    return (
-        font("RESET ECONOMY") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("This will reset for all users:") + "\n"
-        + "• Balance / EC\n"
-        + "• XP / Level / rank values\n"
-        + "• REP and REP daily records\n"
-        + "• Message reward count\n"
-        + "• Daily claim date\n\n"
-        + font("This will NOT delete:") + "\n"
-        + "• Inventory\n"
-        + "• Garage / selected vehicles\n"
-        + "• Vault / limited items\n"
-        + "• Market items\n\n"
-        + font("Press Confirm only if you really want a clean launch economy.")
-    )
+    return font("RESET ECONOMY") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("This will reset for all users:") + "\n• Balance / EC\n• XP / Level / rank values\n• REP and REP daily records\n• Message reward count\n• Daily claim date\n\n" + font("This will NOT delete:") + "\n• Inventory\n• Garage / selected vehicles\n• Vault / limited items\n• Market items\n\n" + font("Press Confirm only if you really want a clean launch economy.")
 
 
 async def reset_economy_data() -> dict:
     now = now_ist()
-    wallet_result = await wallet_db.update_many(
-        {},
-        {"$set": {"balance": 0, "xp": 0, "level": 1, "rep": 0, "messages": 0, "daily_at": None, "updated_at": now}, "$unset": {"rank": "", "rank_points": "", "power": "", "protection": "", "protection_until": "", "protect_until": "", "raid_wins": "", "attack_wins": "", "fight_wins": "", "heist_wins": "", "last_work": "", "last_luck": "", "last_heist": "", "work_at": "", "luck_at": "", "heist_at": ""}},
-    )
+    wallet_result = await wallet_db.update_many({}, {"$set": {"balance": 0, "xp": 0, "level": 1, "rep": 0, "messages": 0, "daily_at": None, "updated_at": now}, "$unset": {"rank": "", "rank_points": "", "power": "", "protection": "", "protection_until": "", "protect_until": "", "raid_wins": "", "attack_wins": "", "fight_wins": "", "heist_wins": "", "last_work": "", "last_luck": "", "last_heist": "", "work_at": "", "luck_at": "", "heist_at": ""}})
     rep_result = await rep_db.delete_many({})
     extra_counts = {}
     for col_name in ("azai_hustle_stats", "azai_hustle_cooldowns", "azai_economy_cooldowns", "azai_work_cooldowns", "azai_luck_cooldowns", "azai_heist_cooldowns", "azai_protection"):
@@ -236,15 +192,7 @@ def reset_done_text(stats: dict) -> str:
     extra_text = ""
     if extra:
         extra_text = "\n" + "\n".join(f"• {k}: {v}" for k, v in extra.items())
-    return (
-        font("ECONOMY RESET DONE") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Wallets matched:") + f" {stats.get('matched_wallets', 0)}\n"
-        + font("Wallets updated:") + f" {stats.get('wallets', 0)}\n"
-        + font("REP logs deleted:") + f" {stats.get('rep_logs', 0)}"
-        + extra_text + "\n\n"
-        + font("Inventory, garage, vault, and market items were kept safe.")
-    )
+    return font("ECONOMY RESET DONE") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Wallets matched:") + f" {stats.get('matched_wallets', 0)}\n" + font("Wallets updated:") + f" {stats.get('wallets', 0)}\n" + font("REP logs deleted:") + f" {stats.get('rep_logs', 0)}" + extra_text + "\n\n" + font("Inventory, garage, vault, and market items were kept safe.")
 
 
 def reset_buttons():
@@ -261,18 +209,7 @@ async def quiz_auto_status_line(chat_id: int) -> str:
 
 async def quiz_text(chat_id: int) -> str:
     status = await quiz_auto_status_line(chat_id)
-    return (
-        font("ANIME QUIZ CONTROL") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Add Image Quiz:") + " /addanimeq answer | option1 | option2 | option3 | option4\n"
-        + font("Play One Quiz:") + " /animeguess /quiz\n"
-        + font("Stats:") + " /quizstats /quiztop\n"
-        + font("Owner:") + " /quizlist /delanimeq question_id\n"
-        + font("Auto:") + " every 30 minutes\n"
-        + font("Status:") + f" {status}\n\n"
-        + font("Rule:") + " one saved quiz at a time, never all together\n"
-        + font("Reward:") + " 150 EC + 15 XP"
-    )
+    return font("ANIME QUIZ CONTROL") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Add Image Quiz:") + " /addanimeq answer | option1 | option2 | option3 | option4\n" + font("Play One Quiz:") + " /animeguess /quiz\n" + font("Stats:") + " /quizstats /quiztop\n" + font("Owner:") + " /quizlist /delanimeq question_id\n" + font("Auto:") + " every 30 minutes\n" + font("Status:") + f" {status}\n\n" + font("Rule:") + " one saved quiz at a time, never all together\n" + font("Reward:") + " 150 EC + 15 XP"
 
 
 def quiz_buttons():
@@ -285,21 +222,7 @@ async def set_quiz_auto(chat_id: int, enabled: bool, user_id: int = 0):
 
 
 def market_text() -> str:
-    return (
-        font("MARKET MEDIA CONTROL") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Set start panel image:") + "\n"
-        + font("Send image/video, reply, then use:") + " /setstartpic\n\n"
-        + font("Set item image:") + "\n"
-        + font("Send item image, reply, then use:") + " /setitempic item_id\n\n"
-        + font("EGO HUSTLE MEDIA:") + "\n"
-        + "/sethustlemedia panel\n"
-        + "/sethustlemedia work\n"
-        + "/sethustlemedia raid\n"
-        + "/sethustlemedia protect\n"
-        + "/sethustlemedia luck\n"
-        + "/sethustlemedia heist"
-    )
+    return font("MARKET MEDIA CONTROL") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Set start panel image:") + "\n" + font("Send image/video, reply, then use:") + " /setstartpic\n\n" + font("Set item image:") + "\n" + font("Send item image, reply, then use:") + " /setitempic item_id\n\n" + font("EGO HUSTLE MEDIA:") + "\n/sethustlemedia panel\n/sethustlemedia work\n/sethustlemedia raid\n/sethustlemedia attack\n/sethustlemedia protect\n/sethustlemedia luck\n/sethustlemedia heist"
 
 
 def events_text() -> str:
@@ -307,23 +230,15 @@ def events_text() -> str:
 
 
 def games_text() -> str:
-    return font("GAME CONTROL") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Panel:") + " /games\n" + font("Commands:") + " /dice /dart /basketball\n" + font("EGO HUSTLE:") + " /hustle /work /raid /protect /luck /heist"
+    return font("GAME CONTROL") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("Panel:") + " /games\n" + font("Commands:") + " /dice /dart /basketball\n" + font("EGO HUSTLE:") + " /hustle /work /raid /attack /protect /luck /heist"
 
 
 def guide_text() -> str:
-    return (
-        font("AZAI SETUP GUIDE") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("OWNER MOD:") + "\n/ownermod on\n/ownermod off\n/ownermod status\n"
-        + font("Phrases:") + " azai nikal / azai chup\n\n"
-        + font("EGO HUSTLE MEDIA:") + "\n/sethustlemedia panel\n/sethustlemedia work\n/sethustlemedia raid\n/sethustlemedia protect\n/sethustlemedia luck\n/sethustlemedia heist\n\n"
-        + font("ANIME QUIZ:") + "\n/addanimeq answer | option1 | option2 | option3 | option4\n/animeguess\n\n"
-        + font("EVENTS:") + "\n/events\n/addevent DD/MM | title | text\n"
-    )
+    return font("AZAI SETUP GUIDE") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + font("OWNER MOD:") + "\n/ownermod on\n/ownermod off\n/ownermod status\n" + font("Phrases:") + " azai nikal / azai chup\n\n" + font("EGO HUSTLE MEDIA:") + "\n/sethustlemedia panel\n/sethustlemedia work\n/sethustlemedia raid\n/sethustlemedia attack\n/sethustlemedia protect\n/sethustlemedia luck\n/sethustlemedia heist\n\n" + font("ANIME QUIZ:") + "\n/addanimeq answer | option1 | option2 | option3 | option4\n/animeguess\n\n" + font("EVENTS:") + "\n/events\n/addevent DD/MM | title | text\n"
 
 
 def launch_text() -> str:
-    return font("LAUNCH CHECKLIST") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n1. " + font("Restart bot after latest repo update") + "\n2. " + font("Test") + " /start /commands\n3. " + font("Test") + " /owner /events /wallet /ownermod status\n4. " + font("Test") + " /hustle /work /luck /heist\n5. " + font("Set media") + " /sethustlemedia panel|work|raid|protect|luck|heist\n6. " + font("Run live group test")
+    return font("LAUNCH CHECKLIST") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n1. " + font("Restart bot after latest repo update") + "\n2. " + font("Test") + " /start /commands\n3. " + font("Test") + " /owner /events /wallet /ownermod status\n4. " + font("Test") + " /hustle /work /attack /luck /heist\n5. " + font("Set media") + " /sethustlemedia panel|work|raid|attack|protect|luck|heist\n6. " + font("Run live group test")
 
 
 def maintenance_text() -> str:
@@ -331,16 +246,7 @@ def maintenance_text() -> str:
 
 
 def owner_buttons():
-    return [
-        [Button.inline(font("Guide"), b"azown_guide"), Button.inline(font("Bot Status"), b"azown_bot")],
-        [Button.inline(font("AI Status"), b"azown_ai"), Button.inline(font("Database"), b"azown_db")],
-        [Button.inline(font("Security"), b"azown_security"), Button.inline(font("Owner Mod"), b"azown_owner_mod")],
-        [Button.inline(font("Economy"), b"azown_economy"), Button.inline(font("Reset Economy"), b"azown_reseteco")],
-        [Button.inline(font("Quiz"), b"azown_quiz"), Button.inline(font("Events"), b"azown_events")],
-        [Button.inline(font("Games"), b"azown_games"), Button.inline(font("Market Media"), b"azown_market")],
-        [Button.inline(font("Launch Check"), b"azown_launch"), Button.inline(font("Maintenance"), b"azown_maintenance")],
-        [Button.inline(font("Logs"), b"azown_logs"), Button.inline(font("Close"), b"azown_close")],
-    ]
+    return [[Button.inline(font("Guide"), b"azown_guide"), Button.inline(font("Bot Status"), b"azown_bot")], [Button.inline(font("AI Status"), b"azown_ai"), Button.inline(font("Database"), b"azown_db")], [Button.inline(font("Security"), b"azown_security"), Button.inline(font("Owner Mod"), b"azown_owner_mod")], [Button.inline(font("Economy"), b"azown_economy"), Button.inline(font("Reset Economy"), b"azown_reseteco")], [Button.inline(font("Quiz"), b"azown_quiz"), Button.inline(font("Events"), b"azown_events")], [Button.inline(font("Games"), b"azown_games"), Button.inline(font("Market Media"), b"azown_market")], [Button.inline(font("Launch Check"), b"azown_launch"), Button.inline(font("Maintenance"), b"azown_maintenance")], [Button.inline(font("Logs"), b"azown_logs"), Button.inline(font("Close"), b"azown_close")]]
 
 
 def back_buttons():
