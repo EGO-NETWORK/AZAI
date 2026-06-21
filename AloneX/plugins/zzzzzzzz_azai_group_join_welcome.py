@@ -7,12 +7,14 @@ from AloneX.plugins.aaa_azai_start_pic import saved_pic
 
 UPDATES_LINK = "https://t.me/EGOxUPDATES"
 SUPPORT_LINK = "https://t.me/EGOxSUPPORT"
+EGO_HUSTLE_LINK = "https://t.me/EGOxHUSTEL"
 
 
 def welcome_buttons():
     return [
         [Button.url(font("Support"), SUPPORT_LINK), Button.url(font("Updates"), UPDATES_LINK)],
-        [Button.inline(font("Settings"), b"azgw_settings"), Button.inline(font("Close"), b"azgw_close")],
+        [Button.url(font("EGO HUSTLE"), EGO_HUSTLE_LINK), Button.inline(font("Settings"), b"azgw_settings")],
+        [Button.inline(font("Close"), b"azgw_close")],
     ]
 
 
@@ -46,11 +48,11 @@ def welcome_text(group_name: str, admin_line: str) -> str:
         + font("Thank you for adding AZAI to") + f" {group_name}.\n"
         + font("AZAI is ready for verification, moderation, economy, media control, and clean community management.")
         + "\n\n"
-        + font("Admin / Owner Notice:")
+        + font("Admin / Owner Setup:")
         + f" {admin_line}\n"
-        + font("For no verification restriction on current members, run:")
+        + font("To trust current members and let them chat normally, use:")
         + " /verifyall\n"
-        + font("For fresh verification for everyone, run:")
+        + font("To reset access and make everyone complete verification again, use:")
         + " /unverifyall\n\n"
         + font("Recommended Setup:")
         + "\n1. Make AZAI admin with delete, mute, invite-link and management permissions."
