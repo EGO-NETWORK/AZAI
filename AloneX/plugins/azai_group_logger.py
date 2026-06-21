@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 import pytz
-from telethon import events
+from telethon import events, functions
 
 from AloneX import database, font, prefix_cmds, tbot
 import config
@@ -81,11 +81,18 @@ def user_line(user):
     return f"{name} (@{username}) | ID: {uid}" if username else f"{name} | ID: {uid}"
 
 
-def public_group_link(chat):
+async def group_link(chat):
     username = getattr(chat, "username", None)
     if username:
         return f"https://t.me/{username}"
-    return "Not available. Public username missing. For private groups, bot must be admin and invite-link permission is required."
+    try:
+        invite = await tbot(functions.messages.ExportChatInviteRequest(chat))
+        link = getattr(invite, "link", None)
+        if link:
+            return link
+    except Exception:
+        pass
+    return "Not available. Make AZAI admin with invite-link permission."
 
 
 async def logon_cmd(event):
@@ -144,12 +151,13 @@ async def group_add_logger(event):
             pass
         title = getattr(chat, "title", None) or "Unknown"
         cid = getattr(chat, "id", None)
+        link = await group_link(chat)
         await send_log(
             "AZAI ADDED TO GROUP\n"
             "━━━━━━━━━━━━━━━━━━\n"
             f"Group: {title}\n"
             f"Chat ID: {cid}\n"
-            f"Link: {public_group_link(chat)}\n"
+            f"Link: {link}\n"
             f"Added By: {user_line(added_by)}\n"
             f"Time: {now_ist()}"
         )
