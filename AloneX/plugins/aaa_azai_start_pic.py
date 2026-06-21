@@ -75,7 +75,7 @@ def start_buttons():
         [Button.inline(font("Help & Cmds"), b"azai_help_cmds_menu"), Button.inline(font("System Stats"), b"azai_system_stats")],
         [Button.url(font("Add AZAI To Your Empire"), add_to_group_link())],
         [Button.url(font("Updates"), UPDATES_LINK), Button.url(font("Support"), SUPPORT_LINK)],
-        [Button.url(font("Privacy"), PRIVACY_LINK), Button.inline(font("Donate"), b"azai_donate_panel")],
+        [Button.url(font("Privacy"), PRIVACY_LINK)],
         [Button.url(font("My Master"), MASTER_LINK), Button.inline(font("Close"), b"azai_close_panel")],
     ]
 
@@ -86,10 +86,6 @@ def close_back_buttons():
 
 def home_back_buttons():
     return [[Button.inline(font("Back"), b"azai_start_home"), Button.inline(font("Close"), b"azai_close_panel")]]
-
-
-def donate_buttons():
-    return [[Button.url(font("Support"), SUPPORT_LINK), Button.inline(font("Back"), b"azai_start_home")]]
 
 
 def help_buttons():
@@ -108,17 +104,6 @@ def help_text() -> str:
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("Choose a panel below.") + "\n\n"
         + font("Core, Owner, Economy, Market, Family, Games, Media, System")
-    )
-
-
-def donate_text() -> str:
-    return (
-        font("AZAI DONATE") + "\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Donation method is not configured yet.") + "\n\n"
-        + font("To enable donate button, MR EGO needs to set one of these:") + "\n"
-        + font("UPI ID / Payment Link / Support Collection Link / Crypto Wallet") + "\n\n"
-        + font("For now, tap Support and send:") + " DONATE SETUP"
     )
 
 
@@ -247,8 +232,6 @@ async def start_callback_handler(event):
         await event.edit(media_text(), buttons=close_back_buttons())
     elif data == "azai_system_stats":
         await event.edit(stats_text(), buttons=home_back_buttons())
-    elif data == "azai_donate_panel":
-        await event.edit(donate_text(), buttons=donate_buttons())
     elif data == "azai_start_home":
         await event.edit(start_text(), buttons=start_buttons())
     elif data == "azai_close_panel":
@@ -260,5 +243,5 @@ if "aaa_azai_start_pic" not in tbot.handlers_loaded:
     tbot.add_event_handler(set_start_pic, events.NewMessage(pattern=f"^{prefix_cmds}setstartpic$", incoming=True))
     tbot.add_event_handler(start_pic_handler, events.NewMessage(pattern=f"^{prefix_cmds}start(?:@\w+)?(?: .*)?$", incoming=True))
     tbot.add_event_handler(start_pic_handler, events.NewMessage(pattern=f"^{prefix_cmds}help(?:@\w+)?$", incoming=True))
-    tbot.add_event_handler(start_callback_handler, events.CallbackQuery(pattern=b"^azai_(help_cmds_menu|help_core|help_owner|help_economy|help_market|help_family|help_games|help_media|system_stats|donate_panel|start_home|close_panel)$"))
+    tbot.add_event_handler(start_callback_handler, events.CallbackQuery(pattern=b"^azai_(help_cmds_menu|help_core|help_owner|help_economy|help_market|help_family|help_games|help_media|system_stats|start_home|close_panel)$"))
     tbot.handlers_loaded.add("aaa_azai_start_pic")
