@@ -36,7 +36,7 @@ def welcome_text(admin_name: str) -> str:
         + f"{admin_name}, "
         + font("thank you for adding AZAI to your group.")
         + "\n\n"
-        + font("AZAI is ready to help with verification, moderation, economy, media, and clean group management.")
+        + font("AZAI is ready to help with verification, moderation, economy, and clean group management.")
         + "\n\n"
         + font("Recommended setup:")
         + "\n1. "
@@ -51,9 +51,6 @@ def welcome_text(admin_name: str) -> str:
         + "\n4. "
         + font("If you want everyone to verify again, run")
         + " /unverifyall"
-        + "\n\n"
-        + font("Owner media controls:")
-        + " /setstartpic /setleaderpic /setitempic item_id /msettings"
         + "\n\n"
         + font("Powered By:")
         + " "
