@@ -1,4 +1,4 @@
-"""AZAI owner panel media and fun command patch."""
+"""AZAI owner panel media, games, and economy command patch."""
 
 from AloneX import font
 from AloneX.plugins import azai_owner_panel as owner_panel
@@ -8,22 +8,18 @@ BRAND = font("EGO Network - EST. 2026")
 
 def market_text() -> str:
     return (
-        font("MEDIA CONTROL")
+        font("MEDIA & COMMAND CONTROL")
         + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Start / Help Panel:")
-        + "\n"
-        + font("Send image or video, reply, then use:")
-        + " /setstartpic\n\n"
-        + font("Shop Item Image:")
-        + "\n"
-        + font("Send item image, reply, then use:")
-        + " /setitempic item_id\n\n"
-        + font("Leaderboard Image:")
-        + "\n"
-        + font("Send leaderboard image, reply, then use:")
-        + " /setleaderpic\n\n"
-        + font("Media Settings Guide:")
-        + " /msettings\n\n"
+        + font("Media Setup:")
+        + "\n/setstartpic - set start, help, and group welcome media"
+        + "\n/setleaderpic - set leaderboard image"
+        + "\n/setitempic item_id - set shop/item image"
+        + "\n/msettings - open media setup guide\n\n"
+        + font("Fun Commands:")
+        + "\n/dice /dart /basketball /slot\n\n"
+        + font("Economy & EGO Hustle:")
+        + "\n/wallet /daily /work /send amount"
+        + "\n/hustle /raid /attack /luck /heist /protect\n\n"
         + font("Powered By:")
         + " "
         + BRAND
@@ -32,21 +28,38 @@ def market_text() -> str:
 
 def games_text() -> str:
     return (
-        font("FUN & GAME CONTROL")
+        font("GAME & FUN CONTROL")
         + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Game Panel:")
-        + " /games\n"
         + font("EGO Hustle:")
         + " /hustle\n"
-        + font("Mini Games:")
+        + font("Actions:")
+        + " /raid /attack /luck /heist /protect\n"
+        + font("Telegram Fun:")
         + " /dice /dart /basketball /slot\n\n"
-        + font("Use:")
-        + " "
-        + font("Keep group activity fun, clean, and premium.")
-        + "\n\n"
         + font("Powered By:")
         + " "
         + BRAND
+    )
+
+
+def economy_text() -> str:
+    return (
+        font("ECONOMY & HUSTLE CONTROL")
+        + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Wallet:")
+        + " /wallet /balance /bal\n"
+        + font("Rewards:")
+        + " /daily /work\n"
+        + font("Transfer:")
+        + " /send amount\n"
+        + font("EGO Hustle:")
+        + " /hustle /raid /attack /luck /heist /protect\n"
+        + font("Inventory:")
+        + " /inventory /garage /vault\n"
+        + font("Market:")
+        + " /shop /setcar /setbike /gift\n\n"
+        + font("Currency:")
+        + " EGO CREDIT (EC)"
     )
 
 
@@ -55,14 +68,17 @@ def guide_text() -> str:
         font("AZAI SETUP GUIDE")
         + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         + font("MEDIA SETUP:")
-        + "\n/setstartpic - set start and help panel media\n"
+        + "\n/setstartpic - set start, help, and group welcome media\n"
         + "/setitempic item_id - set shop item image\n"
         + "/setleaderpic - set leaderboard image\n"
         + "/msettings - open media setup guide\n\n"
-        + font("FUN / GAMES:")
-        + "\n/games - open game panel\n"
-        + "/hustle - open EGO Hustle\n"
-        + "/dice /dart /basketball /slot - Telegram mini games\n\n"
+        + font("FUN & GAMES:")
+        + "\n/hustle /raid /attack /luck /heist /protect\n"
+        + "/dice /dart /basketball /slot\n\n"
+        + font("ECONOMY:")
+        + "\n/wallet /daily /work /send amount /inventory /leaderboard\n\n"
+        + font("SECURITY:")
+        + "\n/verify /verifyall /unverifyall /ownermod status\n\n"
         + font("OWNER MOD:")
         + "\n/ownermod on\n/ownermod off\n/ownermod status\n\n"
         + font("ANIME QUIZ:")
@@ -74,4 +90,5 @@ def guide_text() -> str:
 
 owner_panel.market_text = market_text
 owner_panel.games_text = games_text
+owner_panel.economy_text = economy_text
 owner_panel.guide_text = guide_text
