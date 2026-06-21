@@ -1,4 +1,4 @@
-"""AZAI owner panel media command patch."""
+"""AZAI owner panel media and fun command patch."""
 
 from AloneX import font
 from AloneX.plugins import azai_owner_panel as owner_panel
@@ -30,6 +30,26 @@ def market_text() -> str:
     )
 
 
+def games_text() -> str:
+    return (
+        font("FUN & GAME CONTROL")
+        + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("Game Panel:")
+        + " /games\n"
+        + font("EGO Hustle:")
+        + " /hustle\n"
+        + font("Mini Games:")
+        + " /dice /dart /basketball /slot\n\n"
+        + font("Use:")
+        + " "
+        + font("Keep group activity fun, clean, and premium.")
+        + "\n\n"
+        + font("Powered By:")
+        + " "
+        + BRAND
+    )
+
+
 def guide_text() -> str:
     return (
         font("AZAI SETUP GUIDE")
@@ -39,6 +59,10 @@ def guide_text() -> str:
         + "/setitempic item_id - set shop item image\n"
         + "/setleaderpic - set leaderboard image\n"
         + "/msettings - open media setup guide\n\n"
+        + font("FUN / GAMES:")
+        + "\n/games - open game panel\n"
+        + "/hustle - open EGO Hustle\n"
+        + "/dice /dart /basketball /slot - Telegram mini games\n\n"
         + font("OWNER MOD:")
         + "\n/ownermod on\n/ownermod off\n/ownermod status\n\n"
         + font("ANIME QUIZ:")
@@ -49,4 +73,5 @@ def guide_text() -> str:
 
 
 owner_panel.market_text = market_text
+owner_panel.games_text = games_text
 owner_panel.guide_text = guide_text
