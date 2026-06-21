@@ -18,8 +18,29 @@ DAILY_REWARD = 500
 WORK_COOLDOWN = 600
 LUCK_COOLDOWN = 14400
 PROTECT = {"6h": (21600, 200), "1d": (86400, 500)}
-WORKS = ["completed a delivery shift", "completed an EGO market task", "finished a garage task", "closed a client task", "completed an online work task", "handled a support task"]
-MEDIA_COMMANDS = {"setgamepic": "game", "setworkpic": "work", "setluckpic": "luck", "setleaderboardpic": "leaderboard", "setgameprofilepic": "profile"}
+WORKS = [
+    "completed a delivery shift",
+    "completed an EGO market task",
+    "finished a garage task",
+    "closed a client task",
+    "completed an online work task",
+    "handled a support task",
+]
+
+MEDIA_COMMANDS = {
+    "setgamepic": "game",
+    "sethustlepic": "game",
+    "setwalletpic": "wallet",
+    "setdailypic": "daily",
+    "setworkpic": "work",
+    "setluckpic": "luck",
+    "setprotectpic": "protect",
+    "setleaderboardpic": "leaderboard",
+    "setgameprofilepic": "profile",
+    "setraidpic": "raid",
+    "setattackpic": "attack",
+    "setheistpic": "heist",
+}
 
 
 def ts():
@@ -188,8 +209,7 @@ async def bal(event):
     reply = await event.get_reply_message()
     user = await reply.get_sender() if reply else await event.get_sender()
     data = await wallet(user.id, user)
-    await event.reply(await bal_text(user, data), buttons=back())
-    raise events.StopPropagation
+    await send(event, "wallet", await bal_text(user, data), back())
 
 
 async def daily_result(user):
@@ -202,8 +222,7 @@ async def daily_result(user):
 
 
 async def daily(event):
-    await event.reply(await daily_result(await event.get_sender()), buttons=back())
-    raise events.StopPropagation
+    await send(event, "daily", await daily_result(await event.get_sender()), back())
 
 
 async def work_result(user):
@@ -227,16 +246,14 @@ async def protect(event):
     parts = (event.raw_text or "").split(maxsplit=1)
     plan = parts[1].strip().lower() if len(parts) > 1 else ""
     if plan not in PROTECT:
-        await event.reply(font("VAULT PROTECTION") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n/protect 6h - 200 EC\n/protect 1d - 500 EC")
-        raise events.StopPropagation
+        await send(event, "protect", font("VAULT PROTECTION") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n/protect 6h - 200 EC\n/protect 1d - 500 EC", back())
     seconds, price = PROTECT[plan]
     data = await wallet(user.id, user)
     if int(data.get("balance", 0)) < price:
-        await event.reply(font("Not enough EC."))
-        raise events.StopPropagation
+        await send(event, "protect", font("Not enough EC."), back())
     await wallet_db.update_one({"user_id": int(user.id)}, {"$inc": {"balance": -price}, "$set": {"game.protection_until": ts() + seconds, "updated_at": now_ist()}}, upsert=True)
     text = font("VAULT PROTECTION") + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" + f"{uname(user)} " + font("activated vault protection.") + f"\n\n{font('Duration:')} {plan}\n{font('Paid:')} {price} {CURRENCY}"
-    await send(event, "game", text, back())
+    await send(event, "protect", text, back())
 
 
 async def luck_result(user):
@@ -289,8 +306,7 @@ async def top_text():
 
 
 async def top(event):
-    await event.reply(await top_text(), buttons=back())
-    raise events.StopPropagation
+    await send(event, "leaderboard", await top_text(), back())
 
 
 async def profile_text(user, data):
@@ -302,8 +318,7 @@ async def profile(event):
     reply = await event.get_reply_message()
     user = await reply.get_sender() if reply else await event.get_sender()
     data = await wallet(user.id, user)
-    await event.reply(await profile_text(user, data), buttons=back())
-    raise events.StopPropagation
+    await send(event, "profile", await profile_text(user, data), back())
 
 
 async def cb(event):
@@ -329,7 +344,7 @@ async def cb(event):
 
 
 async def media_cmd(event):
-    cmd = (event.raw_text or "").split()[0].lstrip("/!.").lower()
+    cmd = (event.raw_text or "").split()[0].lstrip("/!?.*#,$&\\").lower()
     key = MEDIA_COMMANDS.get(cmd)
     if key:
         await save_media(event, key)
@@ -344,6 +359,6 @@ if "zzzz_azai_ego_hustle_core" not in tbot.handlers_loaded:
     tbot.add_event_handler(luck, events.NewMessage(pattern=f"^{prefix_cmds}luck(?:@\w+)?$", incoming=True))
     tbot.add_event_handler(top, events.NewMessage(pattern=f"^{prefix_cmds}(leaderboard|top)(?:@\w+)?$", incoming=True))
     tbot.add_event_handler(profile, events.NewMessage(pattern=f"^{prefix_cmds}profile(?:@\w+)?$", incoming=True))
-    tbot.add_event_handler(media_cmd, events.NewMessage(pattern=f"^{prefix_cmds}(setgamepic|setworkpic|setluckpic|setleaderboardpic|setgameprofilepic)$", incoming=True))
+    tbot.add_event_handler(media_cmd, events.NewMessage(pattern=f"^{prefix_cmds}(setgamepic|sethustlepic|setwalletpic|setdailypic|setworkpic|setluckpic|setprotectpic|setleaderboardpic|setgameprofilepic|setraidpic|setattackpic|setheistpic)$", incoming=True))
     tbot.add_event_handler(cb, events.CallbackQuery(pattern=b"^egoh_"))
     tbot.handlers_loaded.add("zzzz_azai_ego_hustle_core")
