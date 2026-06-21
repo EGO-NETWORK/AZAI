@@ -1,4 +1,5 @@
 import os
+import random
 import re
 import time
 from collections import defaultdict, deque
@@ -18,6 +19,8 @@ FLOOD_WINDOW_SECONDS = 8
 FLOOD_LIMIT = 6
 STICKER_WINDOW_SECONDS = 20
 STICKER_LIMIT = 5
+MUTE_MINUTES = 10
+REVIEW_STRIKES = 3
 
 msg_cache = defaultdict(lambda: deque(maxlen=20))
 sticker_cache = defaultdict(lambda: deque(maxlen=20))
@@ -37,6 +40,21 @@ ABUSE_PATTERNS = [
     "saa" + "le",
 ]
 ABUSE_RE = re.compile("|".join(ABUSE_PATTERNS), re.IGNORECASE)
+
+USER_WARNINGS = [
+    "{user} yahan low-level bakchodi nahi chalegi. Seedha baat kar.",
+    "{user} tone control. Group clean rahega, drama nahi.",
+    "{user} words sambhal. Respect se baat kar, warna system handle karega.",
+    "{user} yeh group kachra zone nahi hai. Line me aa.",
+    "{user} faltu heat nahi. Seedha point bol, personal mat ja.",
+]
+
+ADMIN_WARNINGS = [
+    "{user}, admin side se thoda standard maintain karo. Group tumhe dekh ke line pakadta hai.",
+    "{user}, admin ho. Example set karo, scene mat bigado.",
+    "{user}, friendly reminder: authority ke saath tone bhi clean rakho.",
+    "{user}, group ka control tabhi premium lagta hai jab admins bhi clean bolte hain.",
+]
 
 
 def now_ist() -> str:
@@ -65,6 +83,14 @@ async def is_admin(event) -> bool:
         return bool(getattr(perms, "is_admin", False) or getattr(perms, "is_creator", False))
     except Exception:
         return False
+
+
+def mention_user(user, user_id: int) -> str:
+    username = getattr(user, "username", None)
+    if username:
+        return f"@{username}"
+    name = getattr(user, "first_name", None) or "User"
+    return f"{name} ({user_id})"
 
 
 async def safe_delete(event):
@@ -101,14 +127,6 @@ async def add_strike(chat_id: int, user_id: int, reason: str) -> int:
     return count
 
 
-def strike_text(count: int, action: str) -> str:
-    return (
-        font("💀 AZAI Saw That") + "\n\n"
-        + font("Strike:") + f" {count}/3\n"
-        + font(action)
-    )
-
-
 def review_buttons(chat_id: int, user_id: int):
     return [[
         Button.inline(font("Ban"), f"azab_ban|{chat_id}|{user_id}".encode()),
@@ -116,28 +134,66 @@ def review_buttons(chat_id: int, user_id: int):
     ]]
 
 
-async def handle_abuse(event):
-    count = await add_strike(event.chat_id, event.sender_id, "abuse")
-    await safe_delete(event)
-    if count == 1:
-        await event.respond(strike_text(count, "Warning"))
-        await send_log(font("MOD LOG") + f"\nAbuse strike 1: {event.sender_id}\nChat: {event.chat_id}")
-        return
-    if count == 2:
-        muted = await mute_user(event, 10)
-        action = "Muted for 10 minutes" if muted else "Mute failed; check admin permissions"
-        await event.respond(strike_text(count, action))
-        await send_log(font("MOD LOG") + f"\nAbuse strike 2: {event.sender_id}\nAction: {action}")
-        return
-    muted = await mute_user(event, 60)
-    action = "Muted for 60 minutes; admin review required" if muted else "Admin review required; mute failed"
-    await pending_db.update_one(
-        {"chat_id": int(event.chat_id), "user_id": int(event.sender_id)},
-        {"$set": {"chat_id": int(event.chat_id), "user_id": int(event.sender_id), "created_at": now_ist(), "status": "pending"}},
-        upsert=True,
+def user_warning_text(name: str, count: int, muted: bool) -> str:
+    line = random.choice(USER_WARNINGS).format(user=name)
+    action = f"Mute: {MUTE_MINUTES} min" if muted else "Mute failed: check AZAI admin permission"
+    return (
+        font("AZAI MODERATION") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font(line) + "\n"
+        + font("Strike:") + f" {count}/{REVIEW_STRIKES}\n"
+        + font(action)
     )
-    await event.respond(strike_text(count, action), buttons=review_buttons(event.chat_id, event.sender_id))
-    await send_log(font("MOD LOG") + f"\nAbuse strike {count}: {event.sender_id}\nAction: {action}")
+
+
+def admin_warning_text(name: str) -> str:
+    line = random.choice(ADMIN_WARNINGS).format(user=name)
+    return (
+        font("ADMIN REMINDER") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font(line) + "\n"
+        + font("Action:") + " " + font("Message removed, no mute applied.")
+    )
+
+
+def review_text(name: str, count: int, muted: bool) -> str:
+    action = f"Muted for {MUTE_MINUTES} minutes" if muted else "Mute failed; check AZAI permissions"
+    return (
+        font("ADMIN REVIEW REQUIRED") + "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        + font("User:") + f" {name}\n"
+        + font("Strike:") + f" {count}/{REVIEW_STRIKES}\n"
+        + font("Action:") + f" {action}\n\n"
+        + font("Owner/Admin, choose Ignore or Ban.")
+    )
+
+
+async def handle_abuse(event):
+    sender = await event.get_sender()
+    name = mention_user(sender, int(event.sender_id))
+    admin_user = await is_admin(event)
+    await safe_delete(event)
+
+    if admin_user:
+        await event.respond(admin_warning_text(name))
+        await send_log(font("MOD LOG") + f"\nAdmin abuse reminder: {event.sender_id}\nChat: {event.chat_id}")
+        return
+
+    count = await add_strike(event.chat_id, event.sender_id, "abuse")
+    muted = await mute_user(event, MUTE_MINUTES)
+
+    if count >= REVIEW_STRIKES:
+        await pending_db.update_one(
+            {"chat_id": int(event.chat_id), "user_id": int(event.sender_id)},
+            {"$set": {"chat_id": int(event.chat_id), "user_id": int(event.sender_id), "created_at": now_ist(), "status": "pending"}},
+            upsert=True,
+        )
+        await event.respond(review_text(name, count, muted), buttons=review_buttons(event.chat_id, event.sender_id))
+        await send_log(font("MOD LOG") + f"\nAbuse strike {count}: {event.sender_id}\nAction: review required")
+        return
+
+    await event.respond(user_warning_text(name, count, muted))
+    await send_log(font("MOD LOG") + f"\nAbuse strike {count}: {event.sender_id}\nMuted: {muted}\nChat: {event.chat_id}")
 
 
 async def handle_flood(event):
@@ -147,9 +203,9 @@ async def handle_flood(event):
     recent = [t for t in msg_cache[key] if now - t <= FLOOD_WINDOW_SECONDS]
     if len(recent) < FLOOD_LIMIT:
         return False
-    await mute_user(event, 10)
+    await mute_user(event, MUTE_MINUTES)
     await safe_delete(event)
-    await event.respond(font("💀 Chat Locked") + "\n\n" + font("Flood detected. Muted for 10 minutes."))
+    await event.respond(font("CHAT LOCKED") + "\n\n" + font(f"Flood detected. Muted for {MUTE_MINUTES} minutes."))
     await send_log(font("MOD LOG") + f"\nFlood mute: {event.sender_id}\nChat: {event.chat_id}")
     msg_cache[key].clear()
     return True
@@ -164,9 +220,9 @@ async def handle_sticker_spam(event):
     recent = [t for t in sticker_cache[key] if now - t <= STICKER_WINDOW_SECONDS]
     if len(recent) < STICKER_LIMIT:
         return False
-    await mute_user(event, 10)
+    await mute_user(event, MUTE_MINUTES)
     await safe_delete(event)
-    await event.respond(font("💀 Chat Locked") + "\n\n" + font("Sticker spam detected. Muted for 10 minutes."))
+    await event.respond(font("CHAT LOCKED") + "\n\n" + font(f"Sticker spam detected. Muted for {MUTE_MINUTES} minutes."))
     await send_log(font("MOD LOG") + f"\nSticker spam mute: {event.sender_id}\nChat: {event.chat_id}")
     sticker_cache[key].clear()
     return True
@@ -175,7 +231,7 @@ async def handle_sticker_spam(event):
 async def abuse_guard(event):
     if event.is_private or (event.is_channel and not event.is_group):
         return
-    if not event.sender_id or await is_admin(event):
+    if not event.sender_id:
         return
     text = event.raw_text or ""
     if text.strip() and text.strip()[0] in prefix_cmds:
@@ -204,7 +260,7 @@ async def abuse_review_callback(event):
         try:
             await event.client.edit_permissions(chat_id, user_id, view_messages=False)
             await pending_db.update_one({"chat_id": chat_id, "user_id": user_id}, {"$set": {"status": "banned", "reviewed_at": now_ist()}}, upsert=True)
-            await event.edit(font("💀 Access Denied") + "\n\n" + font("User banned by admin review."))
+            await event.edit(font("ACCESS DENIED") + "\n\n" + font("User banned by admin review."))
             await send_log(font("MOD LOG") + f"\nReview ban: {user_id}\nChat: {chat_id}")
         except Exception:
             await event.answer(font("Ban failed. Check permissions."), alert=True)
