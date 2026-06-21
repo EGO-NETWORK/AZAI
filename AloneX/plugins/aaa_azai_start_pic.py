@@ -55,6 +55,10 @@ def brand() -> str:
     return font("EGO Network - EST. 2026")
 
 
+def cmd_line(command: str, usage: str) -> str:
+    return f"{command} - {font(usage)}\n"
+
+
 def start_text() -> str:
     uptime = readable_time(time.time() - START_TIME)
     ist_time = datetime.now(IST).strftime("%d %b %Y - %I:%M:%S %p")
@@ -102,7 +106,8 @@ def help_text() -> str:
     return (
         font("AZAI HELP & COMMANDS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Choose a panel below.") + "\n\n"
+        + font("Choose a panel below.") + "\n"
+        + font("Each command includes its use in English.") + "\n\n"
         + font("Core, Owner, Economy, Market, Family, Games, Media, System")
     )
 
@@ -111,7 +116,11 @@ def core_text() -> str:
     return (
         font("CORE COMMANDS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + "/start\n/help\n/ping\n/alive\n/repo"
+        + cmd_line("/start", "Open the official AZAI start panel")
+        + cmd_line("/help", "Open the help and command menu")
+        + cmd_line("/ping", "Check bot response speed")
+        + cmd_line("/alive", "Check if AZAI is online")
+        + cmd_line("/repo", "Show project repository information")
     )
 
 
@@ -119,7 +128,13 @@ def owner_text() -> str:
     return (
         font("OWNER COMMANDS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + "/owner\n/settings\n/logstatus\n/logon\n/logoff"
+        + cmd_line("/owner", "Open MR EGO owner control panel")
+        + cmd_line("/settings", "Open group settings panel")
+        + cmd_line("/msettings", "Open media settings panel")
+        + cmd_line("/broadcast", "Send an official broadcast")
+        + cmd_line("/logstatus", "Check logger status")
+        + cmd_line("/logon", "Enable private and group logger")
+        + cmd_line("/logoff", "Disable private and group logger")
     )
 
 
@@ -127,7 +142,13 @@ def economy_text() -> str:
     return (
         font("ECONOMY COMMANDS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + "/wallet\n/balance\n/daily\n/send\n/leaderboard"
+        + cmd_line("/wallet", "Open your wallet panel")
+        + cmd_line("/balance or /bal", "Check your EC balance and XP")
+        + cmd_line("/daily", "Claim your daily EC reward")
+        + cmd_line("/work", "Earn EC through activity jobs")
+        + cmd_line("/send amount", "Transfer EC to another user by reply")
+        + cmd_line("/leaderboard", "View the richest users leaderboard")
+        + cmd_line("/inventory", "View your owned items")
     )
 
 
@@ -135,7 +156,12 @@ def market_text() -> str:
     return (
         font("MARKET COMMANDS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + "/shop\n/inventory\n/garage\n/setbike item_id\n/setcar item_id"
+        + cmd_line("/shop", "Open the item shop")
+        + cmd_line("/inventory", "View your purchased items")
+        + cmd_line("/garage", "View your cars and bikes")
+        + cmd_line("/setbike item_id", "Set your active bike")
+        + cmd_line("/setcar item_id", "Set your active car")
+        + cmd_line("/gift item_name", "Gift an item by replying to a user")
     )
 
 
@@ -143,7 +169,12 @@ def family_text() -> str:
     return (
         font("FAMILY COMMANDS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + "/brother\n/sister\n/adopt\n/family\n/familytree\n/leavefamily"
+        + cmd_line("/brother", "Send a brother relation request")
+        + cmd_line("/sister", "Send a sister relation request")
+        + cmd_line("/adopt", "Send an adoption relation request")
+        + cmd_line("/family", "View your saved family relations")
+        + cmd_line("/familytree", "Open your family tree panel")
+        + cmd_line("/leavefamily", "Leave your current family relation")
     )
 
 
@@ -151,8 +182,13 @@ def games_text() -> str:
     return (
         font("GAMES COMMANDS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + "/dice\n/dart\n/basketball\n/slot\n\n"
-        + font("Use games in group for fun and activity.")
+        + cmd_line("/hustle", "Open EGO Hustle economy game panel")
+        + cmd_line("/dice", "Play the Telegram dice mini game")
+        + cmd_line("/dart", "Play the dart mini game")
+        + cmd_line("/basketball", "Play the basketball mini game")
+        + cmd_line("/slot", "Play the slot machine mini game")
+        + "\n"
+        + font("Use games in groups for fun, activity, and rewards.")
     )
 
 
@@ -160,7 +196,10 @@ def media_text() -> str:
     return (
         font("MEDIA COMMANDS") + "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + "/setstartpic\n/setitempic item_id\n/setleaderpic"
+        + cmd_line("/setstartpic", "Set start and help panel media")
+        + cmd_line("/setitempic item_id", "Attach media to a shop item")
+        + cmd_line("/setleaderpic", "Set leaderboard media card")
+        + cmd_line("/msettings", "Open media setup guide")
     )
 
 
