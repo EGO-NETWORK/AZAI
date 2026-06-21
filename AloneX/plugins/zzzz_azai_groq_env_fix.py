@@ -1,6 +1,6 @@
 import os
 
-from AloneX.plugins import azai_ai_chat as chat
+from AloneX.plugins import chatbot as chat
 
 
 def fixed_groq_key() -> str:
@@ -8,4 +8,4 @@ def fixed_groq_key() -> str:
 
 
 chat.GROQ_API_KEY = fixed_groq_key()
-chat.groq_key = fixed_groq_key
+chat.groq_key = fixed_groq_key()
