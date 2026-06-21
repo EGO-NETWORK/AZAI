@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 import pytz
-from telethon import events, functions
+from telethon import events, functions, types
 
 from AloneX import database, font, prefix_cmds, tbot
 import config
@@ -136,6 +136,21 @@ async def private_start_logger(event):
     )
 
 
+async def log_group_snapshot(chat, added_by=None, title="AZAI GROUP LOGGER"):
+    group_title = getattr(chat, "title", None) or "Unknown"
+    cid = getattr(chat, "id", None)
+    link = await group_link(chat)
+    await send_log(
+        f"{title}\n"
+        "━━━━━━━━━━━━━━━━━━\n"
+        f"Group: {group_title}\n"
+        f"Chat ID: {cid}\n"
+        f"Link: {link}\n"
+        f"Added By: {user_line(added_by)}\n"
+        f"Time: {now_ist()}"
+    )
+
+
 async def group_add_logger(event):
     try:
         me = await tbot.get_me()
@@ -149,20 +164,22 @@ async def group_add_logger(event):
             added_by = await event.get_added_by()
         except Exception:
             pass
-        title = getattr(chat, "title", None) or "Unknown"
-        cid = getattr(chat, "id", None)
-        link = await group_link(chat)
-        await send_log(
-            "AZAI ADDED TO GROUP\n"
-            "━━━━━━━━━━━━━━━━━━\n"
-            f"Group: {title}\n"
-            f"Chat ID: {cid}\n"
-            f"Link: {link}\n"
-            f"Added By: {user_line(added_by)}\n"
-            f"Time: {now_ist()}"
-        )
+        await log_group_snapshot(chat, added_by=added_by, title="AZAI ADDED TO GROUP")
     except Exception as e:
         print(f"AZAI Group Logger Error: {e}")
+
+
+async def admin_update_logger(update):
+    try:
+        me = await tbot.get_me()
+        if not isinstance(update, types.UpdateChannelParticipant):
+            return
+        if int(getattr(update, "user_id", 0) or 0) != int(me.id):
+            return
+        chat = await tbot.get_entity(types.PeerChannel(update.channel_id))
+        await log_group_snapshot(chat, title="AZAI GROUP PERMISSION UPDATED")
+    except Exception as e:
+        print(f"AZAI Admin Logger Error: {e}")
 
 
 if "azai_group_logger" not in tbot.handlers_loaded:
@@ -171,4 +188,5 @@ if "azai_group_logger" not in tbot.handlers_loaded:
     tbot.add_event_handler(logstatus_cmd, events.NewMessage(pattern=f"^{prefix_cmds}logstatus(?:@\w+)?$", incoming=True))
     tbot.add_event_handler(private_start_logger, events.NewMessage(pattern=f"^{prefix_cmds}start(?:@\w+)?$", incoming=True))
     tbot.add_event_handler(group_add_logger, events.ChatAction())
+    tbot.add_event_handler(admin_update_logger, events.Raw())
     tbot.handlers_loaded.add("azai_group_logger")
