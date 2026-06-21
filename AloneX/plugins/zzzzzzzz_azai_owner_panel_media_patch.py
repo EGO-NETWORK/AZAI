@@ -10,13 +10,20 @@ def market_text() -> str:
     return (
         font("MEDIA & COMMAND CONTROL")
         + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("Media Setup:")
-        + "\n/setstartpic - set start, help, and group welcome media"
-        + "\n/setleaderpic - set leaderboard image"
-        + "\n/setitempic item_id - set shop/item image"
-        + "\n/msettings - open media setup guide\n\n"
+        + font("Main Media:")
+        + "\n/setstartpic - start, help, and group welcome media"
+        + "\n/setleaderpic - leaderboard image"
+        + "\n/setitempic item_id - shop/item image"
+        + "\n/msettings - media setup guide\n\n"
+        + font("EGO Hustle Media:")
+        + "\n/sethustlepic /setwalletpic /setdailypic /setworkpic"
+        + "\n/setraidpic /setattackpic /setluckpic /setheistpic /setprotectpic\n\n"
+        + font("Custom Fun Commands:")
+        + "\n/addfuncmd command | response text"
+        + "\n/setfuncmdpic command"
+        + "\n/delfuncmd command /funcmds\n\n"
         + font("Fun Commands:")
-        + "\n/dice /dart /basketball /slot\n\n"
+        + "\n/dice /dart /basketball /slot /huggy /pat /highfive\n\n"
         + font("Economy & EGO Hustle:")
         + "\n/wallet /daily /work /send amount"
         + "\n/hustle /raid /attack /luck /heist /protect\n\n"
@@ -35,7 +42,11 @@ def games_text() -> str:
         + font("Actions:")
         + " /raid /attack /luck /heist /protect\n"
         + font("Telegram Fun:")
-        + " /dice /dart /basketball /slot\n\n"
+        + " /dice /dart /basketball /slot\n"
+        + font("Custom Fun:")
+        + " /huggy /pat /highfive /funcmds\n\n"
+        + font("Owner Setup:")
+        + " /addfuncmd /setfuncmdpic /delfuncmd\n\n"
         + font("Powered By:")
         + " "
         + BRAND
@@ -58,6 +69,8 @@ def economy_text() -> str:
         + " /inventory /garage /vault\n"
         + font("Market:")
         + " /shop /setcar /setbike /gift\n\n"
+        + font("Media:")
+        + " /setdailypic /setraidpic /setattackpic /setheistpic\n\n"
         + font("Currency:")
         + " EGO CREDIT (EC)"
     )
@@ -67,24 +80,27 @@ def guide_text() -> str:
     return (
         font("AZAI SETUP GUIDE")
         + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("MEDIA SETUP:")
-        + "\n/setstartpic - set start, help, and group welcome media\n"
-        + "/setitempic item_id - set shop item image\n"
-        + "/setleaderpic - set leaderboard image\n"
-        + "/msettings - open media setup guide\n\n"
+        + font("MAIN MEDIA:")
+        + "\n/setstartpic - start, help, and group welcome media\n"
+        + "/setitempic item_id - shop item image\n"
+        + "/setleaderpic - leaderboard image\n"
+        + "/msettings - media setup guide\n\n"
+        + font("EGO HUSTLE MEDIA:")
+        + "\n/sethustlepic /setwalletpic /setdailypic /setworkpic\n"
+        + "/setraidpic /setattackpic /setluckpic /setheistpic /setprotectpic\n\n"
+        + font("CUSTOM FUN MEDIA:")
+        + "\n/addfuncmd command | response text\n"
+        + "/setfuncmdpic command\n"
+        + "/delfuncmd command\n/funcmds\n\n"
         + font("FUN & GAMES:")
         + "\n/hustle /raid /attack /luck /heist /protect\n"
-        + "/dice /dart /basketball /slot\n\n"
+        + "/dice /dart /basketball /slot /huggy /pat /highfive\n\n"
         + font("ECONOMY:")
         + "\n/wallet /daily /work /send amount /inventory /leaderboard\n\n"
         + font("SECURITY:")
         + "\n/verify /verifyall /unverifyall /ownermod status\n\n"
         + font("OWNER MOD:")
-        + "\n/ownermod on\n/ownermod off\n/ownermod status\n\n"
-        + font("ANIME QUIZ:")
-        + "\n/addanimeq answer | option1 | option2 | option3 | option4\n/animeguess\n\n"
-        + font("EVENTS:")
-        + "\n/events\n/addevent DD/MM | title | text\n"
+        + "\n/ownermod on\n/ownermod off\n/ownermod status\n"
     )
 
 
