@@ -38,13 +38,13 @@ ALONE_OWNER_ID = int(getenv("ALONE_OWNER_ID", "0"))
 # Chat id of a group for logging bot's activities
 LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", "0"))
 
-SUPPORT_GROUP = getenv("SUPPORT_GROUP", "https://t.me/EikoUpdates")
+SUPPORT_GROUP = getenv("SUPPORT_GROUP", "https://t.me/EGOxSUPPORT")
 
-START_IMG_URL = getenv("START_IMG_URL", "https://files.catbox.moe/1gxuh7.jpg")
+START_IMG_URL = getenv("START_IMG_URL", "")
 
 
-SUPPORT_CHAT = getenv('SUPPORT_CHAT', 'EikoUpdates')
-UPDATE_CHANNEL = getenv('UPDATE_CHANNEL', 'EikoUpdates')
+SUPPORT_CHAT = getenv('SUPPORT_CHAT', 'EGOxSUPPORT')
+UPDATE_CHANNEL = getenv('UPDATE_CHANNEL', 'EGOxUPDATES')
 
 _logs_channel = getenv('LOGS_CHANNEL') or getenv('LOG_GROUP_ID') or getenv('LOGGER_ID')
 if _logs_channel:
@@ -56,8 +56,8 @@ else:
     LOGS_CHANNEL = None
 
 LOGGER_ID = int(getenv('LOGGER_ID', '0'))
-BOT_USERNAME = getenv('BOT_USERNAME', '@oxnybot')
-BOT_NAME = getenv('BOT_NAME', 'Eiko')
+BOT_USERNAME = getenv('BOT_USERNAME', '@Urxazaibot')
+BOT_NAME = getenv('BOT_NAME', 'AZAI')
 IS_WEB_SUP = getenv('IS_WEB_SUP', 'True').lower() == 'true'
 
 SUDO_USERS = [int(x) for x in getenv("SUDO_USERS", "8458947967").split() if x.isdigit()]
@@ -84,7 +84,7 @@ GIST_TOKEN = getenv('GIST_TOKEN')
 
 
 # keep alive ( web support )
-WEB_URL = getenv('WEB_URL', "https://t.me/ForRealAlone")
+WEB_URL = getenv('WEB_URL', "https://t.me/EGOxSUPPORT")
 
 KEEP_ALIVE = getenv('KEEP_ALIVE', 'True').lower() == 'true'
 PORT = int(os.environ.get("PORT", 8080))
@@ -98,17 +98,17 @@ BTN_ROWS = int(getenv('BTN_ROWS', '6'))
 
 
 # some media source
-PM_START_IMG = getenv('PM_START_IMG', "https://files.catbox.moe/1gxuh7.jpg")
+PM_START_IMG = getenv('PM_START_IMG', "")
 
-HELP_CMD_IMG = getenv('HELP_CMD_IMG', "https://files.catbox.moe/1gxuh7.jpg")
-
-
-HELP_MODULE_IMG = getenv('HELP_MODULE_IMG', "https://files.catbox.moe/1gxuh7.jpg")
-
-START_IMG = getenv('START_IMG', "https://files.catbox.moe/1gxuh7.jpg")
+HELP_CMD_IMG = getenv('HELP_CMD_IMG', "")
 
 
-FORCE_JOIN_IMG = getenv('FORCE_JOIN_IMG', "https://files.catbox.moe/1gxuh7.jpg")
+HELP_MODULE_IMG = getenv('HELP_MODULE_IMG', "")
+
+START_IMG = getenv('START_IMG', "")
+
+
+FORCE_JOIN_IMG = getenv('FORCE_JOIN_IMG', "")
 
 AF_START_STICKERS = [
   "CAACAgUAAxkBAAEBrV9nWukpft8gmtrZVMkbO4GKlZy0HQACWxUAAnHv2FZkjr7WjG3OjzYE",
@@ -118,7 +118,7 @@ AF_START_STICKERS = [
 
 STICKERS = {
 "CAACAgQAAxkBAAECdO1ndW8ICjKDXuzrYsEo5hqQbVw6rAAC7w4AAjULSFDuxCh0capMYDYE",
-"CAACAgQAAxkBAAECdPBndW8Sdvfw4Ppj87fy_npiIdJfDwACPBEAAg1eUVAboAI8ZLYkXTYE",
+"CAACAgQAAxkBAAECdPBndW8Sdvfw4Ppj87fy_npiIdJfDwACPBEAAwIAA3kAAzYE",
 "CAACAgQAAxkBAAECdPNndW8utxbCZtWzQmf5ZsttjCmgjwACfhIAApO7UVDWdRWcykiwuDYE",
 "CAACAgQAAxkBAAECdPZndW9Suh_gnSo8lD3WAsbCiISpYAACyA4AAiOqKVKUg3R3m5-gqjYE",
 "CAACAgQAAxkBAAECdPlndW9cYXPSw39cyQHvE6nEdNB2JQACCBIAAtn8IFK1g1MaQBON0TYE",
@@ -180,14 +180,13 @@ AF_PHOTOS = [
 
 
 
-
 #autofilter & file store
 AF_USERS = []
 AF_USERS.extend(DEV_LIST) # load devs
 
 STREAM_MOD = getenv('STREAM_MOD', 'False').lower() == 'true'
 AF_FILE_DEL_TIME = int(getenv('AF_FILE_DEL_TIME', str(30*60)))
-AF_SUB_CHAT = getenv('AF_SUB_CHAT', "@AloneUpdates")
+AF_SUB_CHAT = getenv('AF_SUB_CHAT', "@EGOxUPDATES")
 FILE_DB_CHANNEL = int(getenv('FILE_DB_CHANNEL', '0')) # file store channel
 AF_SUB_TEXT = getenv('AF_SUB_TEXT', """
 <blockquote><b>
