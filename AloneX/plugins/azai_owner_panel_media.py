@@ -1,4 +1,4 @@
-"""AZAI owner panel media, games, and economy command guide."""
+"""AZAI owner panel media, games, economy, and manual setup guide."""
 
 from AloneX import font
 from AloneX.plugins import azai_owner_panel as owner_panel
@@ -78,29 +78,57 @@ def economy_text() -> str:
 
 def guide_text() -> str:
     return (
-        font("AZAI SETUP GUIDE")
+        font("AZAI MANUAL SETUP GUIDE")
         + "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        + font("MAIN MEDIA:")
-        + "\n/setstartpic - start, help, and group welcome media\n"
-        + "/setitempic item_id - shop item image\n"
-        + "/setleaderpic - leaderboard image\n"
-        + "/msettings - media setup guide\n\n"
-        + font("EGO HUSTLE MEDIA:")
-        + "\n/sethustlepic /setwalletpic /setdailypic /setworkpic\n"
-        + "/setraidpic /setattackpic /setluckpic /setheistpic /setprotectpic\n\n"
-        + font("CUSTOM FUN MEDIA:")
-        + "\n/addfuncmd command | response text\n"
-        + "/setfuncmdpic command\n"
-        + "/delfuncmd command\n/funcmds\n\n"
-        + font("FUN & GAMES:")
-        + "\n/hustle /raid /attack /luck /heist /protect\n"
-        + "/dice /dart /basketball /slot /huggy /pat /highfive\n\n"
-        + font("ECONOMY:")
-        + "\n/wallet /daily /work /send amount /inventory /leaderboard\n\n"
-        + font("SECURITY:")
-        + "\n/verify /verifyall /unverifyall /ownermod status\n\n"
-        + font("OWNER MOD:")
-        + "\n/ownermod on\n/ownermod off\n/ownermod status\n"
+        + font("1. MAIN MEDIA SETUP")
+        + "\nSend image/video in chat, reply to it, then use:"
+        + "\n/setstartpic - Start, help, and welcome panel media"
+        + "\n/setleaderpic - Leaderboard card media"
+        + "\n/msettings - Open media settings panel\n\n"
+        + font("2. EGO HUSTLE MEDIA")
+        + "\nReply to image/video, then use the matching command:"
+        + "\n/sethustlepic - EGO HUSTLE home"
+        + "\n/setwalletpic - Wallet card"
+        + "\n/setdailypic - Daily reward"
+        + "\n/setworkpic - Work mode"
+        + "\n/setraidpic - Raid mode"
+        + "\n/setattackpic - Attack mode"
+        + "\n/setluckpic - Luck mode"
+        + "\n/setheistpic - Heist mode"
+        + "\n/setprotectpic - Protection mode\n\n"
+        + font("3. SHOP / ITEM MEDIA")
+        + "\nReply to item image, then use:"
+        + "\n/setitempic item_id"
+        + "\nExample: /setitempic cat"
+        + "\nThen users can see/purchase/gift that item from shop/market.\n\n"
+        + font("4. CUSTOM FUN COMMANDS")
+        + "\n/addfuncmd command | response text"
+        + "\nExample: /addfuncmd huggy | hugs you softly"
+        + "\n/setfuncmdpic command - reply to image/sticker/GIF first"
+        + "\n/delfuncmd command - delete custom fun command"
+        + "\n/funcmds - list custom fun commands\n\n"
+        + font("5. READY FUN COMMANDS")
+        + "\n/huggy /hug /pat /highfive /dice /dart /basketball /slot"
+        + "\nIf a fun command does not show media, set its media with /setfuncmdpic when supported.\n\n"
+        + font("6. GARAGE / MARKET")
+        + "\n/garage - open garage panel when available"
+        + "\n/shop or /market - open item shop"
+        + "\n/inventory or /inv - user inventory"
+        + "\n/gift item_id - reply to a user and gift item\n\n"
+        + font("7. EVENTS / FESTIVALS")
+        + "\n/addfestival title | religion | message"
+        + "\n/delfestival title"
+        + "\n/festivals - list saved festivals"
+        + "\n/religion hindu/muslim/christian/sikh/buddhist/jain/all"
+        + "\n/festivalauto on/off/status\n\n"
+        + font("8. OWNER SAFETY")
+        + "\nNever paste token, API hash, Mongo URL, or cookies in public."
+        + "\nOwner commands require correct OWNER_ID and ALONE_OWNER_ID in .env."
+        + "\nIf /owner says owner-only, check numeric Telegram ID and anonymous admin mode.\n\n"
+        + font("9. CHAT-OFF MODE")
+        + "\nKeep brain/personality/tone/real_alive chat plugins disabled."
+        + "\nKeep reaction.py for emoji reactions."
+        + "\nUse /reaction on to enable emoji reactions."
     )
 
 
