@@ -1,4 +1,4 @@
-"""AZAI owner panel media, games, and economy command patch."""
+"""AZAI owner panel media, games, and economy command guide."""
 
 from AloneX import font
 from AloneX.plugins import azai_owner_panel as owner_panel
